@@ -22,6 +22,9 @@ interface CaseData {
   fileSize?: string;
   fileName?: string;
   investigator?: string;
+  leadInvestigator?: string;
+  department?: string;
+  caseType?: string;
   priority?: string;
   location?: string;
 }
@@ -183,7 +186,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
               </p>
             </div>
 
-            {caseData.investigator && (
+            {(caseData.leadInvestigator || caseData.investigator) && (
               <div className="flex items-center space-x-2">
                 <User className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                 <div>
@@ -191,9 +194,31 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
                     Lead Investigator
                   </label>
                   <p className="text-gray-900 dark:text-slate-100">
-                    {caseData.investigator}
+                    {caseData.leadInvestigator || caseData.investigator}
                   </p>
                 </div>
+              </div>
+            )}
+
+            {caseData.department && (
+              <div>
+                <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                  Department
+                </label>
+                <p className="text-gray-900 dark:text-slate-100">
+                  {caseData.department}
+                </p>
+              </div>
+            )}
+
+            {caseData.caseType && (
+              <div>
+                <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                  Case Type
+                </label>
+                <p className="text-gray-900 dark:text-slate-100">
+                  {caseData.caseType}
+                </p>
               </div>
             )}
 
