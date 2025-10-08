@@ -4,15 +4,18 @@ import { useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, FileText, X } from "lucide-react";
+import { CaseCreationModal, CaseFormData } from "./case-creation-modal";
 
 interface UploadBoxProps {
   onFileUpload?: (file: File) => void;
+  onCaseCreated?: (caseData: CaseFormData) => void;
 }
 
-export function UploadBox({ onFileUpload }: UploadBoxProps) {
+export function UploadBox({ onFileUpload, onCaseCreated }: UploadBoxProps) {
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [error, setError] = useState<string>("");
+  const [showCaseModal, setShowCaseModal] = useState(false);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -56,6 +59,8 @@ export function UploadBox({ onFileUpload }: UploadBoxProps) {
         if (validateFile(file)) {
           setUploadedFile(file);
           onFileUpload?.(file);
+          // Open case creation modal for .ufdr files
+          setShowCaseModal(true);
         }
       }
     },
@@ -68,6 +73,8 @@ export function UploadBox({ onFileUpload }: UploadBoxProps) {
       if (validateFile(file)) {
         setUploadedFile(file);
         onFileUpload?.(file);
+        // Open case creation modal for .ufdr files
+        setShowCaseModal(true);
       }
     }
   };
@@ -75,6 +82,16 @@ export function UploadBox({ onFileUpload }: UploadBoxProps) {
   const removeFile = () => {
     setUploadedFile(null);
     setError("");
+  };
+
+  const handleCaseCreated = (caseData: CaseFormData) => {
+    onCaseCreated?.(caseData);
+    setShowCaseModal(false);
+  };
+
+  const handleModalClose = () => {
+    setShowCaseModal(false);
+    // Don't remove the file when modal is cancelled, just close the modal
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -177,6 +194,14 @@ export function UploadBox({ onFileUpload }: UploadBoxProps) {
           </p>
         </div>
       </CardContent>
+
+      {/* Case Creation Modal */}
+      <CaseCreationModal
+        isOpen={showCaseModal}
+        onClose={handleModalClose}
+        onCreateCase={handleCaseCreated}
+        fileName={uploadedFile?.name || ""}
+      />
     </Card>
   );
 }
