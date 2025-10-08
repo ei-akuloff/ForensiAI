@@ -7,7 +7,7 @@ import { ClientWrapper } from "@/components/client-wrapper";
 
 export function Navbar() {
   const pathname = usePathname();
-  const isDashboard = pathname?.startsWith("/dashboard");
+  const isDashboard = pathname?.startsWith("/dashboard") || pathname?.startsWith("/cases");
 
   return (
     <ClientWrapper>
@@ -38,7 +38,11 @@ export function Navbar() {
                     </Link>
                     <button
                       onClick={() => {
-                        // TODO: Implement logout logic
+                        // Clear any user session data if needed
+                        if (typeof window !== 'undefined') {
+                          // You can add more logout logic here like clearing tokens, etc.
+                          localStorage.removeItem('user_session');
+                        }
                         window.location.href = "/";
                       }}
                       className="text-slate-600 hover:text-red-600 dark:text-slate-300 dark:hover:text-red-400 transition-colors"

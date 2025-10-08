@@ -10,6 +10,7 @@ import { CaseMap } from "@/components/case-map";
 import { CaseChatbot } from "@/components/case-chatbot";
 import { CaseExport } from "@/components/case-export";
 import { ClientWrapper } from "@/components/client-wrapper";
+import { useCases } from "@/components/case-context";
 
 type SidebarItem =
   | "overview"
@@ -19,32 +20,36 @@ type SidebarItem =
   | "chatbot"
   | "export";
 
-// Dummy case data - in real app, this would come from API
-const getCaseData = (id: string) => ({
-  id,
-  name: `Case #2024-${id.padStart(3, "0")}`,
-  dateOpened: "2024-01-15",
-  status: "completed" as const,
-  description: "iPhone 14 Pro data extraction and analysis",
-  fileSize: "2.3 GB",
-  fileName: "evidence_mobile_device.ufdr",
-  investigator: "Agent Smith",
-  priority: "High",
-  location: "New York, NY",
-});
-
 export default function CaseDetailsPage() {
   const params = useParams();
   const caseId = params.id as string;
   const [activeSection, setActiveSection] = useState<SidebarItem>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  const { getCaseById } = useCases();
+  const caseData = getCaseById(caseId);
 
-  const caseData = getCaseData(caseId);
+  // Fallback case data if case not found (for backward compatibility)
+  const fallbackCaseData = {
+    id: caseId,
+    name: `Case #2024-${caseId.padStart(3, "0")}`,
+    dateOpened: "2024-01-15",
+    status: "completed" as const,
+    description: "iPhone 14 Pro data extraction and analysis",
+    fileSize: "2.3 GB",
+    fileName: "evidence_mobile_device.ufdr",
+    leadInvestigator: "Agent Smith",
+    priority: "High",
+    department: "Cybercrime Unit",
+    caseType: "Mobile Device",
+  };
+
+  const displayCaseData = caseData || fallbackCaseData;
 
   const renderMainContent = () => {
     switch (activeSection) {
       case "overview":
-        return <CaseOverview caseData={caseData} />;
+        return <CaseOverview caseData={displayCaseData} />;
       case "timeline":
         return <CaseTimeline caseId={caseId} />;
       case "graphs":
@@ -54,22 +59,22 @@ export default function CaseDetailsPage() {
       case "chatbot":
         return <CaseChatbot caseId={caseId} />;
       case "export":
-        return <CaseExport caseData={caseData} />;
+        return <CaseExport caseData={displayCaseData} />;
       default:
-        return <CaseOverview caseData={caseData} />;
+        return <CaseOverview caseData={displayCaseData} />;
     }
   };
 
   return (
     <ClientWrapper>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <div className="flex h-screen">
+        <div className="flex" style={{ height: 'calc(100vh - 64px)' }}>
           {/* Sidebar - Desktop */}
           <div className="hidden lg:block">
             <Sidebar
               activeSection={activeSection}
               setActiveSection={setActiveSection}
-              caseData={caseData}
+              caseData={displayCaseData}
             />
           </div>
 
@@ -83,7 +88,7 @@ export default function CaseDetailsPage() {
                 <Sidebar
                   activeSection={activeSection}
                   setActiveSection={setActiveSection}
-                  caseData={caseData}
+                  caseData={displayCaseData}
                   onItemClick={() => setSidebarOpen(false)}
                 />
               </div>
@@ -97,7 +102,7 @@ export default function CaseDetailsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-                    {caseData.name}
+                    {displayCaseData.name}
                   </h1>
                   <p className="text-sm text-slate-500 dark:text-slate-400 capitalize">
                     {activeSection}

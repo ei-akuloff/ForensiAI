@@ -4,6 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
+import { CaseProvider } from "@/components/case-context";
+import { ClientOnly } from "@/components/client-only";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,10 +38,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="min-h-screen flex flex-col bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-          </div>
+          <ClientOnly>
+            <CaseProvider>
+              <div className="min-h-screen flex flex-col bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100">
+                <Navbar />
+                <main className="flex-1">{children}</main>
+              </div>
+            </CaseProvider>
+          </ClientOnly>
         </ThemeProvider>
       </body>
     </html>

@@ -3,20 +3,63 @@
 import { StatsCard } from "@/components/stats-card";
 import { UploadBox } from "@/components/upload-box";
 import { CaseList } from "@/components/case-list";
+import { useCases } from "@/components/case-context";
+import { CaseFormData } from "@/components/case-creation-modal";
 import { FolderOpen, Clock, CheckCircle, TrendingUp } from "lucide-react";
+import { uploadUFDRFile, generateSessionId } from "@/lib/backend-service";
+import { useState } from "react";
 
 export default function DashboardPage() {
-  // Dummy stats data - replace with real data from API
+  const { cases, addCase, updateCase } = useCases();
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
+  // Calculate stats from actual cases
   const stats = {
-    totalCases: 127,
-    ongoingCases: 23,
-    completedCases: 104,
+    totalCases: cases.length,
+    ongoingCases: cases.filter(c => c.status === "ongoing").length,
+    completedCases: cases.filter(c => c.status === "completed").length,
   };
 
-  const handleFileUpload = (file: File) => {
-    // Handle file upload logic here
-    console.log("Uploaded file:", file.name);
-    // TODO: Implement file upload to backend
+  const handleFileUpload = async (file: File) => {
+    // Store the file for later upload when case is created
+    setUploadedFile(file);
+  };
+
+  const handleCaseCreated = async (caseData: CaseFormData) => {
+    const newCaseId = addCase(caseData);
+    
+    // Upload the file to the backend if one was selected
+    if (uploadedFile) {
+      try {
+        const sessionId = generateSessionId(newCaseId);
+        
+        // Update case to show processing status
+        updateCase(newCaseId, { fileSize: "Processing..." });
+        
+        const uploadResponse = await uploadUFDRFile(uploadedFile, sessionId);
+        
+        // Update case with upload results
+        const fileSizeMB = (uploadedFile.size / (1024 * 1024)).toFixed(2);
+        updateCase(newCaseId, { 
+          fileSize: `${fileSizeMB} MB`,
+          description: `${caseData.description}\n\nProcessed ${uploadResponse.chunks} chunks successfully.`
+        });
+        
+        console.log("File uploaded successfully:", uploadResponse);
+        
+        // Store session ID for later use in chatbot
+        localStorage.setItem(`case_${newCaseId}_session`, sessionId);
+        
+      } catch (error) {
+        console.error("Upload failed:", error);
+        updateCase(newCaseId, { 
+          fileSize: "Upload failed",
+          description: `${caseData.description}\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`
+        });
+      } finally {
+        setUploadedFile(null);
+      }
+    }
   };
 
   return (
@@ -62,7 +105,7 @@ export default function DashboardPage() {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">
             New Analysis
           </h2>
-          <UploadBox onFileUpload={handleFileUpload} />
+          <UploadBox onFileUpload={handleFileUpload} onCaseCreated={handleCaseCreated} />
         </div>
 
         {/* Past Cases Section */}

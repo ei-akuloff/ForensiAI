@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,11 @@ import {
   Search,
   FileText,
   Clock,
+  Globe,
+  ChevronDown,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import { queryDocuments } from "@/lib/backend-service";
 
 interface Message {
   id: string;
@@ -21,47 +25,12 @@ interface Message {
   sender: "user" | "ai";
   timestamp: string;
   suggestions?: string[];
+  detectedLanguage?: string;
 }
 
 interface CaseChatbotProps {
   caseId: string;
 }
-
-// Dummy conversation data
-const initialMessages: Message[] = [
-  {
-    id: "1",
-    content:
-      "Hello! I'm ForensiAI Assistant. I can help you analyze this case. What would you like to know?",
-    sender: "ai",
-    timestamp: "2024-01-15T09:00:00Z",
-    suggestions: [
-      "What files were recovered?",
-      "Show me the timeline",
-      "Any suspicious activity?",
-      "Summary of findings",
-    ],
-  },
-  {
-    id: "2",
-    content: "What files were recovered from this device?",
-    sender: "user",
-    timestamp: "2024-01-15T09:01:00Z",
-  },
-  {
-    id: "3",
-    content:
-      "I found several categories of files from the iPhone 14 Pro analysis:\n\n📸 **Images**: 534 photos (including 23 deleted)\n💬 **Messages**: 267 text conversations\n📞 **Call Logs**: 89 call records\n📍 **Location Data**: 15 GPS coordinates\n📄 **Documents**: 12 PDF files\n🎵 **Media**: 45 audio/video files\n\nWould you like me to elaborate on any specific category?",
-    sender: "ai",
-    timestamp: "2024-01-15T09:01:30Z",
-    suggestions: [
-      "Show deleted photos",
-      "Analyze message content",
-      "Location timeline",
-      "Recent call activity",
-    ],
-  },
-];
 
 const quickActions = [
   {
@@ -86,10 +55,171 @@ const quickActions = [
   },
 ];
 
+const supportedLanguages = [
+  { code: "", label: "Auto-detect", flag: "🌐" },
+  { code: "en", label: "English", flag: "🇺🇸" },
+  { code: "hi", label: "हिंदी (Hindi)", flag: "🇮🇳" },
+  { code: "hinglish", label: "Hinglish", flag: "🇮🇳" },
+  { code: "mr", label: "मराठी (Marathi)", flag: "🇮🇳" },
+  { code: "gu", label: "ગુજરાતી (Gujarati)", flag: "🇮🇳" },
+  { code: "ta", label: "தமிழ் (Tamil)", flag: "🇮🇳" },
+  { code: "te", label: "తెలుగు (Telugu)", flag: "🇮🇳" },
+  { code: "bn", label: "বাংলা (Bengali)", flag: "🇮🇳" },
+  { code: "kn", label: "ಕನ್ನಡ (Kannada)", flag: "🇮🇳" },
+  { code: "ml", label: "മലയാളം (Malayalam)", flag: "🇮🇳" },
+  { code: "pa", label: "ਪੰਜਾਬੀ (Punjabi)", flag: "🇮🇳" },
+  { code: "es", label: "Español (Spanish)", flag: "🇪🇸" },
+  { code: "fr", label: "Français (French)", flag: "🇫🇷" },
+  { code: "de", label: "Deutsch (German)", flag: "🇩🇪" },
+  { code: "zh", label: "中文 (Chinese)", flag: "🇨🇳" },
+];
+
+const defaultMessages: Message[] = [{
+  id: "1",
+  content: "Hello! I'm ForensiAI Assistant with multilingual capabilities. I can analyze this case and respond in multiple languages including Hindi, Marathi, Gujarati, Tamil, Telugu, Bengali, Spanish, French, German, and English. What would you like to know?\n\nनमस्ते! मैं बहुभाषी ForensiAI असिस्टेंट हूं। मैं इस केस का विश्लेषण कर सकता हूं।",
+  sender: "ai",
+  timestamp: new Date().toISOString(),
+  suggestions: [
+    "What files were recovered?",
+    "Show me the timeline",
+    "Any suspicious activity?",
+    "Summary of findings",
+    "इस केस में क्या मिला?",
+    "कोई संदिग्ध गतिविधि?",
+  ],
+}];
+
 export function CaseChatbot({ caseId }: CaseChatbotProps) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = (force = false) => {
+    if (messagesEndRef.current && force) {
+      // Only scroll when explicitly requested by user clicking the button
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleScroll = () => {
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      const isAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 50;
+      setShowScrollButton(!isAtBottom && messages.length > 1);
+    }
+  };
+
+  // Show scroll button when new messages arrive and user is not at bottom
+  useEffect(() => {
+    if (messagesContainerRef.current && messages.length > 1 && isLoaded) {
+      // Small delay to ensure DOM is updated
+      const timeoutId = setTimeout(() => {
+        if (messagesContainerRef.current) {
+          const container = messagesContainerRef.current;
+          const isAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 50;
+          setShowScrollButton(!isAtBottom);
+        }
+      }, 50);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [messages.length, isLoaded]);
+
+  // Initialize scroll state when loaded without triggering scroll
+  useEffect(() => {
+    if (isLoaded && messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      // Just check scroll position without forcing any scroll
+      const isAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 50;
+      setShowScrollButton(!isAtBottom && messages.length > 1);
+    }
+  }, [isLoaded]);
+
+  // Debug function - available in console as window.debugChat
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).debugChat = () => {
+        console.log('=== Chat Debug Info ===');
+        console.log('Case ID:', caseId);
+        console.log('Messages count:', messages.length);
+        console.log('IsClient:', isClient);
+        console.log('IsLoaded:', isLoaded);
+        console.log('Selected Language:', selectedLanguage);
+        console.log('Chat Key:', `chat_history_${caseId}`);
+        console.log('LocalStorage value:', localStorage.getItem(`chat_history_${caseId}`));
+        console.log('Current messages:', messages);
+      };
+      
+      // Test language function
+      (window as any).testLanguage = async (query: string, lang: string) => {
+        console.log(`Testing: "${query}" in language: ${lang}`);
+        const sessionId = localStorage.getItem(`case_${caseId}_session`);
+        if (sessionId) {
+          try {
+            const response = await queryDocuments(query, sessionId, lang);
+            console.log('Response:', response);
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        }
+      };
+    }
+  }, [caseId]); // Only depend on caseId since debug functions should access current state
+
+  // Ensure we're on the client side to prevent hydration errors
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Load chat history from localStorage when component mounts
+  useEffect(() => {
+    if (!isClient || !caseId) return;
+    
+    try {
+      const chatKey = `chat_history_${caseId}`;
+      const savedMessages = localStorage.getItem(chatKey);
+      
+      console.log(`Loading chat for case ${caseId}:`, savedMessages); // Debug log
+      
+      if (savedMessages) {
+        const parsedMessages = JSON.parse(savedMessages);
+        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
+          setMessages(parsedMessages);
+          console.log(`Loaded ${parsedMessages.length} messages`); // Debug log
+          setIsLoaded(true);
+          return;
+        }
+      }
+      
+      // No saved messages, use default
+      setMessages(defaultMessages);
+      console.log(`No saved messages found, using default messages`); // Debug log
+      setIsLoaded(true);
+    } catch (error) {
+      console.error("Error loading chat history:", error);
+      setMessages(defaultMessages);
+      setIsLoaded(true);
+    }
+  }, [caseId, isClient]);
+
+  // Save chat history to localStorage whenever messages change (but only after initial load)
+  useEffect(() => {
+    if (!isClient || !caseId || !isLoaded) return;
+    
+    try {
+      const chatKey = `chat_history_${caseId}`;
+      localStorage.setItem(chatKey, JSON.stringify(messages));
+      console.log(`Saved ${messages.length} messages for case ${caseId}`); // Debug log
+    } catch (error) {
+      console.error("Error saving chat history:", error);
+    }
+  }, [messages, caseId, isClient, isLoaded]);
 
   const formatTime = (timestamp: string) => {
     return new Date(timestamp).toLocaleTimeString("en-US", {
@@ -113,87 +243,42 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Get the session ID for this case from localStorage
+      const sessionId = localStorage.getItem(`case_${caseId}_session`);
+      
+      if (!sessionId) {
+        throw new Error("No session found for this case. Please ensure a UFDR file has been uploaded.");
+      }
+
+      // Query the backend using our service
+      const response = await queryDocuments(content, sessionId, selectedLanguage || undefined);
+      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: generateAIResponse(content),
+        content: response.response,
         sender: "ai",
         timestamp: new Date().toISOString(),
-        suggestions: generateSuggestions(content),
+        suggestions: undefined,
+        detectedLanguage: response.detected_language,
       };
-
+      
       setMessages((prev) => [...prev, aiMessage]);
+      
+    } catch (error) {
+      console.error("Chat error:", error);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: `Error: ${error instanceof Error ? error.message : "Failed to get AI response"}`,
+        sender: "ai",
+        timestamp: new Date().toISOString(),
+      };
+      
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
-  };
-
-  const generateAIResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
-
-    if (input.includes("deleted") || input.includes("photo")) {
-      return "I found 23 deleted photos that were successfully recovered. They include:\n\n🗓️ **Recent deletions** (last 7 days): 15 photos\n📷 **Screenshots**: 8 items\n🔍 **Analysis**: Most were deleted on Jan 14th between 10:30-11:45 PM\n\nThese photos may contain important evidence. Would you like me to show the metadata or check for any connections to other evidence?";
     }
-
-    if (
-      input.includes("message") ||
-      input.includes("text") ||
-      input.includes("chat")
-    ) {
-      return "Message analysis reveals interesting patterns:\n\n💬 **Total conversations**: 267 threads\n⚠️ **Flagged content**: 5 conversations contain suspicious keywords\n🕐 **Active periods**: Heavy usage between 8 PM - 2 AM\n📱 **Apps analyzed**: WhatsApp, SMS, Telegram, Signal\n\nI detected potential evidence in conversations with contacts 'Unknown-1' and 'J.Smith'. Should I provide detailed analysis?";
-    }
-
-    if (
-      input.includes("location") ||
-      input.includes("gps") ||
-      input.includes("map")
-    ) {
-      return "Location analysis shows movement patterns:\n\n📍 **Tracked locations**: 15 GPS coordinates\n🗺️ **Key areas**: Central Park, Times Square, Brooklyn Bridge\n⏱️ **Timeline**: Jan 15th, 9:20 AM - 6:30 PM\n🚗 **Transportation**: Connected to vehicle Bluetooth at 6:30 PM\n\nThere's a 2-hour gap in location data from 2:00-4:00 PM. This might indicate the device was turned off or in airplane mode.";
-    }
-
-    if (input.includes("call") || input.includes("phone")) {
-      return "Call log analysis reveals:\n\n📞 **Total calls**: 89 records\n🔴 **Outgoing**: 45 calls\n🟢 **Incoming**: 44 calls\n⏰ **Duration range**: 30 seconds to 47 minutes\n📊 **Peak activity**: 3 calls to unknown number on Jan 14th\n\nOne number appears frequently but isn't in contacts: +1-555-0147. This number was called 8 times in the last week.";
-    }
-
-    return "I understand you're asking about this case. Based on the current evidence, I can provide insights about:\n\n🔍 File recovery and analysis\n📱 Device usage patterns\n📍 Location and movement data\n💬 Communication analysis\n⚡ Timeline reconstruction\n\nWhat specific aspect would you like me to investigate further?";
-  };
-
-  const generateSuggestions = (userInput: string): string[] => {
-    const input = userInput.toLowerCase();
-
-    if (input.includes("deleted") || input.includes("photo")) {
-      return [
-        "Show photo metadata",
-        "Check for duplicates",
-        "Timeline of deletions",
-        "Related evidence",
-      ];
-    }
-
-    if (input.includes("message")) {
-      return [
-        "Suspicious conversations",
-        "Contact analysis",
-        "Keyword search",
-        "Export messages",
-      ];
-    }
-
-    if (input.includes("location")) {
-      return [
-        "Show route map",
-        "Missing time periods",
-        "Frequent locations",
-        "Speed analysis",
-      ];
-    }
-
-    return [
-      "More details",
-      "Related evidence",
-      "Export findings",
-      "Next steps",
-    ];
   };
 
   const handleQuickAction = (prompt: string) => {
@@ -209,6 +294,22 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
     handleSendMessage(inputValue);
   };
 
+  const clearChatHistory = () => {
+    if (!isClient || !caseId) return;
+    
+    const confirmed = window.confirm("Are you sure you want to clear the chat history? This action cannot be undone.");
+    if (confirmed) {
+      setMessages(defaultMessages);
+      try {
+        const chatKey = `chat_history_${caseId}`;
+        localStorage.removeItem(chatKey);
+        console.log(`Cleared chat history for case ${caseId}`); // Debug log
+      } catch (error) {
+        console.error("Error clearing chat history:", error);
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -220,20 +321,56 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Chat Interface */}
-        <div className="lg:col-span-3">
+        <div className="xl:col-span-3">
           <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-                <MessageSquare className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                <span>Case Analysis Chat</span>
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
+                  <MessageSquare className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Case Analysis Chat</span>
+                </CardTitle>
+                <div className="flex items-center space-x-2">
+                  {/* Language Selector */}
+                  <div className="flex items-center space-x-2">
+                    <Globe className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                    <select
+                      value={selectedLanguage}
+                      onChange={(e) => setSelectedLanguage(e.target.value)}
+                      className="text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md px-2 py-1 text-slate-700 dark:text-slate-200"
+                    >
+                      {supportedLanguages.map((lang) => (
+                        <option key={lang.code} value={lang.code}>
+                          {lang.flag} {lang.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={clearChatHistory}
+                    className="text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400"
+                  >
+                    Clear Chat
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {/* Messages */}
-              <div className="h-96 overflow-y-auto mb-4 space-y-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
-                {messages.map((message) => (
+              <div 
+                ref={messagesContainerRef}
+                onScroll={handleScroll}
+                className="h-[500px] overflow-y-auto mb-4 space-y-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg relative"
+              >
+                {!isLoaded ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-slate-500 dark:text-slate-400">Loading chat history...</div>
+                  </div>
+                ) : (
+                  messages.map((message) => (
                   <div
                     key={message.id}
                     className={`flex ${
@@ -243,10 +380,10 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                     }`}
                   >
                     <div
-                      className={`flex items-start space-x-2 max-w-xs lg:max-w-md ${
+                      className={`flex items-start space-x-2 max-w-[85%] ${
                         message.sender === "user"
-                          ? "flex-row-reverse space-x-reverse"
-                          : ""
+                          ? "flex-row-reverse space-x-reverse ml-auto"
+                          : "mr-auto"
                       }`}
                     >
                       <div
@@ -264,18 +401,29 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                       </div>
                       <div className="flex-1">
                         <div
-                          className={`p-3 rounded-lg ${
+                          className={`p-4 rounded-lg ${
                             message.sender === "user"
                               ? "bg-indigo-600 text-white"
                               : "bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700"
                           }`}
                         >
-                          <p className="text-sm whitespace-pre-line">
-                            {message.content}
-                          </p>
+                          <div className="text-sm leading-relaxed">
+                            {message.sender === "ai" ? (
+                              <ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">
+                                {message.content}
+                              </ReactMarkdown>
+                            ) : (
+                              <span>{message.content}</span>
+                            )}
+                          </div>
                         </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                           {formatTime(message.timestamp)}
+                          {message.sender === "ai" && message.detectedLanguage && (
+                            <span className="ml-2 text-xs bg-slate-200 dark:bg-slate-600 px-1 rounded">
+                              {message.detectedLanguage}
+                            </span>
+                          )}
                         </p>
 
                         {/* AI Suggestions */}
@@ -297,7 +445,8 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                       </div>
                     </div>
                   </div>
-                ))}
+                  ))
+                )}
 
                 {/* Typing Indicator */}
                 {isTyping && (
@@ -322,6 +471,21 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                     </div>
                   </div>
                 )}
+                <div ref={messagesEndRef} />
+                
+                {/* Scroll to Bottom Button */}
+                {showScrollButton && (
+                  <button
+                    onClick={() => {
+                      scrollToBottom(true);
+                      setShowScrollButton(false);
+                    }}
+                    className="absolute bottom-4 right-4 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 z-10"
+                    title="New messages below - Click to scroll to latest"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                )}
               </div>
 
               {/* Input Form */}
@@ -345,7 +509,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
         </div>
 
         {/* Quick Actions */}
-        <div className="lg:col-span-1">
+        <div className="xl:col-span-1">
           <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
@@ -375,6 +539,17 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
               </div>
             </CardContent>
           </Card>
+
+          {/* REMOVED: Multilingual Quick Actions */}
+
+
+                  <button
+                    onClick={() => handleQuickAction("Welche Dateien wurden in diesem Fall gefunden?")}
+                    className="p-2 bg-white dark:bg-slate-700 rounded border text-left hover:bg-slate-50 dark:hover:bg-slate-600"
+                  >
+                    �� Welche Dateien wurden gefunden?
+                  </button>
+
 
           {/* Case Info */}
           <Card className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border-indigo-200 dark:border-indigo-700 mt-6">

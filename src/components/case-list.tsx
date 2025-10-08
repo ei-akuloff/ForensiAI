@@ -17,65 +17,15 @@ import {
 import { Search, Eye, Download, Calendar, File } from "lucide-react";
 import CaseDecrypt from "./case-decrypt";
 import { ClientWrapper } from "@/components/client-wrapper";
-
-interface Case {
-  id: string;
-  name: string;
-  dateOpened: string;
-  status: "ongoing" | "completed";
-  description?: string;
-  fileSize?: string;
-}
+import { useCases, Case } from "./case-context";
 
 interface CaseListProps {
   cases?: Case[];
 }
 
-// Dummy data
-const defaultCases: Case[] = [
-  {
-    id: "1",
-    name: "Mobile Device Analysis - Case #2024-001",
-    dateOpened: "2024-01-15",
-    status: "completed",
-    description: "iPhone 14 Pro data extraction and analysis",
-    fileSize: "2.3 GB",
-  },
-  {
-    id: "2",
-    name: "Computer Forensics - Case #2024-002",
-    dateOpened: "2024-02-03",
-    status: "ongoing",
-    description: "Windows 11 system investigation",
-    fileSize: "15.7 GB",
-  },
-  {
-    id: "3",
-    name: "Network Traffic Analysis - Case #2024-003",
-    dateOpened: "2024-02-10",
-    status: "ongoing",
-    description: "Suspicious network activity investigation",
-    fileSize: "890 MB",
-  },
-  {
-    id: "4",
-    name: "Digital Evidence Recovery - Case #2024-004",
-    dateOpened: "2024-01-28",
-    status: "completed",
-    description: "Deleted file recovery from SSD",
-    fileSize: "5.1 GB",
-  },
-  {
-    id: "5",
-    name: "Cloud Storage Investigation - Case #2024-005",
-    dateOpened: "2024-02-15",
-    status: "ongoing",
-    description: "Google Drive forensic analysis",
-    fileSize: "3.2 GB",
-  },
-];
-
-export function CaseList({ cases = defaultCases }: CaseListProps) {
+export function CaseList({ cases: propCases }: CaseListProps) {
+  const { cases: contextCases } = useCases();
+  const cases = propCases || contextCases;
   const [searchTerm, setSearchTerm] = useState("");
   const [showDecryptFor, setShowDecryptFor] = useState<string | null>(null);
 
