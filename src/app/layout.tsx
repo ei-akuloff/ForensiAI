@@ -19,7 +19,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ForensiAI - Advanced Forensic Analysis",
-  description: "Advanced forensic analysis powered by AI",
+  description: "Advanced forensic analysis powered by cutting-edge AI technology. Streamline investigations with intelligent case management and automated analysis.",
+  keywords: ["forensic analysis", "AI", "digital forensics", "case management", "investigation tools"],
+  authors: [{ name: "ForensiAI Team" }],
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
@@ -34,13 +37,13 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ThemeProvider
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
           <ClientOnly>
             <CaseProvider>
-              <div className="min-h-screen flex flex-col bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100">
+              <div className="min-h-screen flex flex-col">
                 <Navbar />
                 <main className="flex-1">{children}</main>
               </div>

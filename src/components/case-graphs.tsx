@@ -17,42 +17,56 @@ interface CaseGraphsProps {
 
 export function CaseGraphs({ caseId }: CaseGraphsProps) {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">
-          Case Analytics
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          Visual analysis and statistics for case data patterns.
-        </p>
+    <div className="space-y-8 animate-fade-in">
+      {/* Header Section */}
+      <div className="relative">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <BarChart3 className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold gradient-text mb-2">
+              Case Analytics
+            </h1>
+            <p className="text-slate-600 dark:text-slate-300 text-lg">
+              Advanced visual analysis and statistical insights from forensic data
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Main Graph Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* File Type Distribution */}
-        <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-              <PieChart className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-              <span>File Type Distribution</span>
+        <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+          
+          <CardHeader className="relative">
+            <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-slate-100">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <PieChart className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <span className="text-xl font-semibold">File Type Distribution</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center h-64 bg-slate-50 dark:bg-slate-700/50 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600">
+          <CardContent className="relative">
+            <div className="flex items-center justify-center h-80 bg-gradient-to-br from-slate-50/50 to-slate-100/50 dark:from-slate-700/30 dark:to-slate-800/30 rounded-2xl border-2 border-dashed border-emerald-200 dark:border-emerald-800/50 group-hover:border-emerald-300 dark:group-hover:border-emerald-700 transition-colors duration-300">
               <div className="text-center">
-                <PieChart className="h-12 w-12 text-slate-400 dark:text-slate-500 mx-auto mb-3" />
-                <p className="text-slate-600 dark:text-slate-400 font-medium">
-                  Pie Chart Placeholder
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/50 dark:to-teal-900/50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <PieChart className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <p className="text-slate-700 dark:text-slate-300 font-semibold text-lg mb-2">
+                  Interactive Pie Chart
                 </p>
-                <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
-                  Distribution of file types found in evidence
+                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">
+                  Visual breakdown of file types discovered during forensic analysis
                 </p>
               </div>
             </div>
             <div className="mt-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
                   <span className="text-sm text-slate-600 dark:text-slate-400">
                     Images
                   </span>
@@ -102,7 +116,7 @@ export function CaseGraphs({ caseId }: CaseGraphsProps) {
         <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-              <Activity className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <Activity className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               <span>Case Activity Over Time</span>
             </CardTitle>
           </CardHeader>
@@ -135,7 +149,7 @@ export function CaseGraphs({ caseId }: CaseGraphsProps) {
         <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-              <Database className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <Database className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               <span>Evidence Sources</span>
             </CardTitle>
           </CardHeader>
@@ -184,7 +198,7 @@ export function CaseGraphs({ caseId }: CaseGraphsProps) {
         <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-              <TrendingUp className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               <span>Processing Metrics</span>
             </CardTitle>
           </CardHeader>
@@ -213,7 +227,7 @@ export function CaseGraphs({ caseId }: CaseGraphsProps) {
                 <span className="text-slate-600 dark:text-slate-400">
                   Accuracy
                 </span>
-                <span className="font-medium text-blue-600 dark:text-blue-400">
+                <span className="font-medium text-emerald-600 dark:text-emerald-400">
                   99.2%
                 </span>
               </div>
@@ -221,7 +235,7 @@ export function CaseGraphs({ caseId }: CaseGraphsProps) {
                 <span className="text-slate-600 dark:text-slate-400">
                   Completion
                 </span>
-                <span className="font-medium text-indigo-600 dark:text-indigo-400">
+                <span className="font-medium text-teal-600 dark:text-teal-400">
                   100%
                 </span>
               </div>
@@ -233,7 +247,7 @@ export function CaseGraphs({ caseId }: CaseGraphsProps) {
         <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-              <FileText className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               <span>File Size Analysis</span>
             </CardTitle>
           </CardHeader>
@@ -280,10 +294,10 @@ export function CaseGraphs({ caseId }: CaseGraphsProps) {
       </div>
 
       {/* Summary Stats */}
-      <Card className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border-indigo-200 dark:border-indigo-700">
+      <Card className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-200 dark:border-emerald-700">
         <CardContent className="p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <BarChart3 className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+            <BarChart3 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
             <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100">
               Analysis Summary
             </h3>

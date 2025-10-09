@@ -105,13 +105,16 @@ async def query_documents(query: str = Form(...), session_id: str = Form(...), l
             return JSONResponse(content={"response": "No relevant information found in the documents."})
         
         # Enhanced multilingual support with auto-detection and explicit language handling
-        lang_instruction = "IMPORTANT: Respond in English by default."
+        lang_instruction = "IMPORTANT: You MUST respond in English only. Use proper English grammar, vocabulary, and sentence structure. Do not use any other languages."
         detected_language = None
         
         if language:
             # Explicit language parameter provided
             language_lower = language.lower()
-            if language_lower in ["hi", "hindi", "हिंदी"]:
+            if language_lower in ["en", "english", "eng"]:
+                lang_instruction = "IMPORTANT: You MUST respond in English only. Use proper English grammar, vocabulary, and sentence structure. Do not use any other languages."
+                detected_language = "English"
+            elif language_lower in ["hi", "hindi", "हिंदी"]:
                 lang_instruction = "IMPORTANT: You MUST respond in Hindi (Devanagari script). Use proper Hindi grammar and vocabulary. Do not use English."
                 detected_language = "Hindi"
             elif language_lower in ["hinglish", "hi-en", "mixed"]:

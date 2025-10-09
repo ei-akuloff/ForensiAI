@@ -76,7 +76,7 @@ const supportedLanguages = [
 
 const defaultMessages: Message[] = [{
   id: "1",
-  content: "Hello! I'm ForensiAI Assistant with multilingual capabilities. I can analyze this case and respond in multiple languages including Hindi, Marathi, Gujarati, Tamil, Telugu, Bengali, Spanish, French, German, and English. What would you like to know?\n\nनमस्ते! मैं बहुभाषी ForensiAI असिस्टेंट हूं। मैं इस केस का विश्लेषण कर सकता हूं।",
+  content: "Hello! I'm your ForensiAI Assistant. I can help you analyze this case and answer questions about the uploaded evidence. What would you like to know about this investigation?",
   sender: "ai",
   timestamp: new Date().toISOString(),
   suggestions: [
@@ -84,8 +84,8 @@ const defaultMessages: Message[] = [{
     "Show me the timeline",
     "Any suspicious activity?",
     "Summary of findings",
-    "इस केस में क्या मिला?",
-    "कोई संदिग्ध गतिविधि?",
+    "Generate a detailed report",
+    "What evidence was found?",
   ],
 }];
 
@@ -95,7 +95,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("english");
   const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -311,29 +311,41 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">
-          AI Assistant
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          Ask questions about the case evidence and get AI-powered insights.
-        </p>
+    <div className="space-y-8 animate-fade-in">
+      {/* Header Section */}
+      <div className="relative">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <MessageSquare className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold gradient-text mb-2">
+              AI Assistant
+            </h1>
+            <p className="text-slate-600 dark:text-slate-300 text-lg">
+              Intelligent analysis and insights powered by advanced AI technology
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Chat Interface */}
         <div className="xl:col-span-3">
-          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
-            <CardHeader>
+          <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+            
+            <CardHeader className="relative">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-                  <MessageSquare className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Case Analysis Chat</span>
+                <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-slate-100">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <MessageSquare className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <span className="text-xl font-semibold">Case Analysis Chat</span>
                 </CardTitle>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   {/* Language Selector */}
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-white/20 dark:border-slate-600/50">
                     <Globe className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                     <select
                       value={selectedLanguage}
@@ -389,7 +401,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                       <div
                         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                           message.sender === "user"
-                            ? "bg-indigo-600 text-white"
+                            ? "bg-emerald-600 text-white"
                             : "bg-emerald-600 text-white"
                         }`}
                       >
@@ -403,7 +415,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                         <div
                           className={`p-4 rounded-lg ${
                             message.sender === "user"
-                              ? "bg-indigo-600 text-white"
+                              ? "bg-emerald-600 text-white"
                               : "bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700"
                           }`}
                         >
@@ -480,7 +492,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                       scrollToBottom(true);
                       setShowScrollButton(false);
                     }}
-                    className="absolute bottom-4 right-4 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 z-10"
+                    className="absolute bottom-4 right-4 bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 z-10"
                     title="New messages below - Click to scroll to latest"
                   >
                     <ChevronDown className="h-4 w-4" />
@@ -499,7 +511,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                 <Button
                   type="submit"
                   disabled={!inputValue.trim() || isTyping}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -513,7 +525,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
           <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-                <Lightbulb className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                <Lightbulb className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                 <span>Quick Actions</span>
               </CardTitle>
             </CardHeader>

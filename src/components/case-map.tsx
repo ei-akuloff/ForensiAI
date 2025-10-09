@@ -47,11 +47,11 @@ const getLocationIcon = (type: LocationData["type"]) => {
 const getLocationColor = (type: LocationData["type"]) => {
   switch (type) {
     case "photo":
-      return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
     case "gps":
       return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
     case "call":
-      return "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400";
+      return "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400";
     case "wifi":
       return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
     case "bluetooth":
@@ -123,23 +123,34 @@ export function CaseMap({ caseId }: CaseMapProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">
-          Location Analysis
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          Geographic data and location timeline extracted from evidence.
-        </p>
+    <div className="space-y-8 animate-fade-in">
+      {/* Header Section */}
+      <div className="relative">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <Map className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              Interactive Map
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400 text-lg">
+              Comprehensive forensic analysis details and evidence summary
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Main Map Area */}
         <div className="xl:col-span-2">
-          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
-            <CardHeader>
+          <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+            <CardHeader className="relative">
               <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-                <Map className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Map className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
                 <span>Interactive Map</span>
               </CardTitle>
             </CardHeader>
@@ -166,7 +177,7 @@ export function CaseMap({ caseId }: CaseMapProps) {
               {/* Map Controls */}
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <button className="px-3 py-1 text-xs bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-md">
+                  <button className="px-3 py-1 text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-md">
                     All Points
                   </button>
                   <button className="px-3 py-1 text-xs bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 rounded-md">
@@ -186,10 +197,13 @@ export function CaseMap({ caseId }: CaseMapProps) {
 
         {/* Location List */}
         <div className="xl:col-span-1">
-          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
-            <CardHeader>
+          <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+            <CardHeader className="relative">
               <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-                <MapPin className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <MapPin className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
                 <span>Location Points</span>
               </CardTitle>
             </CardHeader>
@@ -283,13 +297,13 @@ export function CaseMap({ caseId }: CaseMapProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-purple-200 dark:border-purple-700">
+        <Card className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border-teal-200 dark:border-teal-700">
           <CardContent className="p-4 text-center">
-            <Smartphone className="h-6 w-6 text-purple-500 dark:text-purple-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
+            <Smartphone className="h-6 w-6 text-teal-500 dark:text-teal-400 mx-auto mb-2" />
+            <p className="text-sm font-medium text-teal-600 dark:text-teal-400">
               Cell Towers
             </p>
-            <p className="text-xl font-bold text-purple-700 dark:text-purple-300">
+            <p className="text-xl font-bold text-teal-700 dark:text-teal-300">
               1
             </p>
           </CardContent>
