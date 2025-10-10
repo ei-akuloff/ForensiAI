@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { CaseFormData } from "./case-creation-modal";
 
 export interface Case {
@@ -39,13 +45,13 @@ export function CaseProvider({ children }: { children: ReactNode }) {
   // Ensure we're on the client side to prevent hydration errors
   useEffect(() => {
     setIsClient(true);
-    
+
     // One-time check for clearing old data (can be removed after first run)
-    if (typeof window !== 'undefined') {
-      const shouldClearOldData = !localStorage.getItem('forensiai_initialized');
+    if (typeof window !== "undefined") {
+      const shouldClearOldData = !localStorage.getItem("forensiai_initialized");
       if (shouldClearOldData) {
         localStorage.removeItem(STORAGE_KEY);
-        localStorage.setItem('forensiai_initialized', 'true');
+        localStorage.setItem("forensiai_initialized", "true");
       }
     }
   }, []);
@@ -53,7 +59,7 @@ export function CaseProvider({ children }: { children: ReactNode }) {
   // Load cases from localStorage only on client side
   useEffect(() => {
     if (!isClient) return;
-    
+
     try {
       const storedCases = localStorage.getItem(STORAGE_KEY);
       if (storedCases) {
@@ -70,7 +76,7 @@ export function CaseProvider({ children }: { children: ReactNode }) {
   // Save cases to localStorage whenever cases change (client-side only)
   useEffect(() => {
     if (!isClient) return;
-    
+
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
     } catch (error) {
@@ -83,7 +89,7 @@ export function CaseProvider({ children }: { children: ReactNode }) {
     const newCase: Case = {
       id: newId,
       name: `${caseData.caseTitle} - Case #${caseData.caseNo}`,
-      dateOpened: new Date().toISOString().split('T')[0],
+      dateOpened: new Date().toISOString().split("T")[0],
       status: "ongoing",
       description: caseData.description,
       fileSize: "Processing...",
@@ -94,17 +100,58 @@ export function CaseProvider({ children }: { children: ReactNode }) {
       fileName: caseData.fileName,
     };
 
-    setCases(prevCases => [newCase, ...prevCases]);
+    setCases((prevCases) => [newCase, ...prevCases]);
+
+    // Save to MongoDB backend
+    if (isClient) {
+      import("@/lib/backend-service")
+        .then(({ createCase, createSession, generateSessionId }) => {
+          // Get current user from localStorage
+          const userStr = localStorage.getItem("user");
+          const user = userStr ? JSON.parse(userStr) : null;
+          const userId = user?.user_id || "default_user";
+
+          createCase(
+            `${caseData.caseTitle} - Case #${caseData.caseNo}`,
+            caseData.caseNo,
+            caseData.description,
+            caseData.priority?.toLowerCase() || "medium",
+            userId
+          )
+            .then((response) => {
+              console.log("Case created in MongoDB:", response);
+              // Store MongoDB case_id for this local case
+              localStorage.setItem(
+                `case_${newId}_mongodb_id`,
+                response.case.case_id
+              );
+
+              // Create a session for this case
+              const sessionId = generateSessionId(newId);
+              return createSession(sessionId, response.case.case_id, userId);
+            })
+            .then((sessionResponse) => {
+              console.log("Session created in MongoDB:", sessionResponse);
+            })
+            .catch((error) => {
+              console.error("Error saving case to MongoDB:", error);
+            });
+        })
+        .catch((error) => {
+          console.error("Error importing backend-service:", error);
+        });
+    }
+
     return newId;
   };
 
   const getCaseById = (id: string): Case | undefined => {
-    return cases.find(caseItem => caseItem.id === id);
+    return cases.find((caseItem) => caseItem.id === id);
   };
 
   const updateCase = (id: string, updates: Partial<Case>): void => {
-    setCases(prevCases =>
-      prevCases.map(caseItem =>
+    setCases((prevCases) =>
+      prevCases.map((caseItem) =>
         caseItem.id === id ? { ...caseItem, ...updates } : caseItem
       )
     );
@@ -130,11 +177,7 @@ export function CaseProvider({ children }: { children: ReactNode }) {
     clearAllCases,
   };
 
-  return (
-    <CaseContext.Provider value={value}>
-      {children}
-    </CaseContext.Provider>
-  );
+  return <CaseContext.Provider value={value}>{children}</CaseContext.Provider>;
 }
 
 export function useCases() {

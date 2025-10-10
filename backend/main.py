@@ -1,18 +1,26 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from contextlib import asynccontextmanager
 import tempfile
 import os
 import base64
 import hashlib
 import zipfile
 import json
+import uuid
 from pathlib import Path
+from datetime import datetime
+from typing import Any, Dict
 from ufdr_parser import parse_ufdr, parse_json_data, chunk_text, extract_ufdr_contents, list_ufdr_contents
 from vector_store import add_documents, get_full_context, delete_session
 from openai import OpenAI
 from dotenv import load_dotenv
-import os
+
+# MongoDB imports
+from database import connect_to_mongodb, close_mongodb_connection, get_database
+from models import Case, Session, AnalysisResult, Relationship, FileMetadata, CaseStatus, CasePriority
+import crud
 
 try:
     from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -25,6 +33,15 @@ except ImportError as e:
     CRYPTO_AVAILABLE = False
 
 load_dotenv()
+
+# Lifespan context manager for startup and shutdown events
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    await connect_to_mongodb()
+    yield
+    # Shutdown
+    await close_mongodb_connection()
 
 def decrypt_ufdr_with_key(encrypted_data: bytes, key_base64: str, iv_base64: str) -> bytes:
     """
@@ -59,7 +76,10 @@ def verify_sha256(data: bytes, expected_hash: str) -> bool:
     actual_hash = hashlib.sha256(data).hexdigest()
     return actual_hash.lower() == expected_hash.lower()
 
-app = FastAPI(title="UFDR Investigation Agent Backend")
+app = FastAPI(
+    title="UFDR Investigation Agent Backend",
+    lifespan=lifespan
+)
 
 # Add CORS middleware for frontend
 app.add_middleware(
@@ -70,12 +90,306 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ===== UTILITY FUNCTIONS =====
+
+def serialize_datetime(data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Convert datetime objects in a dictionary to ISO format strings
+    """
+    if not isinstance(data, dict):
+        return data
+    
+    for key, value in data.items():
+        if isinstance(value, datetime):
+            data[key] = value.isoformat()
+        elif isinstance(value, dict):
+            data[key] = serialize_datetime(value)
+        elif isinstance(value, list):
+            data[key] = [serialize_datetime(item) if isinstance(item, dict) else item for item in value]
+    
+    return data
+
 @app.get("/")
 async def health_check():
     """
     Health check endpoint.
     """
     return {"status": "healthy", "message": "UFDR Investigation Agent Backend is running"}
+
+
+# ===== AUTHENTICATION ENDPOINTS =====
+
+@app.post("/auth/signup")
+async def signup(
+    username: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    full_name: str = Form(...),
+    db = Depends(get_database)
+):
+    """
+    Register a new user
+    """
+    try:
+        # Check if user already exists
+        existing_user = await crud.get_user_by_email(db, email)
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        existing_username = await crud.get_user_by_username(db, username)
+        if existing_username:
+            raise HTTPException(status_code=400, detail="Username already taken")
+        
+        # Hash password (basic hashing - use proper bcrypt in production)
+        import hashlib
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        
+        # Create user
+        from models import User, UserRole
+        user = User(
+            username=username,
+            email=email,
+            password_hash=password_hash,
+            full_name=full_name,
+            role=UserRole.ANALYST
+        )
+        
+        created_user = await crud.create_user(db, user)
+        
+        # Remove password_hash from response
+        created_user.pop('password_hash', None)
+        
+        # Convert datetime objects to ISO format strings
+        created_user = serialize_datetime(created_user)
+        
+        return JSONResponse(content={
+            "message": "User registered successfully",
+            "user": created_user
+        })
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
+
+
+@app.post("/auth/login")
+async def login(
+    email: str = Form(...),
+    password: str = Form(...),
+    db = Depends(get_database)
+):
+    """
+    Login user
+    """
+    try:
+        # Get user
+        user = await crud.get_user_by_email(db, email)
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        # Verify password (basic verification - use proper bcrypt in production)
+        import hashlib
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        
+        if user['password_hash'] != password_hash:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        # Update last login
+        await crud.update_user_last_login(db, user['user_id'])
+        
+        # Remove password_hash from response
+        user.pop('password_hash', None)
+        
+        # Convert datetime objects to ISO format strings
+        user = serialize_datetime(user)
+        
+        return JSONResponse(content={
+            "message": "Login successful",
+            "user": user
+        })
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error logging in: {str(e)}")
+
+
+# ===== MONGODB CASE MANAGEMENT ENDPOINTS =====
+
+@app.post("/cases/")
+async def create_new_case(
+    title: str = Form(...),
+    description: str = Form(None),
+    case_number: str = Form(...),
+    priority: str = Form("medium"),
+    created_by: str = Form("default_user"),
+    db = Depends(get_database)
+):
+    """
+    Create a new case in MongoDB
+    """
+    try:
+        case = Case(
+            case_id=str(uuid.uuid4()),
+            case_number=case_number,
+            title=title,
+            description=description,
+            priority=CasePriority(priority),
+            created_by=created_by
+        )
+        result = await crud.create_case(db, case)
+        result = serialize_datetime(result)
+        return JSONResponse(content={"message": "Case created successfully", "case": result})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating case: {str(e)}")
+
+
+@app.get("/cases/")
+async def list_cases(
+    status: str = None,
+    limit: int = 50,
+    db = Depends(get_database)
+):
+    """
+    List all cases with optional status filter
+    """
+    try:
+        case_status = CaseStatus(status) if status else None
+        cases = await crud.get_all_cases(db, status=case_status, limit=limit)
+        cases = [serialize_datetime(case) for case in cases]
+        return JSONResponse(content={"cases": cases, "count": len(cases)})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching cases: {str(e)}")
+
+
+@app.get("/cases/{case_id}")
+async def get_case_details(
+    case_id: str,
+    db = Depends(get_database)
+):
+    """
+    Get detailed information about a specific case
+    """
+    try:
+        case = await crud.get_case_by_id(db, case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Also get sessions and files for this case
+        sessions = await crud.get_sessions_by_case(db, case_id)
+        files = await crud.get_files_by_case(db, case_id)
+        analysis_results = await crud.get_analysis_results_by_case(db, case_id)
+        
+        # Serialize datetime objects
+        case = serialize_datetime(case)
+        sessions = [serialize_datetime(s) for s in sessions]
+        files = [serialize_datetime(f) for f in files]
+        analysis_results = [serialize_datetime(a) for a in analysis_results]
+        
+        return JSONResponse(content={
+            "case": case,
+            "sessions": sessions,
+            "files": files,
+            "analysis_results": analysis_results
+        })
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching case: {str(e)}")
+
+
+@app.put("/cases/{case_id}")
+async def update_case_details(
+    case_id: str,
+    title: str = Form(None),
+    description: str = Form(None),
+    status: str = Form(None),
+    priority: str = Form(None),
+    db = Depends(get_database)
+):
+    """
+    Update case details
+    """
+    try:
+        updates = {}
+        if title:
+            updates["title"] = title
+        if description:
+            updates["description"] = description
+        if status:
+            updates["status"] = CaseStatus(status)
+        if priority:
+            updates["priority"] = CasePriority(priority)
+        
+        success = await crud.update_case(db, case_id, updates)
+        if not success:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        return JSONResponse(content={"message": "Case updated successfully"})
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating case: {str(e)}")
+
+
+# ===== SESSION MANAGEMENT ENDPOINTS =====
+
+@app.post("/sessions/")
+async def create_new_session(
+    session_id: str = Form(...),
+    case_id: str = Form(...),
+    user_id: str = Form("default_user"),
+    db = Depends(get_database)
+):
+    """
+    Create a new analysis session linked to a case
+    """
+    try:
+        session = Session(
+            session_id=session_id,
+            case_id=case_id,
+            user_id=user_id
+        )
+        result = await crud.create_session(db, session)
+        result = serialize_datetime(result)
+        return JSONResponse(content={"message": "Session created successfully", "session": result})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating session: {str(e)}")
+
+
+@app.get("/sessions/{session_id}")
+async def get_session_details(
+    session_id: str,
+    db = Depends(get_database)
+):
+    """
+    Get session details
+    """
+    try:
+        session = await crud.get_session_by_id(db, session_id)
+        if not session:
+            raise HTTPException(status_code=404, detail="Session not found")
+        session = serialize_datetime(session)
+        return JSONResponse(content={"session": session})
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching session: {str(e)}")
+
+
+@app.get("/cases/{case_id}/sessions")
+async def get_case_sessions(
+    case_id: str,
+    db = Depends(get_database)
+):
+    """
+    Get all sessions for a case
+    """
+    try:
+        sessions = await crud.get_sessions_by_case(db, case_id)
+        sessions = [serialize_datetime(s) for s in sessions]
+        return JSONResponse(content={"sessions": sessions, "count": len(sessions)})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching sessions: {str(e)}")
 
 def get_client():
     """
@@ -124,9 +438,15 @@ def parse_json_safely(text: str):
         return None
 
 @app.post("/upload/")
-async def upload_ufdr(session_id: str = Form(...), file: UploadFile = File(...)):
+async def upload_ufdr(
+    session_id: str = Form(...), 
+    file: UploadFile = File(...),
+    case_id: str = Form(None),
+    db = Depends(get_database)
+):
     """
     Upload UFDR file, extract JSON contents, parse them, chunk the text, and store in vector database.
+    Also saves metadata to MongoDB.
     """
     if not file.filename.endswith('.ufdr') and not file.filename.endswith('.ufdr.enc'):
         raise HTTPException(status_code=400, detail="File must be a .ufdr or .ufdr.enc file")
@@ -159,7 +479,38 @@ async def upload_ufdr(session_id: str = Form(...), file: UploadFile = File(...))
         else:
             print("No chunks generated; skipping add_documents.")
         
-        return JSONResponse(content={"message": "UFDR file processed and stored successfully", "chunks": len(chunks), "session_id": session_id})
+        # Save file metadata to MongoDB if case_id is provided
+        if case_id is not None:
+            try:
+                file_metadata = FileMetadata(
+                    session_id=session_id,
+                    case_id=case_id,
+                    filename=file.filename,
+                    file_type="ufdr",
+                    file_size=len(content),
+                    processed=True,
+                    chunks_count=len(chunks)
+                )
+                await crud.create_file_metadata(db, file_metadata)
+                
+                # Update session with file info
+                await crud.add_file_to_session(db, session_id, {
+                    "filename": file.filename,
+                    "file_type": "ufdr",
+                    "upload_time": datetime.utcnow().isoformat(),
+                    "chunks": len(chunks)
+                })
+                print("File metadata saved to MongoDB")
+            except Exception as mongo_error:
+                print(f"Warning: Could not save to MongoDB: {str(mongo_error)}")
+        
+        saved_to_db = case_id is not None
+        return JSONResponse(content={
+            "message": "UFDR file processed and stored successfully", 
+            "chunks": len(chunks), 
+            "session_id": session_id,
+            "saved_to_db": saved_to_db
+        })
     
     except Exception as e:
         print(f"Upload error details: {str(e)}")
@@ -442,9 +793,14 @@ async def upload_single_json(session_id: str = Form(...), file: UploadFile = Fil
         os.unlink(tmp_path)
 
 @app.post("/analyze-relationships/")
-async def analyze_relationships(session_id: str = Form(...)):
+async def analyze_relationships(
+    session_id: str = Form(...),
+    case_id: str = Form(None),
+    db = Depends(get_database)
+):
     """
     Analyze relationships between people in the UFDR data using LLM.
+    Saves results to MongoDB.
     """
     try:
         # Get all context from the session
@@ -531,10 +887,36 @@ Your JSON analysis:"""
                 "summary": "Analysis completed but could not parse results properly"
             }
         
+        # Save to MongoDB if case_id is provided
+        if case_id is not None:
+            try:
+                relationship = Relationship(
+                    session_id=session_id,
+                    case_id=case_id,
+                    people=analysis.get("people", []),
+                    relationships=analysis.get("relationships", []),
+                    summary=analysis.get("summary", "")
+                )
+                await crud.create_relationship_analysis(db, relationship)
+                
+                # Also save as generic analysis result
+                analysis_result = AnalysisResult(
+                    session_id=session_id,
+                    case_id=case_id,
+                    analysis_type="relationship",
+                    result_data=analysis
+                )
+                await crud.create_analysis_result(db, analysis_result)
+                print("Relationship analysis saved to MongoDB")
+            except Exception as mongo_error:
+                print(f"Warning: Could not save to MongoDB: {str(mongo_error)}")
+        
+        saved_to_db = case_id is not None
         return JSONResponse(content={
             "message": "Relationship analysis completed",
             "session_id": session_id,
-            "analysis": analysis
+            "analysis": analysis,
+            "saved_to_db": saved_to_db
         })
     
     except Exception as e:

@@ -311,3 +311,242 @@ export async function getRelationshipCommunications(
     throw error;
   }
 }
+
+// ===== AUTHENTICATION ENDPOINTS =====
+
+export interface SignupRequest {
+  username: string;
+  email: string;
+  password: string;
+  full_name: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface UserResponse {
+  user_id: string;
+  username: string;
+  email: string;
+  full_name: string;
+  role: string;
+  created_at: string;
+  last_login?: string;
+  is_active: boolean;
+}
+
+export interface AuthResponse {
+  message: string;
+  user: UserResponse;
+}
+
+/**
+ * Register a new user
+ */
+export async function signup(data: SignupRequest): Promise<AuthResponse> {
+  const formData = new FormData();
+  formData.append('username', data.username);
+  formData.append('email', data.email);
+  formData.append('password', data.password);
+  formData.append('full_name', data.full_name);
+
+  const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || 'Failed to sign up');
+  }
+
+  return response.json();
+}
+
+/**
+ * Login user
+ */
+export async function login(data: LoginRequest): Promise<AuthResponse> {
+  const formData = new FormData();
+  formData.append('email', data.email);
+  formData.append('password', data.password);
+
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || 'Failed to login');
+  }
+
+  return response.json();
+}
+
+// ===== CASE MANAGEMENT ENDPOINTS =====
+
+export interface Case {
+  case_id: string;
+  case_number: string;
+  title: string;
+  description?: string;
+  status: string;
+  priority: string;
+  assigned_to?: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  tags: string[];
+  metadata: Record<string, any>;
+}
+
+export interface CaseResponse {
+  message: string;
+  case: Case;
+}
+
+export interface CasesListResponse {
+  cases: Case[];
+  count: number;
+}
+
+/**
+ * Create a new case
+ */
+export async function createCase(
+  title: string,
+  caseNumber: string,
+  description?: string,
+  priority: string = 'medium',
+  createdBy: string = 'default_user'
+): Promise<CaseResponse> {
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('case_number', caseNumber);
+  if (description) formData.append('description', description);
+  formData.append('priority', priority);
+  formData.append('created_by', createdBy);
+
+  const response = await fetch(`${API_BASE_URL}/cases/`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || 'Failed to create case');
+  }
+
+  return response.json();
+}
+
+/**
+ * Get all cases
+ */
+export async function getCases(status?: string, limit: number = 50): Promise<CasesListResponse> {
+  const params = new URLSearchParams();
+  if (status) params.append('status', status);
+  params.append('limit', limit.toString());
+
+  const response = await fetch(`${API_BASE_URL}/cases/?${params.toString()}`);
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || 'Failed to get cases');
+  }
+
+  return response.json();
+}
+
+/**
+ * Get case details
+ */
+export async function getCaseDetails(caseId: string): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}/cases/${caseId}`);
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || 'Failed to get case details');
+  }
+
+  return response.json();
+}
+
+/**
+ * Create a session for a case
+ */
+export async function createSession(
+  sessionId: string,
+  caseId: string,
+  userId: string = 'default_user'
+): Promise<any> {
+  const formData = new FormData();
+  formData.append('session_id', sessionId);
+  formData.append('case_id', caseId);
+  formData.append('user_id', userId);
+
+  const response = await fetch(`${API_BASE_URL}/sessions/`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || 'Failed to create session');
+  }
+
+  return response.json();
+}
+
+/**
+ * Upload a UFDR file with case_id for MongoDB storage
+ */
+export async function uploadUFDRFileWithCase(
+  file: File,
+  sessionId: string,
+  caseId: string
+): Promise<UploadResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("session_id", sessionId);
+  formData.append("case_id", caseId);
+
+  const response = await fetch(`${API_BASE_URL}/upload/`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || "Failed to upload file");
+  }
+
+  return response.json();
+}
+
+/**
+ * Analyze relationships with case_id for MongoDB storage
+ */
+export async function analyzeRelationshipsWithCase(
+  sessionId: string,
+  caseId: string
+): Promise<RelationshipResponse> {
+  const formData = new FormData();
+  formData.append("session_id", sessionId);
+  formData.append("case_id", caseId);
+
+  const response = await fetch(`${API_BASE_URL}/analyze-relationships/`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || "Failed to analyze relationships");
+  }
+
+  return response.json();
+}

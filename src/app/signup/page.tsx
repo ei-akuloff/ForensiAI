@@ -68,16 +68,32 @@ export default function SignupPage() {
 
     setIsLoading(true);
 
-    // Simulate API call
     try {
-      // Replace with actual registration logic
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Signup attempt:", formData);
+      // Call backend signup API
+      const { signup } = await import("@/lib/backend-service");
+      const response = await signup({
+        username: formData.email.split("@")[0], // Use email prefix as username
+        email: formData.email,
+        password: formData.password,
+        full_name: formData.name,
+      });
+
+      console.log("Signup successful:", response);
+
+      // Store user data in localStorage
+      localStorage.setItem("user", JSON.stringify(response.user));
+
       // Handle successful signup - redirect to dashboard
       router.push("/dashboard");
     } catch (error) {
       console.error("Signup error:", error);
-      // Handle signup error
+      // Show error to user
+      setErrors({
+        email:
+          error instanceof Error
+            ? error.message
+            : "Signup failed. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }

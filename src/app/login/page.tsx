@@ -52,16 +52,30 @@ export default function LoginPage() {
 
     setIsLoading(true);
 
-    // Simulate API call
     try {
-      // Replace with actual authentication logic
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Login attempt:", formData);
+      // Call backend login API
+      const { login } = await import("@/lib/backend-service");
+      const response = await login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      console.log("Login successful:", response);
+
+      // Store user data in localStorage
+      localStorage.setItem("user", JSON.stringify(response.user));
+
       // Handle successful login - redirect to dashboard
       router.push("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
-      // Handle login error
+      // Show error to user
+      setErrors({
+        email:
+          error instanceof Error
+            ? error.message
+            : "Login failed. Please check your credentials.",
+      });
     } finally {
       setIsLoading(false);
     }
