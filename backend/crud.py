@@ -265,3 +265,211 @@ async def update_file_processed_status(db, file_id: str, chunks_count: int) -> b
         {"$set": {"processed": True, "chunks_count": chunks_count}}
     )
     return result.modified_count > 0
+
+
+# ===== FORENSIC DATA CRUD OPERATIONS =====
+
+async def create_messenger_message(db, message: Dict) -> Dict:
+    """Create a messenger message record"""
+    message["message_id"] = str(uuid.uuid4())
+    if not message.get("created_at"):
+        message["created_at"] = datetime.utcnow()
+    result = await db.messenger_messages.insert_one(message)
+    message["_id"] = str(result.inserted_id)
+    return serialize_doc(message)
+
+
+async def bulk_create_messenger_messages(db, messages: List[Dict]) -> int:
+    """Bulk create messenger messages"""
+    if not messages:
+        return 0
+    for msg in messages:
+        msg["message_id"] = str(uuid.uuid4())
+        if not msg.get("created_at"):
+            msg["created_at"] = datetime.utcnow()
+    result = await db.messenger_messages.insert_many(messages)
+    return len(result.inserted_ids)
+
+
+async def get_messenger_messages_by_session(db, session_id: str, limit: int = 1000) -> List[Dict]:
+    """Get messenger messages for a session"""
+    cursor = db.messenger_messages.find({"session_id": session_id}).sort("timestamp", -1).limit(limit)
+    messages = await cursor.to_list(length=limit)
+    return [serialize_doc(msg) for msg in messages]
+
+
+async def get_messenger_messages_by_case(db, case_id: str, app_name: Optional[str] = None, limit: int = 1000) -> List[Dict]:
+    """Get messenger messages for a case"""
+    query = {"case_id": case_id}
+    if app_name:
+        query["app_name"] = app_name
+    cursor = db.messenger_messages.find(query).sort("timestamp", -1).limit(limit)
+    messages = await cursor.to_list(length=limit)
+    return [serialize_doc(msg) for msg in messages]
+
+
+async def create_messenger_call(db, call: Dict) -> Dict:
+    """Create a messenger call record"""
+    call["call_id"] = str(uuid.uuid4())
+    if not call.get("created_at"):
+        call["created_at"] = datetime.utcnow()
+    result = await db.messenger_calls.insert_one(call)
+    call["_id"] = str(result.inserted_id)
+    return serialize_doc(call)
+
+
+async def bulk_create_messenger_calls(db, calls: List[Dict]) -> int:
+    """Bulk create messenger calls"""
+    if not calls:
+        return 0
+    for call in calls:
+        call["call_id"] = str(uuid.uuid4())
+        if not call.get("created_at"):
+            call["created_at"] = datetime.utcnow()
+    result = await db.messenger_calls.insert_many(calls)
+    return len(result.inserted_ids)
+
+
+async def get_messenger_calls_by_session(db, session_id: str) -> List[Dict]:
+    """Get messenger calls for a session"""
+    cursor = db.messenger_calls.find({"session_id": session_id}).sort("start_time", -1)
+    calls = await cursor.to_list(length=500)
+    return [serialize_doc(call) for call in calls]
+
+
+async def get_messenger_calls_by_case(db, case_id: str) -> List[Dict]:
+    """Get messenger calls for a case"""
+    cursor = db.messenger_calls.find({"case_id": case_id}).sort("start_time", -1)
+    calls = await cursor.to_list(length=500)
+    return [serialize_doc(call) for call in calls]
+
+
+async def create_messenger_account(db, account: Dict) -> Dict:
+    """Create a messenger account record"""
+    account["account_id"] = str(uuid.uuid4())
+    if not account.get("created_at"):
+        account["created_at"] = datetime.utcnow()
+    result = await db.messenger_accounts.insert_one(account)
+    account["_id"] = str(result.inserted_id)
+    return serialize_doc(account)
+
+
+async def bulk_create_messenger_accounts(db, accounts: List[Dict]) -> int:
+    """Bulk create messenger accounts"""
+    if not accounts:
+        return 0
+    for account in accounts:
+        account["account_id"] = str(uuid.uuid4())
+        if not account.get("created_at"):
+            account["created_at"] = datetime.utcnow()
+    result = await db.messenger_accounts.insert_many(accounts)
+    return len(result.inserted_ids)
+
+
+async def get_messenger_accounts_by_session(db, session_id: str) -> List[Dict]:
+    """Get messenger accounts for a session"""
+    cursor = db.messenger_accounts.find({"session_id": session_id})
+    accounts = await cursor.to_list(length=100)
+    return [serialize_doc(account) for account in accounts]
+
+
+async def get_messenger_accounts_by_case(db, case_id: str) -> List[Dict]:
+    """Get messenger accounts for a case"""
+    cursor = db.messenger_accounts.find({"case_id": case_id})
+    accounts = await cursor.to_list(length=100)
+    return [serialize_doc(account) for account in accounts]
+
+
+async def create_call_log(db, call_log: Dict) -> Dict:
+    """Create a call log record"""
+    call_log["call_log_id"] = str(uuid.uuid4())
+    if not call_log.get("created_at"):
+        call_log["created_at"] = datetime.utcnow()
+    result = await db.call_logs.insert_one(call_log)
+    call_log["_id"] = str(result.inserted_id)
+    return serialize_doc(call_log)
+
+
+async def bulk_create_call_logs(db, call_logs: List[Dict]) -> int:
+    """Bulk create call logs"""
+    if not call_logs:
+        return 0
+    for log in call_logs:
+        log["call_log_id"] = str(uuid.uuid4())
+        if not log.get("created_at"):
+            log["created_at"] = datetime.utcnow()
+    result = await db.call_logs.insert_many(call_logs)
+    return len(result.inserted_ids)
+
+
+async def get_call_logs_by_session(db, session_id: str, limit: int = 1000) -> List[Dict]:
+    """Get call logs for a session"""
+    cursor = db.call_logs.find({"session_id": session_id}).sort("timestamp", -1).limit(limit)
+    logs = await cursor.to_list(length=limit)
+    return [serialize_doc(log) for log in logs]
+
+
+async def get_call_logs_by_case(db, case_id: str, limit: int = 1000) -> List[Dict]:
+    """Get call logs for a case"""
+    cursor = db.call_logs.find({"case_id": case_id}).sort("timestamp", -1).limit(limit)
+    logs = await cursor.to_list(length=limit)
+    return [serialize_doc(log) for log in logs]
+
+
+async def create_find_my_location(db, location: Dict) -> Dict:
+    """Create a Find My location record"""
+    location["location_id"] = str(uuid.uuid4())
+    if not location.get("created_at"):
+        location["created_at"] = datetime.utcnow()
+    result = await db.find_my_locations.insert_one(location)
+    location["_id"] = str(result.inserted_id)
+    return serialize_doc(location)
+
+
+async def bulk_create_find_my_locations(db, locations: List[Dict]) -> int:
+    """Bulk create Find My locations"""
+    if not locations:
+        return 0
+    for loc in locations:
+        loc["location_id"] = str(uuid.uuid4())
+        if not loc.get("created_at"):
+            loc["created_at"] = datetime.utcnow()
+    result = await db.find_my_locations.insert_many(locations)
+    return len(result.inserted_ids)
+
+
+async def get_find_my_locations_by_session(db, session_id: str) -> List[Dict]:
+    """Get Find My locations for a session"""
+    cursor = db.find_my_locations.find({"session_id": session_id}).sort("timestamp", -1)
+    locations = await cursor.to_list(length=1000)
+    return [serialize_doc(loc) for loc in locations]
+
+
+async def get_find_my_locations_by_case(db, case_id: str) -> List[Dict]:
+    """Get Find My locations for a case"""
+    cursor = db.find_my_locations.find({"case_id": case_id}).sort("timestamp", -1)
+    locations = await cursor.to_list(length=1000)
+    return [serialize_doc(loc) for loc in locations]
+
+
+async def create_forensic_summary(db, summary: Dict) -> Dict:
+    """Create a forensic summary record"""
+    summary["summary_id"] = str(uuid.uuid4())
+    if not summary.get("created_at"):
+        summary["created_at"] = datetime.utcnow()
+    result = await db.forensic_summaries.insert_one(summary)
+    summary["_id"] = str(result.inserted_id)
+    return serialize_doc(summary)
+
+
+async def get_forensic_summary_by_session(db, session_id: str) -> Optional[Dict]:
+    """Get forensic summary for a session"""
+    summary = await db.forensic_summaries.find_one({"session_id": session_id})
+    return serialize_doc(summary) if summary else None
+
+
+async def get_forensic_summary_by_case(db, case_id: str) -> List[Dict]:
+    """Get forensic summaries for a case"""
+    cursor = db.forensic_summaries.find({"case_id": case_id}).sort("created_at", -1)
+    summaries = await cursor.to_list(length=100)
+    return [serialize_doc(summary) for summary in summaries]

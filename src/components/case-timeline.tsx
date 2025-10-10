@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Clock,
   Upload,
@@ -11,7 +13,11 @@ import {
   AlertTriangle,
   User,
   Calendar,
+  MessageSquare,
+  Phone,
 } from "lucide-react";
+import { MessengerTimeline } from "@/components/forensic/messenger-timeline";
+import { CallLogsTimeline } from "@/components/forensic/call-logs-timeline";
 
 interface TimelineEvent {
   id: string;
@@ -128,6 +134,11 @@ const timelineEvents: TimelineEvent[] = [
 ];
 
 export function CaseTimeline({ caseId }: CaseTimelineProps) {
+  const [activeTab, setActiveTab] = useState<"case" | "messenger" | "calls">(
+    "case"
+  );
+  const sessionId = `case_${caseId}_session`; // Generate session ID from case ID
+
   const formatDateTime = (timestamp: string) => {
     const date = new Date(timestamp);
     return {
@@ -157,155 +168,199 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
               Case Timeline
             </h1>
             <p className="text-slate-600 dark:text-slate-300 text-lg">
-              Chronological overview of all forensic activities and key discoveries
+              Chronological overview of all forensic activities and key
+              discoveries
             </p>
           </div>
         </div>
+
+        {/* Timeline Type Tabs */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Button
+            variant={activeTab === "case" ? "default" : "outline"}
+            onClick={() => setActiveTab("case")}
+            className="flex items-center gap-2"
+          >
+            <Clock className="h-4 w-4" />
+            Case Events
+          </Button>
+          <Button
+            variant={activeTab === "messenger" ? "default" : "outline"}
+            onClick={() => setActiveTab("messenger")}
+            className="flex items-center gap-2"
+          >
+            <MessageSquare className="h-4 w-4" />
+            Messenger Timeline
+          </Button>
+          <Button
+            variant={activeTab === "calls" ? "default" : "outline"}
+            onClick={() => setActiveTab("calls")}
+            className="flex items-center gap-2"
+          >
+            <Phone className="h-4 w-4" />
+            Call Logs
+          </Button>
+        </div>
       </div>
 
-      <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-        
-        <CardHeader className="relative">
-          <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-slate-100">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            </div>
-            <span className="text-xl font-semibold">Activity Timeline</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="relative">
-          <div className="relative">
-            {/* Enhanced Timeline Line */}
-            <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-200 via-indigo-200 to-blue-200 dark:from-purple-800 dark:via-indigo-800 dark:to-blue-800 rounded-full"></div>
+      {/* Render based on active tab */}
+      {activeTab === "messenger" && (
+        <MessengerTimeline sessionId={sessionId} caseId={caseId} />
+      )}
 
-            <div className="space-y-8">
-              {timelineEvents.map((event, index) => {
-                const EventIcon = getEventIcon(event.type);
-                const { date, time } = formatDateTime(event.timestamp);
+      {activeTab === "calls" && (
+        <CallLogsTimeline sessionId={sessionId} caseId={caseId} />
+      )}
 
-                return (
-                  <div
-                    key={event.id}
-                    className="relative flex items-start space-x-6 animate-slide-up group/item"
-                    style={{animationDelay: `${index * 0.1}s`}}
-                  >
-                    {/* Enhanced Timeline Icon */}
-                    <div
-                      className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full ${getEventBgColor(
-                        event.type
-                      )} border-2`}
-                    >
-                      <EventIcon className="h-5 w-5" />
-                    </div>
+      {activeTab === "case" && (
+        <>
+          <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
 
-                    {/* Event Content */}
-                    <div className="flex-1 min-w-0">
-                      <Card
-                        className={`${getEventBgColor(event.type)} shadow-sm`}
+            <CardHeader className="relative">
+              <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-slate-100">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <span className="text-xl font-semibold">Activity Timeline</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="relative">
+                {/* Enhanced Timeline Line */}
+                <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-200 via-indigo-200 to-blue-200 dark:from-purple-800 dark:via-indigo-800 dark:to-blue-800 rounded-full"></div>
+
+                <div className="space-y-8">
+                  {timelineEvents.map((event, index) => {
+                    const EventIcon = getEventIcon(event.type);
+                    const { date, time } = formatDateTime(event.timestamp);
+
+                    return (
+                      <div
+                        key={event.id}
+                        className="relative flex items-start space-x-6 animate-slide-up group/item"
+                        style={{ animationDelay: `${index * 0.1}s` }}
                       >
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex-1">
-                              <h3 className="font-semibold text-gray-900 dark:text-slate-100">
-                                {event.title}
-                              </h3>
-                              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                                {event.description}
-                              </p>
-                            </div>
-                            <Badge className={getEventColor(event.type)}>
-                              {event.type}
-                            </Badge>
-                          </div>
+                        {/* Enhanced Timeline Icon */}
+                        <div
+                          className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full ${getEventBgColor(
+                            event.type
+                          )} border-2`}
+                        >
+                          <EventIcon className="h-5 w-5" />
+                        </div>
 
-                          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                            <div className="flex items-center space-x-4">
-                              <div className="flex items-center space-x-1">
-                                <Calendar className="h-3 w-3" />
-                                <span>{date}</span>
+                        {/* Event Content */}
+                        <div className="flex-1 min-w-0">
+                          <Card
+                            className={`${getEventBgColor(
+                              event.type
+                            )} shadow-sm`}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex-1">
+                                  <h3 className="font-semibold text-gray-900 dark:text-slate-100">
+                                    {event.title}
+                                  </h3>
+                                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                                    {event.description}
+                                  </p>
+                                </div>
+                                <Badge className={getEventColor(event.type)}>
+                                  {event.type}
+                                </Badge>
                               </div>
-                              <div className="flex items-center space-x-1">
-                                <Clock className="h-3 w-3" />
-                                <span>{time}</span>
+
+                              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                                <div className="flex items-center space-x-4">
+                                  <div className="flex items-center space-x-1">
+                                    <Calendar className="h-3 w-3" />
+                                    <span>{date}</span>
+                                  </div>
+                                  <div className="flex items-center space-x-1">
+                                    <Clock className="h-3 w-3" />
+                                    <span>{time}</span>
+                                  </div>
+                                  {event.user && (
+                                    <div className="flex items-center space-x-1">
+                                      <User className="h-3 w-3" />
+                                      <span>{event.user}</span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                              {event.user && (
-                                <div className="flex items-center space-x-1">
-                                  <User className="h-3 w-3" />
-                                  <span>{event.user}</span>
+
+                              {event.details && (
+                                <div className="mt-3 p-3 bg-white/50 dark:bg-slate-900/30 rounded-lg">
+                                  <p className="text-sm text-slate-700 dark:text-slate-300">
+                                    {event.details}
+                                  </p>
                                 </div>
                               )}
-                            </div>
-                          </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                          {event.details && (
-                            <div className="mt-3 p-3 bg-white/50 dark:bg-slate-900/30 rounded-lg">
-                              <p className="text-sm text-slate-700 dark:text-slate-300">
-                                {event.details}
-                              </p>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          {/* Timeline Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700">
+              <CardContent className="p-4 text-center">
+                <Upload className="h-6 w-6 text-blue-500 dark:text-blue-400 mx-auto mb-2" />
+                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                  Total Events
+                </p>
+                <p className="text-xl font-bold text-blue-700 dark:text-blue-300">
+                  {timelineEvents.length}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-purple-200 dark:border-purple-700">
+              <CardContent className="p-4 text-center">
+                <Search className="h-6 w-6 text-purple-500 dark:text-purple-400 mx-auto mb-2" />
+                <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                  Analysis Time
+                </p>
+                <p className="text-xl font-bold text-purple-700 dark:text-purple-300">
+                  7h 20m
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-700">
+              <CardContent className="p-4 text-center">
+                <FileText className="h-6 w-6 text-amber-500 dark:text-amber-400 mx-auto mb-2" />
+                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                  Discoveries
+                </p>
+                <p className="text-xl font-bold text-amber-700 dark:text-amber-300">
+                  15
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border-red-200 dark:border-red-700">
+              <CardContent className="p-4 text-center">
+                <AlertTriangle className="h-6 w-6 text-red-500 dark:text-red-400 mx-auto mb-2" />
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                  Alerts
+                </p>
+                <p className="text-xl font-bold text-red-700 dark:text-red-300">
+                  1
+                </p>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Timeline Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700">
-          <CardContent className="p-4 text-center">
-            <Upload className="h-6 w-6 text-blue-500 dark:text-blue-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
-              Total Events
-            </p>
-            <p className="text-xl font-bold text-blue-700 dark:text-blue-300">
-              {timelineEvents.length}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-purple-200 dark:border-purple-700">
-          <CardContent className="p-4 text-center">
-            <Search className="h-6 w-6 text-purple-500 dark:text-purple-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
-              Analysis Time
-            </p>
-            <p className="text-xl font-bold text-purple-700 dark:text-purple-300">
-              7h 20m
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-700">
-          <CardContent className="p-4 text-center">
-            <FileText className="h-6 w-6 text-amber-500 dark:text-amber-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
-              Discoveries
-            </p>
-            <p className="text-xl font-bold text-amber-700 dark:text-amber-300">
-              15
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border-red-200 dark:border-red-700">
-          <CardContent className="p-4 text-center">
-            <AlertTriangle className="h-6 w-6 text-red-500 dark:text-red-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-red-600 dark:text-red-400">
-              Alerts
-            </p>
-            <p className="text-xl font-bold text-red-700 dark:text-red-300">
-              1
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+        </>
+      )}
     </div>
   );
 }

@@ -77,6 +77,33 @@ async def create_indexes():
         await database.relationships.create_index("session_id")
         await database.relationships.create_index("case_id")
         
+        # Forensic data collection indexes
+        await database.messenger_messages.create_index("session_id")
+        await database.messenger_messages.create_index("case_id")
+        await database.messenger_messages.create_index("timestamp")
+        await database.messenger_messages.create_index("app_name")
+        
+        await database.messenger_calls.create_index("session_id")
+        await database.messenger_calls.create_index("case_id")
+        await database.messenger_calls.create_index("start_time")
+        
+        await database.messenger_accounts.create_index("session_id")
+        await database.messenger_accounts.create_index("case_id")
+        await database.messenger_accounts.create_index("app_name")
+        
+        await database.call_logs.create_index("session_id")
+        await database.call_logs.create_index("case_id")
+        await database.call_logs.create_index("timestamp")
+        await database.call_logs.create_index("phone_number")
+        
+        await database.find_my_locations.create_index("session_id")
+        await database.find_my_locations.create_index("case_id")
+        await database.find_my_locations.create_index("timestamp")
+        await database.find_my_locations.create_index([("latitude", 1), ("longitude", 1)])
+        
+        await database.forensic_summaries.create_index("session_id", unique=True)
+        await database.forensic_summaries.create_index("case_id")
+        
         print("✅ Database indexes created successfully")
     except Exception as e:
         print(f"⚠️  Error creating indexes: {str(e)}")

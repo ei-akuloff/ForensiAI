@@ -11,7 +11,7 @@ import json
 import uuid
 from pathlib import Path
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from ufdr_parser import parse_ufdr, parse_json_data, chunk_text, extract_ufdr_contents, list_ufdr_contents
 from vector_store import add_documents, get_full_context, delete_session
 from openai import OpenAI
@@ -501,6 +501,64 @@ async def upload_ufdr(
                     "chunks": len(chunks)
                 })
                 print("File metadata saved to MongoDB")
+                
+                # Automatically trigger forensic parsing after successful upload
+                try:
+                    print(f"Starting automatic forensic parsing for session: {session_id}")
+                    import forensic_parser
+                    
+                    # Get the uploaded file metadata to extract JSON
+                    forensic_data = forensic_parser.parse_all_forensic_data(text)
+                    
+                    if forensic_data:
+                        # Store messenger data
+                        if forensic_data["messenger_messages"]:
+                            msg_ids = await crud.bulk_create_messenger_messages(
+                                db, forensic_data["messenger_messages"], session_id, case_id
+                            )
+                            print(f"Stored {len(msg_ids)} messenger messages")
+                        
+                        if forensic_data["messenger_calls"]:
+                            call_ids = await crud.bulk_create_messenger_calls(
+                                db, forensic_data["messenger_calls"], session_id, case_id
+                            )
+                            print(f"Stored {len(call_ids)} messenger calls")
+                        
+                        if forensic_data["messenger_accounts"]:
+                            account_ids = await crud.bulk_create_messenger_accounts(
+                                db, forensic_data["messenger_accounts"], session_id, case_id
+                            )
+                            print(f"Stored {len(account_ids)} messenger accounts")
+                        
+                        # Store call logs
+                        if forensic_data["call_logs"]:
+                            call_log_ids = await crud.bulk_create_call_logs(
+                                db, forensic_data["call_logs"], session_id, case_id
+                            )
+                            print(f"Stored {len(call_log_ids)} call logs")
+                        
+                        # Store Find My locations
+                        if forensic_data["find_my_locations"]:
+                            location_ids = await crud.bulk_create_find_my_locations(
+                                db, forensic_data["find_my_locations"], session_id, case_id
+                            )
+                            print(f"Stored {len(location_ids)} Find My locations")
+                        
+                        # Generate and store forensic summary
+                        summary = forensic_parser.extract_forensic_summary(forensic_data)
+                        if summary:
+                            summary["session_id"] = session_id
+                            summary["case_id"] = case_id
+                            summary_id = await crud.create_forensic_summary(db, summary)
+                            print(f"Stored forensic summary with ID: {summary_id}")
+                        
+                        print("Automatic forensic parsing completed successfully")
+                except Exception as forensic_error:
+                    print(f"Warning: Automatic forensic parsing failed: {str(forensic_error)}")
+                    import traceback
+                    traceback.print_exc()
+                    # Don't fail the upload if forensic parsing fails
+                
             except Exception as mongo_error:
                 print(f"Warning: Could not save to MongoDB: {str(mongo_error)}")
         
@@ -1244,6 +1302,255 @@ Your Response (MUST be in {detected_language or 'the specified language'}):"""
             return JSONResponse(content={"query": query, "response": mock_response, "context_used": len(context) > 0 if 'context' in locals() else False, "session_id": session_id})
         
         raise HTTPException(status_code=500, detail=f"Error querying documents: {str(e)}")
+
+
+# ===== FORENSIC DATA ENDPOINTS =====
+
+@app.post("/forensic/parse-all/{session_id}")
+async def parse_forensic_data(
+    session_id: str,
+    case_id: str = Form(...),
+    db = Depends(get_database)
+):
+    """
+    Parse all forensic data from uploaded UFDR files for a session
+    """
+    try:
+        import forensic_parser
+        import json
+        import zipfile
+        
+        # Get session info
+        session = await crud.get_session_by_id(db, session_id)
+        if not session:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        # Get files for this session
+        files = await crud.get_files_by_session(db, session_id)
+        if not files:
+            raise HTTPException(status_code=404, detail="No files found for session")
+        
+        all_forensic_data = {
+            'messenger_messages': [],
+            'messenger_calls': [],
+            'messenger_accounts': [],
+            'call_logs': [],
+            'find_my_locations': []
+        }
+        
+        # Process each file
+        for file_meta in files:
+            # Try to find and parse the original UFDR file
+            # In production, you'd store the file path or retrieve from cloud storage
+            # For now, we'll extract from ChromaDB metadata or skip
+            print(f"Processing file: {file_meta.get('filename')}")
+        
+        # Parse documents from vector store context
+        try:
+            from vector_store import get_full_context
+            context = get_full_context(session_id, "", top_k=10)
+            
+            # Try to parse JSON from context
+            for chunk in context:
+                try:
+                    # Attempt to parse as JSON
+                    json_data = json.loads(chunk)
+                    forensic_data = forensic_parser.parse_all_forensic_data(json_data)
+                    
+                    # Merge results
+                    all_forensic_data['messenger_messages'].extend(forensic_data.get('messenger_messages', []))
+                    all_forensic_data['messenger_calls'].extend(forensic_data.get('messenger_calls', []))
+                    all_forensic_data['messenger_accounts'].extend(forensic_data.get('messenger_accounts', []))
+                    all_forensic_data['call_logs'].extend(forensic_data.get('call_logs', []))
+                    all_forensic_data['find_my_locations'].extend(forensic_data.get('find_my_locations', []))
+                except json.JSONDecodeError:
+                    continue
+        except Exception as e:
+            print(f"Error extracting forensic data: {str(e)}")
+        
+        # Add session_id and case_id to all records
+        for msg in all_forensic_data['messenger_messages']:
+            msg['session_id'] = session_id
+            msg['case_id'] = case_id
+        for call in all_forensic_data['messenger_calls']:
+            call['session_id'] = session_id
+            call['case_id'] = case_id
+        for account in all_forensic_data['messenger_accounts']:
+            account['session_id'] = session_id
+            account['case_id'] = case_id
+        for log in all_forensic_data['call_logs']:
+            log['session_id'] = session_id
+            log['case_id'] = case_id
+        for loc in all_forensic_data['find_my_locations']:
+            loc['session_id'] = session_id
+            loc['case_id'] = case_id
+        
+        # Bulk insert into MongoDB
+        msg_count = await crud.bulk_create_messenger_messages(db, all_forensic_data['messenger_messages'])
+        call_count = await crud.bulk_create_messenger_calls(db, all_forensic_data['messenger_calls'])
+        account_count = await crud.bulk_create_messenger_accounts(db, all_forensic_data['messenger_accounts'])
+        log_count = await crud.bulk_create_call_logs(db, all_forensic_data['call_logs'])
+        loc_count = await crud.bulk_create_find_my_locations(db, all_forensic_data['find_my_locations'])
+        
+        # Generate and save summary
+        summary_data = forensic_parser.extract_forensic_summary(all_forensic_data)
+        summary_data['session_id'] = session_id
+        summary_data['case_id'] = case_id
+        await crud.create_forensic_summary(db, summary_data)
+        
+        return JSONResponse(content={
+            "message": "Forensic data parsed successfully",
+            "counts": {
+                "messenger_messages": msg_count,
+                "messenger_calls": call_count,
+                "messenger_accounts": account_count,
+                "call_logs": log_count,
+                "find_my_locations": loc_count
+            },
+            "summary": serialize_datetime(summary_data)
+        })
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error parsing forensic data: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error parsing forensic data: {str(e)}")
+
+
+@app.get("/forensic/messenger/{session_id}")
+async def get_messenger_data(
+    session_id: str,
+    app_name: Optional[str] = None,
+    db = Depends(get_database)
+):
+    """
+    Get all messenger data (messages, calls, accounts) for a session
+    """
+    try:
+        messages = await crud.get_messenger_messages_by_session(db, session_id)
+        calls = await crud.get_messenger_calls_by_session(db, session_id)
+        accounts = await crud.get_messenger_accounts_by_session(db, session_id)
+        
+        # Filter by app if specified
+        if app_name:
+            messages = [m for m in messages if m.get('app_name') == app_name]
+            calls = [c for c in calls if c.get('app_name') == app_name]
+            accounts = [a for a in accounts if a.get('app_name') == app_name]
+        
+        # Serialize datetime objects
+        messages = [serialize_datetime(m) for m in messages]
+        calls = [serialize_datetime(c) for c in calls]
+        accounts = [serialize_datetime(a) for a in accounts]
+        
+        return JSONResponse(content={
+            "messages": messages,
+            "calls": calls,
+            "accounts": accounts,
+            "total_messages": len(messages),
+            "total_calls": len(calls),
+            "total_accounts": len(accounts)
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching messenger data: {str(e)}")
+
+
+@app.get("/forensic/call-logs/{session_id}")
+async def get_call_logs_data(
+    session_id: str,
+    db = Depends(get_database)
+):
+    """
+    Get all call logs for a session
+    """
+    try:
+        call_logs = await crud.get_call_logs_by_session(db, session_id)
+        call_logs = [serialize_datetime(log) for log in call_logs]
+        
+        return JSONResponse(content={
+            "call_logs": call_logs,
+            "total_calls": len(call_logs)
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching call logs: {str(e)}")
+
+
+@app.get("/forensic/find-my/{session_id}")
+async def get_find_my_data(
+    session_id: str,
+    db = Depends(get_database)
+):
+    """
+    Get all Find My location data for a session
+    """
+    try:
+        locations = await crud.get_find_my_locations_by_session(db, session_id)
+        locations = [serialize_datetime(loc) for loc in locations]
+        
+        return JSONResponse(content={
+            "locations": locations,
+            "total_locations": len(locations)
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching Find My data: {str(e)}")
+
+
+@app.get("/forensic/summary/{session_id}")
+async def get_forensic_summary_endpoint(
+    session_id: str,
+    db = Depends(get_database)
+):
+    """
+    Get forensic data summary for a session
+    """
+    try:
+        summary = await crud.get_forensic_summary_by_session(db, session_id)
+        if not summary:
+            raise HTTPException(status_code=404, detail="Forensic summary not found")
+        
+        summary = serialize_datetime(summary)
+        return JSONResponse(content=summary)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching forensic summary: {str(e)}")
+
+
+@app.get("/forensic/case/{case_id}")
+async def get_case_forensic_data(
+    case_id: str,
+    data_type: Optional[str] = None,  # "messenger", "call_logs", "find_my", "all"
+    db = Depends(get_database)
+):
+    """
+    Get all forensic data for a case
+    """
+    try:
+        result = {}
+        
+        if data_type is None or data_type == "all" or data_type == "messenger":
+            messages = await crud.get_messenger_messages_by_case(db, case_id)
+            calls = await crud.get_messenger_calls_by_case(db, case_id)
+            accounts = await crud.get_messenger_accounts_by_case(db, case_id)
+            result['messenger'] = {
+                'messages': [serialize_datetime(m) for m in messages],
+                'calls': [serialize_datetime(c) for c in calls],
+                'accounts': [serialize_datetime(a) for a in accounts]
+            }
+        
+        if data_type is None or data_type == "all" or data_type == "call_logs":
+            call_logs = await crud.get_call_logs_by_case(db, case_id)
+            result['call_logs'] = [serialize_datetime(log) for log in call_logs]
+        
+        if data_type is None or data_type == "all" or data_type == "find_my":
+            locations = await crud.get_find_my_locations_by_case(db, case_id)
+            result['find_my_locations'] = [serialize_datetime(loc) for loc in locations]
+        
+        return JSONResponse(content=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching case forensic data: {str(e)}")
+
 
 if __name__ == "__main__":
     import uvicorn

@@ -550,3 +550,122 @@ export async function analyzeRelationshipsWithCase(
 
   return response.json();
 }
+
+// ===== FORENSIC DATA ENDPOINTS =====
+
+import {
+  MessengerData,
+  CallLogsData,
+  FindMyData,
+  ForensicSummary,
+  ForensicParseResult,
+} from "@/types/forensic";
+
+/**
+ * Parse all forensic data from a session (Messenger, call logs, Find My)
+ */
+export async function parseForensicData(
+  sessionId: string,
+  caseId: string
+): Promise<ForensicParseResult> {
+  const formData = new FormData();
+  formData.append("case_id", caseId);
+
+  const response = await fetch(`${API_BASE_URL}/forensic/parse-all/${sessionId}`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || "Failed to parse forensic data");
+  }
+
+  return response.json();
+}
+
+/**
+ * Get Messenger data (messages, calls, accounts) for a session
+ */
+export async function getMessengerData(
+  sessionId: string,
+  appName?: string
+): Promise<MessengerData> {
+  const params = new URLSearchParams();
+  if (appName) params.append("app_name", appName);
+
+  const response = await fetch(
+    `${API_BASE_URL}/forensic/messenger/${sessionId}?${params.toString()}`
+  );
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || "Failed to get messenger data");
+  }
+
+  return response.json();
+}
+
+/**
+ * Get call logs for a session
+ */
+export async function getCallLogs(sessionId: string): Promise<CallLogsData> {
+  const response = await fetch(`${API_BASE_URL}/forensic/call-logs/${sessionId}`);
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || "Failed to get call logs");
+  }
+
+  return response.json();
+}
+
+/**
+ * Get Find My location data for a session
+ */
+export async function getFindMyData(sessionId: string): Promise<FindMyData> {
+  const response = await fetch(`${API_BASE_URL}/forensic/find-my/${sessionId}`);
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || "Failed to get Find My data");
+  }
+
+  return response.json();
+}
+
+/**
+ * Get forensic summary statistics for a session
+ */
+export async function getForensicSummary(sessionId: string): Promise<ForensicSummary | null> {
+  const response = await fetch(`${API_BASE_URL}/forensic/summary/${sessionId}`);
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || "Failed to get forensic summary");
+  }
+
+  return response.json();
+}
+
+/**
+ * Get all forensic data for a case
+ */
+export async function getCaseForensicData(
+  caseId: string,
+  dataType?: "messenger" | "call_logs" | "find_my"
+): Promise<any> {
+  const params = new URLSearchParams();
+  if (dataType) params.append("data_type", dataType);
+
+  const response = await fetch(
+    `${API_BASE_URL}/forensic/case/${caseId}?${params.toString()}`
+  );
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || "Failed to get case forensic data");
+  }
+
+  return response.json();
+}
