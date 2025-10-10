@@ -34,11 +34,13 @@ export function CaseCreationModal({
   const [formData, setFormData] = useState<CaseFormData>({
     caseNo: "",
     leadInvestigator: "",
-    caseTitle: "",
-    department: "",
+    caseTitle: fileName.includes('.ufdr.enc') ? 'Encrypted UFDR Analysis' : 'UFDR Forensic Analysis',
+    department: "Digital Forensics",
     priority: "Medium",
-    caseType: "Other",
-    description: "",
+    caseType: "Mobile Device",
+    description: fileName.includes('.ufdr.enc') ? 
+      `Forensic analysis of encrypted UFDR file: ${fileName}` : 
+      `Forensic analysis of UFDR file: ${fileName}`,
     fileName: fileName
   });
 
@@ -74,15 +76,17 @@ export function CaseCreationModal({
 
   const handleCancel = () => {
     onClose();
-    // Reset form
+    // Reset form with pre-filled values
     setFormData({
       caseNo: "",
       leadInvestigator: "",
-      caseTitle: "",
-      department: "",
+      caseTitle: fileName.includes('.ufdr.enc') ? 'Encrypted UFDR Analysis' : 'UFDR Forensic Analysis',
+      department: "Digital Forensics",
       priority: "Medium",
-      caseType: "Other",
-      description: "",
+      caseType: "Mobile Device",
+      description: fileName.includes('.ufdr.enc') ? 
+        `Forensic analysis of encrypted UFDR file: ${fileName}` : 
+        `Forensic analysis of UFDR file: ${fileName}`,
       fileName: fileName
     });
     setErrors({});

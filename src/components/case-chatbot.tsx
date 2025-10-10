@@ -115,6 +115,28 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
     }
   };
 
+  // Initialize with welcome message for UFDR cases
+  useEffect(() => {
+    if (!isClient || !caseId) return;
+    
+    const sessionId = localStorage.getItem(`case_${caseId}_session`);
+    if (sessionId && messages.length === 0) {
+      const welcomeMessage: Message = {
+        id: "welcome",
+        content: "Hello! I'm your UFDR forensic analysis assistant. I can help you analyze the uploaded forensic data including calls, contacts, locations, WhatsApp chats, and more. What would you like to investigate?",
+        sender: "ai",
+        timestamp: new Date().toISOString(),
+        suggestions: [
+          "What information is available in this dataset?",
+          "Show me a summary of call records",
+          "Analyze communication patterns",
+          "Find suspicious activities"
+        ]
+      };
+      setMessages([welcomeMessage]);
+    }
+  }, [isClient, caseId, messages.length]);
+
   // Show scroll button when new messages arrive and user is not at bottom
   useEffect(() => {
     if (messagesContainerRef.current && messages.length > 1 && isLoaded) {

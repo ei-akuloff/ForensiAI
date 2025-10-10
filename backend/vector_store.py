@@ -1,4 +1,5 @@
 import chromadb
+from chromadb.config import Settings
 from chromadb.utils import embedding_functions
 import os
 from dotenv import load_dotenv
@@ -33,8 +34,11 @@ class LocalEmbeddingFunction(embedding_functions.EmbeddingFunction):
 
 local_ef = LocalEmbeddingFunction(model)
 
-# Initialize ChromaDB client (persistent)
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
+# Initialize ChromaDB client (persistent) with telemetry disabled to avoid capture() errors
+chroma_client = chromadb.PersistentClient(
+    path="./chroma_db",
+    settings=Settings(anonymized_telemetry=False)
+)
 collection = chroma_client.get_or_create_collection(
     name="ufdr_docs",
     embedding_function=local_ef

@@ -7,12 +7,13 @@ import { useCases } from "@/components/case-context";
 import { CaseFormData } from "@/components/case-creation-modal";
 import { DecryptionData } from "@/components/decryption-modal";
 import { FolderOpen, Clock, CheckCircle, TrendingUp } from "lucide-react";
-import { uploadUFDRFile, generateSessionId } from "@/lib/backend-service";
+import { uploadUFDRFile, uploadEncryptedUFDRFile, generateSessionId } from "@/lib/backend-service";
 import { useState } from "react";
 
 export default function DashboardPage() {
   const { cases, addCase, updateCase } = useCases();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [decryptionData, setDecryptionData] = useState<DecryptionData | null>(null);
 
   // Calculate stats from actual cases
   const stats = {
@@ -37,19 +38,46 @@ export default function DashboardPage() {
         // Update case to show processing status
         updateCase(newCaseId, { fileSize: "Processing..." });
         
-        const uploadResponse = await uploadUFDRFile(uploadedFile, sessionId);
+        let uploadResponse;
+        
+        // Check if it's an encrypted file
+        if (uploadedFile.name.toLowerCase().endsWith('.ufdr.enc')) {
+          // For encrypted files, use stored decryption data
+          if (decryptionData) {
+            uploadResponse = await uploadEncryptedUFDRFile(uploadedFile, sessionId, decryptionData.decryptionKey || "", decryptionData.hashValue);
+          } else {
+            throw new Error("Decryption data not found for encrypted file");
+          }
+        } else {
+          // For regular UFDR files
+          uploadResponse = await uploadUFDRFile(uploadedFile, sessionId);
+        }
         
         // Update case with upload results
         const fileSizeMB = (uploadedFile.size / (1024 * 1024)).toFixed(2);
+        const isEncrypted = uploadedFile.name.toLowerCase().endsWith('.ufdr.enc');
+        const decryptionInfo = isEncrypted && decryptionData ? 
+          `\nDecryption: ${decryptionData.decryptionKey ? 'Key provided' : 'No key'}, Hash: ${decryptionData.hashValue ? 'Verified' : 'Not provided'}` : '';
+        
         updateCase(newCaseId, { 
           fileSize: `${fileSizeMB} MB`,
-          description: `${caseData.description}\n\nProcessed ${uploadResponse.chunks} chunks successfully.`
+          fileName: uploadedFile.name,
+          description: `${caseData.description}\n\nFile: ${uploadedFile.name}${decryptionInfo}\nProcessed ${uploadResponse.chunks} chunks successfully.\nSession ID: ${sessionId}`,
+          status: "ongoing"
         });
         
         console.log("File uploaded successfully:", uploadResponse);
         
         // Store session ID for later use in chatbot
         localStorage.setItem(`case_${newCaseId}_session`, sessionId);
+        
+        // Show success message and redirect to case page
+        alert(`UFDR file processed successfully! ${uploadResponse.chunks} chunks created. Redirecting to case page...`);
+        
+        // Redirect to case page after a short delay
+        setTimeout(() => {
+          window.location.href = `/cases/${newCaseId}`;
+        }, 2000);
         
       } catch (error) {
         console.error("Upload failed:", error);
@@ -59,14 +87,76 @@ export default function DashboardPage() {
         });
       } finally {
         setUploadedFile(null);
+        setDecryptionData(null);
       }
     }
   };
 
   const handleDecryptionSuccess = async (decryptionData: DecryptionData) => {
     console.log("Decryption successful:", decryptionData);
-    // Here you could send the decryption data to your backend
-    // or perform additional processing
+    // Store decryption data for later use when case is created
+    setDecryptionData(decryptionData);
+  };
+
+  const handleAddToExistingCase = async (caseId: string, file: File, decryptionData?: DecryptionData) => {
+    try {
+      const sessionId = generateSessionId(caseId);
+      
+      // Update case to show processing status
+      updateCase(caseId, { fileSize: "Processing..." });
+      
+      let uploadResponse;
+      
+      // Check if it's an encrypted file
+      if (file.name.toLowerCase().endsWith('.ufdr.enc')) {
+        // For encrypted files, use stored decryption data
+        if (decryptionData) {
+          uploadResponse = await uploadEncryptedUFDRFile(file, sessionId, decryptionData.decryptionKey || "", decryptionData.hashValue);
+        } else {
+          throw new Error("Decryption data not found for encrypted file");
+        }
+      } else {
+        // For regular UFDR files
+        uploadResponse = await uploadUFDRFile(file, sessionId);
+      }
+      
+      // Update case with upload results
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      const isEncrypted = file.name.toLowerCase().endsWith('.ufdr.enc');
+      const decryptionInfo = isEncrypted && decryptionData ? 
+        `\nDecryption: ${decryptionData.decryptionKey ? 'Key provided' : 'No key'}, Hash: ${decryptionData.hashValue ? 'Verified' : 'Not provided'}` : '';
+      
+      // Get current case data
+      const currentCase = getCaseById(caseId);
+      const updatedDescription = currentCase ? 
+        `${currentCase.description}\n\n--- Additional UFDR File ---\nFile: ${file.name}${decryptionInfo}\nProcessed ${uploadResponse.chunks} chunks successfully.\nSession ID: ${sessionId}` :
+        `Additional UFDR file: ${file.name}${decryptionInfo}\nProcessed ${uploadResponse.chunks} chunks successfully.\nSession ID: ${sessionId}`;
+      
+      updateCase(caseId, { 
+        fileSize: `${fileSizeMB} MB`,
+        fileName: file.name,
+        description: updatedDescription,
+        status: "ongoing"
+      });
+      
+      console.log("File added to existing case successfully:", uploadResponse);
+      
+      // Store session ID for later use in chatbot
+      localStorage.setItem(`case_${caseId}_session`, sessionId);
+      
+      // Show success message
+      alert(`UFDR file added to case successfully! ${uploadResponse.chunks} chunks created.`);
+      
+    } catch (error) {
+      console.error("Upload failed:", error);
+      updateCase(caseId, { 
+        fileSize: "Upload failed",
+        description: `Error adding file: ${error instanceof Error ? error.message : 'Unknown error'}`
+      });
+    } finally {
+      setUploadedFile(null);
+      setDecryptionData(null);
+    }
   };
 
   return (
@@ -120,14 +210,18 @@ export default function DashboardPage() {
 
         {/* Upload Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">
-            New Analysis
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-6">
+            Upload Forensic Data
           </h2>
-          <UploadBox 
-            onFileUpload={handleFileUpload} 
-            onCaseCreated={handleCaseCreated}
-            onDecryptionSuccess={handleDecryptionSuccess}
-          />
+          
+          <div className="max-w-2xl mx-auto">
+            <UploadBox
+              onFileUpload={handleFileUpload}
+              onCaseCreated={handleCaseCreated}
+              onAddToExistingCase={handleAddToExistingCase}
+              onDecryptionSuccess={handleDecryptionSuccess}
+            />
+          </div>
         </div>
 
         {/* Past Cases Section */}

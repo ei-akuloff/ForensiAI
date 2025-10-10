@@ -6,19 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Upload, FileText, X } from "lucide-react";
 import { CaseCreationModal, CaseFormData } from "./case-creation-modal";
 import { DecryptionModal, DecryptionData } from "./decryption-modal";
+import { CaseSelectionModal } from "./case-selection-modal";
 
 interface UploadBoxProps {
   onFileUpload?: (file: File) => void;
   onCaseCreated?: (caseData: CaseFormData) => void;
+  onAddToExistingCase?: (caseId: string, file: File, decryptionData?: DecryptionData) => void;
   onDecryptionSuccess?: (data: DecryptionData) => void;
 }
 
-export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: UploadBoxProps) {
+export function UploadBox({ onFileUpload, onCaseCreated, onAddToExistingCase, onDecryptionSuccess }: UploadBoxProps) {
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [error, setError] = useState<string>("");
   const [showCaseModal, setShowCaseModal] = useState(false);
   const [showDecryptionModal, setShowDecryptionModal] = useState(false);
+  const [showCaseSelectionModal, setShowCaseSelectionModal] = useState(false);
   const [caseData, setCaseData] = useState<CaseFormData | null>(null);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -32,13 +35,14 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
   }, []);
 
   const validateFile = (file: File): boolean => {
-    const validExtensions = [".ufdr"];
-    const fileExtension = file.name
-      .toLowerCase()
-      .slice(file.name.lastIndexOf("."));
-
-    if (!validExtensions.includes(fileExtension)) {
-      setError("Only UFDR (.ufdr) files are allowed");
+    const fileName = file.name.toLowerCase();
+    
+    // Check if file ends with .ufdr or .ufdr.enc
+    const isValidUFDR = fileName.endsWith('.ufdr');
+    const isValidEncryptedUFDR = fileName.endsWith('.ufdr.enc');
+    
+    if (!isValidUFDR && !isValidEncryptedUFDR) {
+      setError("Only UFDR (.ufdr) and encrypted UFDR (.ufdr.enc) files are allowed");
       return false;
     }
 
@@ -63,8 +67,14 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
         if (validateFile(file)) {
           setUploadedFile(file);
           onFileUpload?.(file);
-          // Open case creation modal for .ufdr files
-          setShowCaseModal(true);
+          // Check if it's an encrypted file
+          if (file.name.toLowerCase().endsWith('.ufdr.enc')) {
+            // For encrypted files, show decryption modal first
+            setShowDecryptionModal(true);
+          } else {
+            // For regular .ufdr files, show case selection modal
+            setShowCaseSelectionModal(true);
+          }
         }
       }
     },
@@ -72,15 +82,21 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
   );
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (validateFile(file)) {
-        setUploadedFile(file);
-        onFileUpload?.(file);
-        // Open case creation modal for .ufdr files
-        setShowCaseModal(true);
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        if (validateFile(file)) {
+          setUploadedFile(file);
+          onFileUpload?.(file);
+          // Check if it's an encrypted file
+          if (file.name.toLowerCase().endsWith('.ufdr.enc')) {
+            // For encrypted files, show decryption modal first
+            setShowDecryptionModal(true);
+          } else {
+            // For regular .ufdr files, show case selection modal
+            setShowCaseSelectionModal(true);
+          }
+        }
       }
-    }
   };
 
   const removeFile = () => {
@@ -91,18 +107,16 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
   const handleCaseCreated = (formData: CaseFormData) => {
     setCaseData(formData);
     setShowCaseModal(false);
-    // Show decryption modal after case creation
-    setShowDecryptionModal(true);
+    // Do NOT open decryption modal here; decryption (if needed) happens before case creation
+    onCaseCreated?.(formData);
   };
 
   const handleDecryptionSuccess = (decryptionData: DecryptionData) => {
-    // Call the parent callback with the complete case data
-    if (caseData) {
-      onCaseCreated?.(caseData);
-    }
+    // Store decryption data for later use
     onDecryptionSuccess?.(decryptionData);
     setShowDecryptionModal(false);
-    setCaseData(null);
+    // After successful decryption, show case selection modal
+    setShowCaseSelectionModal(true);
   };
 
   const handleModalClose = () => {
@@ -112,6 +126,22 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
 
   const handleDecryptionModalClose = () => {
     setShowDecryptionModal(false);
+  };
+
+  const handleCaseSelectionClose = () => {
+    setShowCaseSelectionModal(false);
+  };
+
+  const handleSelectExistingCase = (caseId: string) => {
+    setShowCaseSelectionModal(false);
+    if (uploadedFile) {
+      onAddToExistingCase?.(caseId, uploadedFile);
+    }
+  };
+
+  const handleCreateNewCase = () => {
+    setShowCaseSelectionModal(false);
+    setShowCaseModal(true);
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -180,7 +210,7 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
                 <input
                   id="file-upload"
                   type="file"
-                  accept=".ufdr"
+                  accept=".ufdr,.ufdr.enc"
                   onChange={handleFileInput}
                   className="hidden"
                 />
@@ -221,7 +251,7 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
           )}
 
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Only UFDR (.ufdr) files are allowed
+            Only UFDR (.ufdr) and encrypted UFDR (.ufdr.enc) files are allowed
           </p>
         </div>
       </CardContent>
@@ -239,6 +269,15 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
         isOpen={showDecryptionModal}
         onClose={handleDecryptionModalClose}
         onDecryptionSuccess={handleDecryptionSuccess}
+        fileName={uploadedFile?.name || ""}
+      />
+
+      {/* Case Selection Modal */}
+      <CaseSelectionModal
+        isOpen={showCaseSelectionModal}
+        onClose={handleCaseSelectionClose}
+        onSelectCase={handleSelectExistingCase}
+        onCreateNew={handleCreateNewCase}
         fileName={uploadedFile?.name || ""}
       />
     </Card>

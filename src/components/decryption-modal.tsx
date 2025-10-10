@@ -57,17 +57,13 @@ export function DecryptionModal({
   };
 
   const validateInputs = (): boolean => {
-    // Hash is now mandatory - either file or manual input
-    if (!hashFile && !hashValue.trim()) {
-      setError("Please provide a hash value (upload file or enter manually)");
-      return false;
-    }
+    // Hash is now optional - either file or manual input
     // Validate hash format if manually entered
     if (hashValue.trim() && (hashValue.length !== 64 || !/^[a-fA-F0-9]+$/.test(hashValue))) {
       setError("Please enter a valid SHA-256 hash (64 hexadecimal characters)");
       return false;
     }
-    // Decryption key is now optional
+    // Decryption key file is optional
     return true;
   };
 
@@ -78,30 +74,48 @@ export function DecryptionModal({
     setError("");
 
     try {
-      // Simulate decryption and hash verification process
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      let keyData = "";
+      let hashValueToUse = "";
 
-      // In a real implementation, you would:
-      // 1. Send the decryption key and hash to your backend
-      // 2. Verify the hash matches the file
-      // 3. Attempt decryption with the provided key
-      
-      // For demo purposes, we'll simulate success
-      const isHashValid = Math.random() > 0.2; // 80% success rate for demo
-      
-      if (isHashValid) {
-        setSuccess(true);
-        setTimeout(() => {
-          onDecryptionSuccess({
-            decryptionKey: decryptionKey?.name || "",
-            hashValue: hashValue || undefined,
-            hashFile: hashFile?.name || undefined
-          });
-          handleClose();
-        }, 1500);
+      // Read decryption key file if provided
+      if (decryptionKey) {
+        const keyText = await decryptionKey.text();
+        try {
+          const keyJson = JSON.parse(keyText);
+          if (!keyJson.key_base64 || !keyJson.iv_base64) {
+            throw new Error("Invalid key format: missing key_base64 or iv_base64");
+          }
+          keyData = keyText; // Send the full JSON as string
+        } catch (e) {
+          setError("Invalid key file format. Expected JSON with key_base64 and iv_base64 fields.");
+          return;
+        }
       } else {
-        setError("Decryption failed: Hash value mismatch or invalid key");
+        // No key provided - will try to decrypt without key or use default method
+        keyData = "";
       }
+
+      // Read hash file if provided
+      if (hashFile) {
+        const hashText = await hashFile.text();
+        hashValueToUse = hashText.trim().split()[0]; // Get first word (hash value)
+      } else if (hashValue) {
+        hashValueToUse = hashValue;
+      }
+
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      setSuccess(true);
+      setTimeout(() => {
+        onDecryptionSuccess({
+          decryptionKey: keyData,
+          hashValue: hashValueToUse || undefined,
+          hashFile: hashFile?.name || undefined
+        });
+        handleClose();
+      }, 1500);
+
     } catch (err) {
       setError("An error occurred during decryption process");
     } finally {
@@ -186,7 +200,7 @@ export function DecryptionModal({
                 <div className="space-y-2">
                   <Label className="text-sm font-medium flex items-center gap-2">
                     <Key className="w-4 h-4" />
-                    Decryption Key File (Optional)
+                    Decryption Key File (.key.json or .key.txt) (Optional)
                   </Label>
                   
                   {!decryptionKey ? (
@@ -208,7 +222,7 @@ export function DecryptionModal({
                         type="file"
                         onChange={handleKeyFileUpload}
                         className="hidden"
-                        accept=".key,.pem,.txt"
+                        accept=".key.json,.json,.key.txt,.txt"
                       />
                     </div>
                   ) : (
@@ -244,7 +258,7 @@ export function DecryptionModal({
                 <div className="space-y-4">
                   <Label className="text-sm font-medium flex items-center gap-2">
                     <Shield className="w-4 h-4" />
-                    Hash Value (SHA-256) *
+                    Hash Value (SHA-256) (Optional)
                   </Label>
                   
                   {/* Hash File Upload */}
@@ -252,7 +266,7 @@ export function DecryptionModal({
                     <div className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-4 text-center hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors">
                       <Upload className="w-6 h-6 mx-auto text-slate-400 mb-2" />
                       <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                        Upload SHA-256 hash file (required)
+                        Upload SHA-256 hash file (.sha256.txt) (optional)
                       </p>
                       <Button
                         variant="outline"
@@ -267,7 +281,7 @@ export function DecryptionModal({
                         type="file"
                         onChange={handleHashFileUpload}
                         className="hidden"
-                        accept=".txt,.hash,.sha256"
+                        accept=".txt,.hash,.sha256,.sha256.txt"
                       />
                     </div>
                   ) : (
