@@ -36,6 +36,9 @@ yarn-error.log*
 
 ufdr_full/
 *.ufdr.enc
+backend/chroma_db/
+*.sqlite3
+*.ufdr
 
 # vercel
 .vercel
