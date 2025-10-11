@@ -137,7 +137,13 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
   const [activeTab, setActiveTab] = useState<"case" | "messenger" | "calls">(
     "case"
   );
-  const sessionId = `case_${caseId}_session`; // Generate session ID from case ID
+
+  // Get the actual session_id from localStorage (stored during upload)
+  const sessionId =
+    typeof window !== "undefined"
+      ? localStorage.getItem(`case_${caseId}_session`) ||
+        `case_${caseId}_session`
+      : `case_${caseId}_session`;
 
   const formatDateTime = (timestamp: string) => {
     const date = new Date(timestamp);

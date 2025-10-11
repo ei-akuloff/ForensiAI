@@ -49,10 +49,14 @@ export function CallLogsTimeline({ sessionId, caseId }: CallLogsTimelineProps) {
   const loadCallLogs = async () => {
     try {
       setLoading(true);
+      console.log('[CallLogsTimeline] Loading data for sessionId:', sessionId);
       const result = await getCallLogs(sessionId);
+      console.log('[CallLogsTimeline] Result:', result);
+      console.log('[CallLogsTimeline] Call logs count:', result.call_logs?.length || 0);
       setData(result);
       setError(null);
     } catch (err) {
+      console.error('[CallLogsTimeline] Error loading data:', err);
       setError(err instanceof Error ? err.message : "Failed to load call logs");
     } finally {
       setLoading(false);

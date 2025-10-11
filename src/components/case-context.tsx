@@ -28,6 +28,7 @@ interface CaseContextType {
   addCase: (caseData: CaseFormData) => string;
   getCaseById: (id: string) => Case | undefined;
   updateCase: (id: string, updates: Partial<Case>) => void;
+  deleteCase: (id: string) => Promise<void>;
   clearAllCases: () => void;
 }
 
@@ -157,6 +158,38 @@ export function CaseProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const deleteCase = async (id: string): Promise<void> => {
+    // Get MongoDB case_id before deleting from localStorage
+    const mongodbCaseId = localStorage.getItem(`case_${id}_mongodb_id`);
+
+    // Delete from MongoDB backend if exists
+    if (mongodbCaseId && isClient) {
+      try {
+        const { deleteCase: deleteCaseAPI } = await import(
+          "@/lib/backend-service"
+        );
+        await deleteCaseAPI(mongodbCaseId);
+        console.log(`Case ${mongodbCaseId} deleted from MongoDB`);
+      } catch (error) {
+        console.error("Error deleting case from MongoDB:", error);
+        // Continue with local deletion even if MongoDB deletion fails
+      }
+    }
+
+    // Remove from local state
+    setCases((prevCases) => prevCases.filter((c) => c.id !== id));
+
+    // Clean up localStorage entries for this case
+    if (isClient) {
+      try {
+        localStorage.removeItem(`case_${id}_mongodb_id`);
+        localStorage.removeItem(`case_${id}_session`);
+      } catch (error) {
+        console.error("Error cleaning up localStorage:", error);
+      }
+    }
+  };
+
   const clearAllCases = (): void => {
     setCases([]);
     // Also clear from localStorage
@@ -174,6 +207,7 @@ export function CaseProvider({ children }: { children: ReactNode }) {
     addCase,
     getCaseById,
     updateCase,
+    deleteCase,
     clearAllCases,
   };
 

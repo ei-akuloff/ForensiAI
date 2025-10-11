@@ -331,6 +331,47 @@ async def update_case_details(
         raise HTTPException(status_code=500, detail=f"Error updating case: {str(e)}")
 
 
+@app.delete("/cases/{case_id}")
+async def delete_case_endpoint(
+    case_id: str,
+    db = Depends(get_database)
+):
+    """
+    Delete a case (soft delete - marks as archived)
+    Also deletes all related forensic data
+    """
+    try:
+        # Delete forensic data first
+        # Delete messenger messages
+        await db.messenger_messages.delete_many({"case_id": case_id})
+        # Delete messenger calls
+        await db.messenger_calls.delete_many({"case_id": case_id})
+        # Delete messenger accounts
+        await db.messenger_accounts.delete_many({"case_id": case_id})
+        # Delete call logs
+        await db.call_logs.delete_many({"case_id": case_id})
+        # Delete find my locations
+        await db.find_my_locations.delete_many({"case_id": case_id})
+        # Delete forensic summaries
+        await db.forensic_summaries.delete_many({"case_id": case_id})
+        
+        # Soft delete the case
+        success = await crud.delete_case(db, case_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        return JSONResponse(content={
+            "message": "Case and all related forensic data deleted successfully"
+        })
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error deleting case: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error deleting case: {str(e)}")
+
+
 # ===== SESSION MANAGEMENT ENDPOINTS =====
 
 @app.post("/sessions/")
@@ -504,45 +545,95 @@ async def upload_ufdr(
                 
                 # Automatically trigger forensic parsing after successful upload
                 try:
-                    print(f"Starting automatic forensic parsing for session: {session_id}")
+                    print(f"[UPLOAD] Starting automatic forensic parsing for session: {session_id}")
                     import forensic_parser
+                    print(f"[UPLOAD] forensic_parser imported successfully")
+                    from multi_format_parser import parse_multi_format_ufdr
+                    print(f"[UPLOAD] multi_format_parser imported successfully")
+                    import zipfile
                     
-                    # Get the uploaded file metadata to extract JSON
-                    forensic_data = forensic_parser.parse_all_forensic_data(text)
+                    # Try multi-format parsing if UFDR is a ZIP
+                    forensic_data = None
+                    try:
+                        # Check if file is a ZIP (multi-file UFDR)
+                        if zipfile.is_zipfile(tmp_path):
+                            print(f"[UPLOAD] ✅ Detected multi-file UFDR (ZIP format) - using multi-format parser")
+                            # Extract to temp directory
+                            temp_extract_dir = tempfile.mkdtemp()
+                            print(f"[UPLOAD] Extracting to: {temp_extract_dir}")
+                            try:
+                                with zipfile.ZipFile(tmp_path, 'r') as zip_ref:
+                                    zip_ref.extractall(temp_extract_dir)
+                                    print(f"[UPLOAD] Extracted {len(zip_ref.namelist())} files: {zip_ref.namelist()}")
+                                
+                                # Parse all formats
+                                print(f"[UPLOAD] Calling multi-format parser...")
+                                multi_data = parse_multi_format_ufdr(temp_extract_dir)
+                                print(f"[UPLOAD] Multi-format parsing complete!")
+                                print(f"[UPLOAD]   - Calls: {len(multi_data.get('calls', []))}")
+                                print(f"[UPLOAD]   - Messages: {len(multi_data.get('messages', []))}")
+                                print(f"[UPLOAD]   - Locations: {len(multi_data.get('locations', []))}")
+                                
+                                # Convert to forensic_parser format
+                                print(f"[UPLOAD] Converting to forensic format...")
+                                forensic_data = forensic_parser.parse_all_forensic_data(multi_data)
+                                print(f"[UPLOAD] Forensic conversion complete!")
+                            finally:
+                                # Clean up temp directory
+                                import shutil
+                                if os.path.exists(temp_extract_dir):
+                                    shutil.rmtree(temp_extract_dir)
+                        else:
+                            # Single JSON file - use original parser
+                            print(f"[UPLOAD] Single JSON UFDR - using original parser")
+                            forensic_data = forensic_parser.parse_all_forensic_data(text)
+                    except Exception as parse_error:
+                        print(f"[UPLOAD] ⚠️ Multi-format parsing failed: {parse_error}")
+                        print(f"[UPLOAD] Falling back to text parsing...")
+                        import traceback
+                        traceback.print_exc()
+                        forensic_data = forensic_parser.parse_all_forensic_data(text)
                     
                     if forensic_data:
+                        print(f"[UPLOAD] 📊 Forensic data summary:")
+                        print(f"[UPLOAD]   - Messenger messages: {len(forensic_data['messenger_messages'])}")
+                        print(f"[UPLOAD]   - Messenger calls: {len(forensic_data['messenger_calls'])}")
+                        print(f"[UPLOAD]   - Messenger accounts: {len(forensic_data['messenger_accounts'])}")
+                        print(f"[UPLOAD]   - Call logs: {len(forensic_data['call_logs'])}")
+                        print(f"[UPLOAD]   - Locations: {len(forensic_data['find_my_locations'])}")
+                        
                         # Store messenger data
                         if forensic_data["messenger_messages"]:
                             msg_ids = await crud.bulk_create_messenger_messages(
                                 db, forensic_data["messenger_messages"], session_id, case_id
                             )
-                            print(f"Stored {len(msg_ids)} messenger messages")
+                            print(f"[UPLOAD] ✅ Stored {len(msg_ids)} messenger messages")
                         
                         if forensic_data["messenger_calls"]:
                             call_ids = await crud.bulk_create_messenger_calls(
                                 db, forensic_data["messenger_calls"], session_id, case_id
                             )
-                            print(f"Stored {len(call_ids)} messenger calls")
+                            print(f"[UPLOAD] ✅ Stored {len(call_ids)} messenger calls")
                         
                         if forensic_data["messenger_accounts"]:
                             account_ids = await crud.bulk_create_messenger_accounts(
                                 db, forensic_data["messenger_accounts"], session_id, case_id
                             )
-                            print(f"Stored {len(account_ids)} messenger accounts")
+                            print(f"[UPLOAD] ✅ Stored {len(account_ids)} messenger accounts")
                         
                         # Store call logs
                         if forensic_data["call_logs"]:
                             call_log_ids = await crud.bulk_create_call_logs(
                                 db, forensic_data["call_logs"], session_id, case_id
                             )
-                            print(f"Stored {len(call_log_ids)} call logs")
+                            print(f"[UPLOAD] ✅ Stored {len(call_log_ids)} call logs")
                         
                         # Store Find My locations
                         if forensic_data["find_my_locations"]:
                             location_ids = await crud.bulk_create_find_my_locations(
                                 db, forensic_data["find_my_locations"], session_id, case_id
                             )
-                            print(f"Stored {len(location_ids)} Find My locations")
+                            print(f"[UPLOAD] ✅ Stored {len(location_ids)} Find My locations")
                         
                         # Generate and store forensic summary
                         summary = forensic_parser.extract_forensic_summary(forensic_data)
@@ -550,11 +641,15 @@ async def upload_ufdr(
                             summary["session_id"] = session_id
                             summary["case_id"] = case_id
                             summary_id = await crud.create_forensic_summary(db, summary)
-                            print(f"Stored forensic summary with ID: {summary_id}")
+                            print(f"[UPLOAD] ✅ Stored forensic summary with ID: {summary_id}")
                         
-                        print("Automatic forensic parsing completed successfully")
+                        print(f"[UPLOAD] 🎉 Automatic forensic parsing completed successfully!")
+                        print(f"[UPLOAD] Session: {session_id}")
+                        print(f"[UPLOAD] Case: {case_id}")
+                    else:
+                        print(f"[UPLOAD] ⚠️ No forensic data returned from parser!")
                 except Exception as forensic_error:
-                    print(f"Warning: Automatic forensic parsing failed: {str(forensic_error)}")
+                    print(f"[UPLOAD] ❌ ERROR: Automatic forensic parsing failed: {str(forensic_error)}")
                     import traceback
                     traceback.print_exc()
                     # Don't fail the upload if forensic parsing fails

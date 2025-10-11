@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Eye, Download, Calendar, File } from "lucide-react";
+import { Search, Eye, Download, Calendar, File, Trash2 } from "lucide-react";
 import CaseDecrypt from "./case-decrypt";
 import { ClientWrapper } from "@/components/client-wrapper";
 import { useCases, Case } from "./case-context";
@@ -24,10 +24,36 @@ interface CaseListProps {
 }
 
 export function CaseList({ cases: propCases }: CaseListProps) {
-  const { cases: contextCases } = useCases();
+  const { cases: contextCases, deleteCase } = useCases();
   const cases = propCases || contextCases;
   const [searchTerm, setSearchTerm] = useState("");
   const [showDecryptFor, setShowDecryptFor] = useState<string | null>(null);
+  const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null);
+
+  const handleDeleteCase = async (caseId: string, caseName: string) => {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${caseName}"? This will permanently delete all forensic data from MongoDB.`
+      )
+    ) {
+      return;
+    }
+
+    setDeletingCaseId(caseId);
+    try {
+      await deleteCase(caseId);
+      alert("Case deleted successfully");
+    } catch (error) {
+      console.error("Error deleting case:", error);
+      alert(
+        `Failed to delete case: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setDeletingCaseId(null);
+    }
+  };
 
   const filteredCases = cases.filter(
     (caseItem) =>
@@ -55,9 +81,12 @@ export function CaseList({ cases: propCases }: CaseListProps) {
 
   return (
     <ClientWrapper>
-      <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-up" style={{animationDelay: '0.2s'}}>
+      <Card
+        className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-up"
+        style={{ animationDelay: "0.2s" }}
+      >
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-        
+
         <CardHeader className="relative">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div className="flex items-center gap-3">
@@ -180,6 +209,20 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                             >
                               Decrypt
                             </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                              onClick={() =>
+                                handleDeleteCase(caseItem.id, caseItem.name)
+                              }
+                              disabled={deletingCaseId === caseItem.id}
+                            >
+                              <Trash2 className="h-3 w-3 mr-1" />
+                              {deletingCaseId === caseItem.id
+                                ? "Deleting..."
+                                : "Delete"}
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -227,36 +270,54 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                           <span>{caseItem.fileSize}</span>
                         </div>
 
-                        <div className="flex space-x-2">
-                          <Link
-                            href={`/cases/${caseItem.id}`}
-                            className="flex-1"
-                          >
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex space-x-2">
+                            <Link
+                              href={`/cases/${caseItem.id}`}
+                              className="flex-1"
+                            >
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full h-8 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                View
+                              </Button>
+                            </Link>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="w-full h-8 text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+                              className="flex-1 h-8 text-xs border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"
                             >
-                              <Eye className="h-3 w-3 mr-1" />
-                              View
+                              <Download className="h-3 w-3 mr-1" />
+                              Export
                             </Button>
-                          </Link>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 h-8 text-xs border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"
-                          >
-                            <Download className="h-3 w-3 mr-1" />
-                            Export
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="flex-1 h-8 text-xs text-slate-400 hover:text-slate-200"
-                            onClick={() => setShowDecryptFor(caseItem.id)}
-                          >
-                            Decrypt
-                          </Button>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="flex-1 h-8 text-xs text-slate-400 hover:text-slate-200"
+                              onClick={() => setShowDecryptFor(caseItem.id)}
+                            >
+                              Decrypt
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 h-8 text-xs border-red-200 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                              onClick={() =>
+                                handleDeleteCase(caseItem.id, caseItem.name)
+                              }
+                              disabled={deletingCaseId === caseItem.id}
+                            >
+                              <Trash2 className="h-3 w-3 mr-1" />
+                              {deletingCaseId === caseItem.id
+                                ? "Deleting..."
+                                : "Delete"}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -267,8 +328,15 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
                   <div className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded shadow-lg p-4">
                     <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-lg font-semibold">Analyst: Decrypt file for case {showDecryptFor}</h3>
-                      <button className="text-slate-500" onClick={() => setShowDecryptFor(null)}>Close</button>
+                      <h3 className="text-lg font-semibold">
+                        Analyst: Decrypt file for case {showDecryptFor}
+                      </h3>
+                      <button
+                        className="text-slate-500"
+                        onClick={() => setShowDecryptFor(null)}
+                      >
+                        Close
+                      </button>
                     </div>
                     <CaseDecrypt />
                   </div>

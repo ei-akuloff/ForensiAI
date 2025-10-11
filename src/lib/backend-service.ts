@@ -669,3 +669,19 @@ export async function getCaseForensicData(
 
   return response.json();
 }
+
+/**
+ * Delete a case and all its related data from MongoDB
+ */
+export async function deleteCase(caseId: string): Promise<{ message: string }> {
+  const response = await fetch(`${API_BASE_URL}/cases/${caseId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(errorData.detail || "Failed to delete case");
+  }
+
+  return response.json();
+}
