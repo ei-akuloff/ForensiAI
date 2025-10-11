@@ -33,6 +33,7 @@ Parser         Parser
 ## Supported Formats (Generic Detection)
 
 ### 1. **JSON Files** (`.json`)
+
 - **Detection**: File extension `.json`
 - **Parser**: Handles nested/flat structures automatically
 - **Supports**:
@@ -44,6 +45,7 @@ Parser         Parser
   - Any custom structure
 
 ### 2. **XML Files** (`.xml`)
+
 - **Detection**: File extension `.xml`
 - **Parser**: ElementTree-based XML parser
 - **Supports**:
@@ -53,6 +55,7 @@ Parser         Parser
   - `<locations>` with `<location>` entries
 
 ### 3. **CSV Files** (`.csv`)
+
 - **Detection**: File extension `.csv`
 - **Parser**: Pandas DataFrame parser with auto-type detection
 - **Auto-detects type by headers**:
@@ -63,6 +66,7 @@ Parser         Parser
   - **Browser History**: `url`, `title` columns
 
 ### 4. **Text Files** (`.txt`)
+
 - **Detection**: File extension `.txt`
 - **Parser**: Regex-based extraction
 - **Extracts**:
@@ -71,6 +75,7 @@ Parser         Parser
   - Key-value pairs for metadata
 
 ### 5. **HTML Files** (`.html`, `.htm`)
+
 - **Detection**: File extension `.html` or `.htm`
 - **Parser**: Tag stripping + content extraction
 - **Extracts**:
@@ -96,13 +101,13 @@ await uploadUFDRFileWithCase(uploadedFile, sessionId, mongodbCaseId);
 async def upload_ufdr(session_id: str, file: UploadFile, case_id: str):
     # Save file temporarily
     tmp_path = f"/tmp/{file.filename}"
-    
+
     # Check if ZIP (multi-file bundle)
     if zipfile.is_zipfile(tmp_path):
         # MULTI-FORMAT PATH
         temp_dir = tempfile.mkdtemp()
         zipfile.ZipFile(tmp_path).extractall(temp_dir)
-        
+
         # Parse ALL formats in the directory
         multi_data = parse_multi_format_ufdr(temp_dir)
         # Returns: {calls: [], messages: [], locations: [], contacts: []}
@@ -118,7 +123,7 @@ async def upload_ufdr(session_id: str, file: UploadFile, case_id: str):
 # Backend: multi_format_parser.py
 def parse_multi_format_ufdr(directory_path: str) -> dict:
     parser = MultiFormatParser()
-    
+
     # Automatically scan directory for all supported files
     for file_path in Path(directory_path).rglob('*'):
         if file_path.suffix == '.json':
@@ -131,16 +136,16 @@ def parse_multi_format_ufdr(directory_path: str) -> dict:
             parser._parse_txt(file_path)
         elif file_path.suffix in ['.html', '.htm']:
             parser._parse_html(file_path)
-    
+
     # Normalize all data to standard schema
     parser._normalize_calls()
     parser._normalize_messages()
     parser._normalize_locations()
     parser._normalize_contacts()
-    
+
     # Remove duplicates (e.g., same call in JSON + XML)
     parser._deduplicate()
-    
+
     return parser.get_data()
 ```
 
@@ -153,7 +158,7 @@ def parse_all_forensic_data(json_data: dict) -> dict:
     messages = parse_messenger_data(json_data)
     calls = parse_call_logs(json_data)
     locations = parse_find_my_data(json_data)
-    
+
     # Returns standardized format for MongoDB
     return {
         'messenger_messages': messages,  # [{sender, receiver, content, timestamp, app_name}]
@@ -172,13 +177,13 @@ if forensic_data:
         await crud.bulk_create_messenger_messages(
             db, forensic_data["messenger_messages"], session_id, case_id
         )
-    
+
     # Store call logs
     if forensic_data["call_logs"]:
         await crud.bulk_create_call_logs(
             db, forensic_data["call_logs"], session_id, case_id
         )
-    
+
     # Store locations
     if forensic_data["find_my_locations"]:
         await crud.bulk_create_find_my_locations(
@@ -200,11 +205,13 @@ const result = await getMessengerData(sessionId);
 ## Key Features (All Generic)
 
 ### 1. **Automatic Format Detection**
+
 - No manual configuration needed
 - Detects file types by extension
 - Handles mixed formats in same bundle
 
 ### 2. **Automatic Deduplication**
+
 - Same call in `report.json` and `calls.xml`? → Stored once
 - Duplicate detection by key fields:
   - Calls: `from + to + datetime`
@@ -212,16 +219,19 @@ const result = await getMessengerData(sessionId);
   - Locations: `latitude + longitude + timestamp`
 
 ### 3. **Contact Name Resolution**
+
 - Automatically builds contact map from `contacts[]`
 - Maps phone numbers to names in call logs
 - Works across all formats (JSON, XML, CSV)
 
 ### 4. **Flexible Data Structure**
+
 - Handles flat structure: `{"messages": [...], "calls": [...]}`
 - Handles nested structure: `{"messenger": {"messages": [...]}}`
 - Handles app-specific structure: `{"apps": [{"app": "WhatsApp", "groups": [...]}]}`
 
 ### 5. **Error Handling**
+
 - Format parsing fails? Falls back to text parsing
 - Missing fields? Uses defaults
 - Corrupted file? Logs error, continues with other files
@@ -229,6 +239,7 @@ const result = await getMessengerData(sessionId);
 ## Example: Rohan Kapoor Case (Generic Handling)
 
 ### Input Files (Multi-Format Bundle)
+
 ```
 rohan_case.ufdr (ZIP containing):
 ├── report_data.json     (10 messages, 9 calls, 10 contacts, 5 locations)
@@ -239,6 +250,7 @@ rohan_case.ufdr (ZIP containing):
 ```
 
 ### Processing (Automatic)
+
 1. **ZIP detected** → Extract all 5 files
 2. **JSON parser** → Extracts 10 messages, 9 calls, 10 contacts, 5 locations
 3. **XML parser** → Extracts 2 messages, 2 calls (duplicates)
@@ -250,6 +262,7 @@ rohan_case.ufdr (ZIP containing):
 9. **Final result** → 10 unique messages, 9 unique calls, 10 contacts, 5 locations
 
 ### MongoDB Storage
+
 ```javascript
 // messenger_messages collection
 {
@@ -280,6 +293,7 @@ rohan_case.ufdr (ZIP containing):
 ## Testing the Generic System
 
 ### Test Case 1: Single JSON UFDR
+
 ```json
 // simple_case.ufdr (not ZIP, just JSON text)
 {
@@ -288,18 +302,22 @@ rohan_case.ufdr (ZIP containing):
   "messages": [...]
 }
 ```
+
 **Result**: Parsed by single JSON parser, stored normally
 
 ### Test Case 2: Multi-File ZIP UFDR
+
 ```
 complex_case.ufdr (ZIP):
 ├── data.json
 ├── calls.xml
 └── history.csv
 ```
+
 **Result**: All 3 formats parsed, merged, deduplicated, stored
 
 ### Test Case 3: WhatsApp Group Messages
+
 ```json
 {
   "apps": [{
@@ -311,19 +329,18 @@ complex_case.ufdr (ZIP):
   }]
 }
 ```
+
 **Result**: WhatsApp messages extracted with group names
 
 ### Test Case 4: Contact Name Resolution
+
 ```json
 {
-  "contacts": [
-    {"name": "Vicky Supplier", "number": "+919988776655"}
-  ],
-  "calls": [
-    {"from": "+919988776655", "to": "+919876543210"}
-  ]
+  "contacts": [{ "name": "Vicky Supplier", "number": "+919988776655" }],
+  "calls": [{ "from": "+919988776655", "to": "+919876543210" }]
 }
 ```
+
 **Result**: Call log shows "Vicky Supplier" instead of just phone number
 
 ## Why Manual Scripts Were Created
@@ -345,6 +362,7 @@ The automatic upload was failing because:
 3. **Data not stored** → Parsing failed, so no data went to MongoDB
 
 **Solution**:
+
 - ✅ Pandas now installed: `pip install pandas`
 - ✅ Added detailed logging: `[UPLOAD]` prefixed logs
 - ✅ Added exception tracebacks for debugging
@@ -352,17 +370,20 @@ The automatic upload was failing because:
 ## Next Steps
 
 1. **Start Backend** with pandas installed:
+
    ```powershell
    cd 'C:\Coding\SIH ''25\nidhibranch\raw-frontend\backend'
    python main.py
    ```
 
 2. **Upload ANY UFDR file** via dashboard:
+
    - Single JSON file → Works automatically
    - Multi-file ZIP bundle → Works automatically
    - JSON + XML + CSV + TXT + HTML → All parsed and merged
 
 3. **Check Backend Logs** for detailed output:
+
    ```
    [UPLOAD] Starting automatic forensic parsing...
    [UPLOAD] ✅ Detected multi-file UFDR (ZIP format)

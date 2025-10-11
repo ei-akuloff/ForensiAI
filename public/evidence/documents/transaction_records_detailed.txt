@@ -1,0 +1,202 @@
+TRANSACTION RECORDS - FORENSIC ANALYSIS
+═══════════════════════════════════════════════════════
+Case ID: DRG-2025-10-001
+Suspect: Rohan Kapoor
+Period: September 1 - October 11, 2025
+═══════════════════════════════════════════════════════
+
+SEPTEMBER 2025 TRANSACTIONS
+═══════════════════════════════════════════════════════
+
+Date: 09/05/2025
+Time: 22:30
+Location: Mall Parking Lot, Gate 3
+Contact: Vicky Supplier
+Amount: ₹38,000
+Quantity: 400g
+Payment Method: Cash
+Notes: Initial purchase. First transaction tracked.
+
+Date: 09/09/2025
+Time: 21:15
+Location: Coffee Shop, MG Road
+Contact: Maya (Customer)
+Amount: ₹4,500
+Quantity: 50g
+Payment Method: Cash
+Net Profit: ₹500
+
+Date: 09/12/2025
+Time: 23:45
+Location: Industrial Area, Warehouse #7
+Contact: Vicky Supplier
+Amount: ₹75,000
+Quantity: 800g
+Payment Method: Cash + UPI (Split)
+UPI ID: vicky***@paytm
+Transaction ID: TXN092508971234
+Notes: Large purchase. Stored at secondary location.
+
+Date: 09/15/2025
+Time: 20:00
+Location: Park Street Corner
+Contact: Customer Group (5 people)
+Total Amount: ₹22,500
+Total Quantity: 250g
+Payment Method: Multiple Cash
+Net Profit: ₹7,500
+
+Date: 09/18/2025
+Time: 22:00
+Location: Coffee Shop, MG Road
+Contact: Maya (Customer)
+Amount: ₹4,500
+Quantity: 50g
+Payment Method: Cash
+Net Profit: ₹500
+
+Date: 09/22/2025
+Time: 21:00
+Location: Behind Stadium
+Contact: Group Transaction
+Amount: ₹60,000
+Quantity: 650g
+Payment Method: Cash
+Net Profit: ₹15,000
+
+Date: 09/24/2025
+Time: 23:00
+Location: Mall Parking Lot
+Contact: Vicky Supplier
+Amount: ₹43,500
+Quantity: 500g
+Payment Method: Cash
+Notes: Premium quality batch
+
+Date: 09/28/2025
+Time: 19:30
+Location: Restaurant Parking
+Contact: New Customer (Tony M referral)
+Amount: ₹9,000
+Quantity: 100g
+Payment Method: Cash
+Net Profit: ₹2,000
+
+═══════════════════════════════════════════════════════
+
+OCTOBER 2025 TRANSACTIONS (PARTIAL)
+═══════════════════════════════════════════════════════
+
+Date: 10/02/2025
+Time: 22:15
+Location: Mall Parking Lot
+Contact: Vicky Supplier
+Amount: ₹85,000
+Quantity: 1kg
+Payment Method: Cash
+Notes: Largest single purchase to date
+
+Date: 10/05/2025
+Time: 20:45
+Location: Various locations
+Contact: Multiple customers
+Total Amount: ₹35,000
+Total Quantity: 400g
+Payment Method: Cash
+Net Profit: ₹10,000
+
+Date: 10/08/2025
+Time: 21:30
+Location: Coffee Shop, MG Road
+Contact: Maya (Customer)
+Amount: ₹4,500
+Quantity: 50g
+Payment Method: Cash
+Net Profit: ₹500
+
+Date: 10/11/2025
+Time: 23:45
+Location: Mall Parking Lot
+Contact: Vicky Supplier
+Amount: ₹50,000
+Quantity: 550g
+Payment Method: Cash
+Notes: LAST TRACKED TRANSACTION BEFORE ARREST
+
+═══════════════════════════════════════════════════════
+
+FINANCIAL SUMMARY
+═══════════════════════════════════════════════════════
+
+Total Purchases from Suppliers: ₹291,500
+Total Sales to Customers: ₹139,500
+Estimated Current Inventory Value: ₹180,000
+Total Net Profit (Estimated): ₹36,000
+
+Cash Flow Pattern:
+- Peak activity: Weekends (Friday-Saturday)
+- Transaction time: 8 PM - 12 AM
+- Average transaction: ₹25,000
+
+Payment Methods:
+- Cash: 92%
+- UPI: 8%
+- Digital trace minimal (intentional)
+
+═══════════════════════════════════════════════════════
+
+LOCATION ANALYSIS
+═══════════════════════════════════════════════════════
+
+Most Frequent Locations:
+1. Mall Parking Lot, Gate 3 (7 transactions)
+2. Coffee Shop, MG Road (4 transactions)
+3. Industrial Area Warehouse (2 transactions)
+4. Behind Stadium (1 transaction)
+
+Pattern Recognition:
+- Always public places with easy escape routes
+- Well-lit areas to avoid suspicion
+- Multiple entry/exit points
+- CCTV blind spots identified
+
+═══════════════════════════════════════════════════════
+
+EVIDENCE TRAIL
+═══════════════════════════════════════════════════════
+
+Digital Evidence:
+- 1 UPI transaction traced (Sept 12)
+- WhatsApp messages (recovered)
+- GPS location data (cross-verified)
+- Call logs (47 suspicious calls)
+
+Physical Evidence:
+- ₹85,000 cash seized from residence
+- 200g substance found in car
+- 1.2kg substance found in storage unit
+- Weighing scale, packaging materials
+
+═══════════════════════════════════════════════════════
+
+INVESTIGATOR NOTES:
+
+This transaction record shows clear evidence of:
+1. Regular purchase and distribution pattern
+2. Growing business scale (400g → 1kg purchases)
+3. Multiple customer base
+4. Knowledge of surveillance avoidance
+5. Intentional minimization of digital footprint
+
+Recommend:
+- Full forensic accounting of all bank accounts
+- Surveillance of identified locations
+- Wiretapping of all suspicious contacts
+- Asset seizure proceedings
+
+═══════════════════════════════════════════════════════
+Document Classification: CONFIDENTIAL
+Generated: October 12, 2025
+Investigator: Detective Sarah Johnson
+Badge: #45782
+═══════════════════════════════════════════════════════

@@ -1,0 +1,276 @@
+SMS BACKUP - FORENSIC EXTRACTION
+═══════════════════════════════════════════════════════
+Device: iPhone 14 Pro
+Owner: Rohan Kapoor
+Extraction Date: October 12, 2025
+Total Messages: 47
+Period: September 1 - October 11, 2025
+═══════════════════════════════════════════════════════
+
+FROM: +91 98765 43210 (Vicky Supplier)
+DATE: Sep 5, 2025 10:15 PM
+"New stock available. Call me."
+
+TO: +91 98765 43210 (Vicky Supplier)  
+DATE: Sep 5, 2025 10:18 PM
+"How much?"
+
+FROM: +91 98765 43210 (Vicky Supplier)
+DATE: Sep 5, 2025 10:20 PM
+"400g, 38k"
+
+TO: +91 98765 43210 (Vicky Supplier)
+DATE: Sep 5, 2025 10:22 PM
+"OK. Same place 10 PM"
+
+───────────────────────────────────────────────────────
+
+FROM: +91 96655 44332 (Maya)
+DATE: Sep 9, 2025 8:45 PM
+"Need the usual"
+
+TO: +91 96655 44332 (Maya)
+DATE: Sep 9, 2025 8:50 PM
+"MG Road coffee shop 10 PM. 4500"
+
+FROM: +91 96655 44332 (Maya)
+DATE: Sep 9, 2025 8:52 PM
+"See u there"
+
+───────────────────────────────────────────────────────
+
+FROM: +91 99887 76655 (Tony M)
+DATE: Sep 12, 2025 9:30 PM
+"Meeting tomorrow night. Group chat for details."
+
+TO: +91 99887 76655 (Tony M)
+DATE: Sep 12, 2025 9:35 PM
+"Got it"
+
+───────────────────────────────────────────────────────
+
+FROM: +91 95544 33221 (Boss Man - Unknown)
+DATE: Sep 15, 2025 1:45 AM
+"Increase weekly quota to 2kg. New territories assigned."
+
+TO: +91 95544 33221 (Boss Man - Unknown)
+DATE: Sep 15, 2025 1:50 AM
+"Understood. When do I get the new contacts?"
+
+FROM: +91 95544 33221 (Boss Man - Unknown)
+DATE: Sep 15, 2025 1:52 AM
+"Next meeting. Come alone. Location TBA."
+
+───────────────────────────────────────────────────────
+
+FROM: +91 97766 55443 (Raj Kumar)
+DATE: Sep 18, 2025 7:20 PM
+"Storage unit ready. Key under usual spot."
+
+TO: +91 97766 55443 (Raj Kumar)
+DATE: Sep 18, 2025 7:25 PM
+"Thanks. Will check tonight."
+
+───────────────────────────────────────────────────────
+
+FROM: +91 94433 22110 (Delivery Guy)
+DATE: Sep 22, 2025 6:15 PM
+"3 packages delivered. All locations confirmed."
+
+TO: +91 94433 22110 (Delivery Guy)
+DATE: Sep 22, 2025 6:20 PM
+"Payment tomorrow. Same as last time."
+
+───────────────────────────────────────────────────────
+
+FROM: +91 98765 43210 (Vicky Supplier)
+DATE: Sep 24, 2025 8:30 PM
+"Premium batch ready. Higher price but better quality."
+
+TO: +91 98765 43210 (Vicky Supplier)
+DATE: Sep 24, 2025 8:35 PM
+"Price?"
+
+FROM: +91 98765 43210 (Vicky Supplier)
+DATE: Sep 24, 2025 8:37 PM
+"45k for 500g"
+
+TO: +91 98765 43210 (Vicky Supplier)
+DATE: Sep 24, 2025 8:40 PM
+"Done. 11 PM mall parking"
+
+───────────────────────────────────────────────────────
+
+FROM: +91 96655 44332 (Maya)
+DATE: Sep 25, 2025 11:20 PM
+"Thanks for tonight. Quality is amazing!"
+
+TO: +91 96655 44332 (Maya)
+DATE: Sep 25, 2025 11:25 PM
+"👍 Tell your friends"
+
+FROM: +91 96655 44332 (Maya)
+DATE: Sep 25, 2025 11:27 PM
+"Already did. 2 of them want to connect with you."
+
+TO: +91 96655 44332 (Maya)
+DATE: Sep 25, 2025 11:30 PM
+"Give them my number. But only people you trust."
+
+───────────────────────────────────────────────────────
+
+FROM: +91 99887 76655 (Tony M)
+DATE: Sep 28, 2025 10:45 PM
+"Police activity in south zone. Lay low for few days."
+
+TO: +91 99887 76655 (Tony M)
+DATE: Sep 28, 2025 10:50 PM
+"How serious?"
+
+FROM: +91 99887 76655 (Tony M)
+DATE: Sep 28, 2025 10:52 PM
+"Just routine. But better safe. Cancel all meets this weekend."
+
+TO: +91 99887 76655 (Tony M)
+DATE: Sep 28, 2025 10:55 PM
+"Roger that. Will inform Vicky."
+
+───────────────────────────────────────────────────────
+
+FROM: +91 95544 33221 (Boss Man - Unknown)
+DATE: Oct 1, 2025 2:15 AM
+"Big shipment arriving Oct 5. Be ready. Details tomorrow."
+
+TO: +91 95544 33221 (Boss Man - Unknown)
+DATE: Oct 1, 2025 2:20 AM
+"How big?"
+
+FROM: +91 95544 33221 (Boss Man - Unknown)
+DATE: Oct 1, 2025 2:22 AM
+"10kg total. You get 2kg. Payment terms same."
+
+TO: +91 95544 33221 (Boss Man - Unknown)
+DATE: Oct 1, 2025 2:25 AM
+"That's huge. Need more time to arrange money."
+
+FROM: +91 95544 33221 (Boss Man - Unknown)
+DATE: Oct 1, 2025 2:27 AM
+"You have 4 days. Don't disappoint me."
+
+───────────────────────────────────────────────────────
+
+FROM: +91 98765 43210 (Vicky Supplier)
+DATE: Oct 2, 2025 9:30 PM
+"Got the call from boss. Meeting tomorrow for pickup."
+
+TO: +91 98765 43210 (Vicky Supplier)
+DATE: Oct 2, 2025 9:35 PM
+"Where?"
+
+FROM: +91 98765 43210 (Vicky Supplier)
+DATE: Oct 2, 2025 9:37 PM
+"Industrial area warehouse #7. Midnight."
+
+TO: +91 98765 43210 (Vicky Supplier)
+DATE: Oct 2, 2025 9:40 PM
+"See you there. Bringing cash."
+
+───────────────────────────────────────────────────────
+
+FROM: +91 97766 55443 (Raj Kumar)
+DATE: Oct 5, 2025 11:45 PM
+"Package stored. Location secured. No tails."
+
+TO: +91 97766 55443 (Raj Kumar)
+DATE: Oct 5, 2025 11:50 PM
+"Good work. Your cut tomorrow."
+
+───────────────────────────────────────────────────────
+
+FROM: +91 96655 44332 (Maya)
+DATE: Oct 8, 2025 9:20 PM
+"Same time same place?"
+
+TO: +91 96655 44332 (Maya)
+DATE: Oct 8, 2025 9:25 PM
+"Yes. 10 PM coffee shop."
+
+───────────────────────────────────────────────────────
+
+FROM: +91 99887 76655 (Tony M)
+DATE: Oct 10, 2025 8:15 PM
+"Heard rumors. Be careful. Someone might be watching."
+
+TO: +91 99887 76655 (Tony M)
+DATE: Oct 10, 2025 8:20 PM
+"What kind of rumors?"
+
+FROM: +91 99887 76655 (Tony M)
+DATE: Oct 10, 2025 8:22 PM
+"Undercover cops in the area. Just be extra careful."
+
+TO: +91 99887 76655 (Tony M)
+DATE: Oct 10, 2025 8:25 PM
+"Thanks for heads up. Will stay alert."
+
+───────────────────────────────────────────────────────
+
+FROM: +91 98765 43210 (Vicky Supplier)
+DATE: Oct 11, 2025 10:30 PM
+"Last delivery tonight. Then taking break for 2 weeks."
+
+TO: +91 98765 43210 (Vicky Supplier)
+DATE: Oct 11, 2025 10:35 PM
+"Everything ok?"
+
+FROM: +91 98765 43210 (Vicky Supplier)
+DATE: Oct 11, 2025 10:37 PM
+"Yeah. Just heat is too much. Need to cool down."
+
+TO: +91 98765 43210 (Vicky Supplier)
+DATE: Oct 11, 2025 10:40 PM
+"Smart move. Let's meet at 11:30. Mall parking."
+
+───────────────────────────────────────────────────────
+
+[LAST MESSAGE SENT]
+TO: +91 98765 43210 (Vicky Supplier)
+DATE: Oct 11, 2025 11:42 PM
+"On my way"
+
+[DEVICE SEIZED AT 11:55 PM - SUSPECT ARRESTED]
+
+═══════════════════════════════════════════════════════
+
+FORENSIC ANALYSIS NOTES:
+
+Key Patterns Identified:
+1. Regular communication with known dealer (Vicky Supplier)
+2. Customer management (Maya - repeat customer)
+3. Organization hierarchy evident (Boss Man giving orders)
+4. Awareness of law enforcement (multiple mentions of police)
+5. Use of code words and vague language
+6. Late night communications (10 PM - 3 AM typical)
+7. Quick message deletion habit (mentioned in WhatsApp)
+
+Evidence Strength:
+- Direct references to quantities and prices
+- Location details for transactions
+- Payment amounts specified
+- Multiple co-conspirators identified
+- Pattern of escalating activity
+- Consciousness of guilt evident
+
+Recommendation:
+Strong evidence for prosecution. Messages corroborate:
+- Physical evidence (drugs found)
+- Financial transactions
+- GPS location data
+- Witness statements
+- Surveillance footage
+
+═══════════════════════════════════════════════════════
+CONFIDENTIAL - LAW ENFORCEMENT ONLY
+Generated by ForensiAI v2.0
+Case ID: DRG-2025-10-001
+═══════════════════════════════════════════════════════

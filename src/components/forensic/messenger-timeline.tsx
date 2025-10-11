@@ -55,17 +55,20 @@ export function MessengerTimeline({
   const loadMessengerData = async () => {
     try {
       setLoading(true);
-      console.log('[MessengerTimeline] Loading data for sessionId:', sessionId);
+      console.log("[MessengerTimeline] Loading data for sessionId:", sessionId);
       const result = await getMessengerData(
         sessionId,
         selectedApp === "all" ? undefined : selectedApp
       );
-      console.log('[MessengerTimeline] Result:', result);
-      console.log('[MessengerTimeline] Messages count:', result.messages?.length || 0);
+      console.log("[MessengerTimeline] Result:", result);
+      console.log(
+        "[MessengerTimeline] Messages count:",
+        result.messages?.length || 0
+      );
       setData(result);
       setError(null);
     } catch (err) {
-      console.error('[MessengerTimeline] Error loading data:', err);
+      console.error("[MessengerTimeline] Error loading data:", err);
       setError(
         err instanceof Error ? err.message : "Failed to load messenger data"
       );

@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { CaseOverview } from "@/components/case-overview";
 import { CaseTimeline } from "@/components/case-timeline";
-import { CaseGraphs } from "@/components/case-graphs";
+import { CaseFiles } from "@/components/case-files";
 import { CaseMap } from "@/components/case-map";
 import { CaseChatbot } from "@/components/case-chatbot";
 import { CaseExport } from "@/components/case-export";
@@ -15,7 +15,7 @@ import { useCases } from "@/components/case-context";
 type SidebarItem =
   | "overview"
   | "timeline"
-  | "graphs"
+  | "files"
   | "map"
   | "chatbot"
   | "export";
@@ -25,7 +25,7 @@ export default function CaseDetailsPage() {
   const caseId = params.id as string;
   const [activeSection, setActiveSection] = useState<SidebarItem>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   const { getCaseById } = useCases();
   const caseData = getCaseById(caseId);
 
@@ -52,8 +52,8 @@ export default function CaseDetailsPage() {
         return <CaseOverview caseData={displayCaseData} />;
       case "timeline":
         return <CaseTimeline caseId={caseId} />;
-      case "graphs":
-        return <CaseGraphs caseId={caseId} />;
+      case "files":
+        return <CaseFiles caseId={caseId} />;
       case "map":
         return <CaseMap caseId={caseId} />;
       case "chatbot":
@@ -71,8 +71,11 @@ export default function CaseDetailsPage() {
         {/* Background pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(16,185,129,0.05),transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_40%,rgba(16,185,129,0.1),transparent_50%)]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(20,184,166,0.05),transparent_50%)] dark:bg-[radial-gradient(circle_at_70%_60%,rgba(20,184,166,0.1),transparent_50%)]"></div>
-        
-        <div className="relative z-10 flex" style={{ height: 'calc(100vh - 64px)' }}>
+
+        <div
+          className="relative z-10 flex"
+          style={{ height: "calc(100vh - 64px)" }}
+        >
           {/* Sidebar - Desktop */}
           <div className="hidden lg:block">
             <Sidebar
