@@ -123,17 +123,17 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
   };
 
   return (
-    <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 overflow-hidden">
+    <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg transition-all duration-300 overflow-hidden">
       {/* Gradient background overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10"></div>
       
       <CardContent className="relative p-8">
         <div className="text-center space-y-6">
           <div className="space-y-2">
-            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-2xl flex items-center justify-center transition-transform duration-300">
               <Upload className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 transition-colors duration-300">
               Upload UFDR File
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400">
@@ -146,7 +146,7 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
               className={`relative border-2 border-dashed rounded-2xl p-12 transition-all duration-300 ${
                 dragActive
                   ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 scale-[1.02]"
-                  : "border-slate-300 dark:border-slate-600 hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-gradient-to-br hover:from-emerald-50/50 hover:to-teal-50/50 dark:hover:from-emerald-900/10 dark:hover:to-teal-900/10"
+                  : "border-slate-300 dark:border-slate-600"
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
@@ -169,7 +169,7 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
 
                 <Button
                   variant="outline"
-                  className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+                  className="border-indigo-200 text-indigo-600 dark:border-indigo-700 dark:text-indigo-400"
                   onClick={() =>
                     document.getElementById("file-upload")?.click()
                   }
@@ -206,7 +206,7 @@ export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: 
                   variant="outline"
                   size="sm"
                   onClick={removeFile}
-                  className="h-8 w-8 p-0 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                  className="h-8 w-8 p-0 border-red-200 text-red-600 dark:border-red-700 dark:text-red-400"
                 >
                   <X className="h-4 w-4" />
                 </Button>

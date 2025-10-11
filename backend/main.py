@@ -299,6 +299,375 @@ Your Response (MUST be in {detected_language or 'the specified language'}):"""
         
         raise HTTPException(status_code=500, detail=f"Error querying documents: {str(e)}")
 
+@app.post("/generate-graph/")
+async def generate_graph(session_id: str = Form(...), chat_history: str = Form(...)):
+    """
+    Generate Neo4j graph visualizations based on chat history and context.
+    
+    Args:
+        session_id: The session ID for this case
+        chat_history: JSON string containing the chat history
+        
+    Returns:
+        Graph data with nodes, relationships, and suggested queries
+    """
+    try:
+        import json
+        from cypher_generator import generate_graph_queries
+        from neo4j_service import execute_cypher_query, get_database_overview, get_neo4j_service
+        from forensic_data_extractor import extract_forensic_graph_data
+        from vector_store import similarity_search
+        
+        # Parse chat history
+        try:
+            chat_messages = json.loads(chat_history)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid chat history format")
+        
+        # Validate chat history format
+        if not isinstance(chat_messages, list):
+            raise HTTPException(status_code=400, detail="Chat history must be a list of messages")
+        
+        # Import query validator for safe queries
+        from query_validator import CypherQueryValidator
+        validator = CypherQueryValidator()
+        
+        # Ensure Neo4j connection and prepare data
+        neo4j_service = get_neo4j_service()
+        if not neo4j_service.connect():
+            # If connection fails, return safe fallback queries
+            return JSONResponse(content={
+                "success": False,
+                "error": "Neo4j database not available",
+                "mock_data": True,
+                "suggested_queries": validator.get_forensic_queries(),
+                "graph_data": {
+                    "nodes": [],
+                    "relationships": [],
+                    "node_count": 0,
+                    "relationship_count": 0
+                }
+            })
+        
+        # Try to get actual UFDR content for this session
+        ufdr_content = None
+        try:
+            # Get relevant documents from vector store
+            chat_context = " ".join([msg.get('content', '') for msg in chat_messages[-5:]])
+            docs, _ = similarity_search(chat_context, session_id, n_results=10)
+            if docs:
+                ufdr_content = "\n".join(docs)
+        except Exception as e:
+            print(f"Could not retrieve UFDR content: {e}")
+        
+        # Clear existing data and create forensic data
+        with neo4j_service.driver.session() as session:
+            session.run("MATCH (n) DETACH DELETE n")
+        
+        # Generate forensic graph data (either from real UFDR or realistic sample)
+        nodes, relationships = extract_forensic_graph_data(session_id, ufdr_content)
+        
+        # Create nodes in Neo4j
+        with neo4j_service.driver.session() as session:
+            # Clear existing data first
+            session.run("MATCH (n) DETACH DELETE n")
+            
+            for node in nodes:
+                labels = ":".join(node['labels'])
+                
+                # Build properties string excluding id and name
+                property_pairs = []
+                for k, v in node['properties'].items():
+                    if k not in ['id', 'name'] and v is not None:
+                        property_pairs.append(f"{k}: ${k}")
+                
+                if property_pairs:
+                    properties_str = ", " + ", ".join(property_pairs)
+                else:
+                    properties_str = ""
+                
+                query = f"CREATE (n:{labels} {{id: $id, name: $name{properties_str}}})"
+                
+                params = {
+                    'id': node['id'],
+                    'name': node['name']
+                }
+                
+                # Add other properties
+                for k, v in node['properties'].items():
+                    if k not in ['id', 'name'] and v is not None:
+                        params[k] = str(v)  # Convert to string to avoid type issues
+                
+                session.run(query, params)
+            
+            # Create relationships
+            for rel in relationships:
+                query = """
+                MATCH (a {id: $start_id}), (b {id: $end_id})
+                CREATE (a)-[r:""" + rel['type'] + """ {id: $rel_id}]->(b)
+                SET r += $properties
+                """
+                
+                params = {
+                    'start_id': rel['start_node'],
+                    'end_id': rel['end_node'],
+                    'rel_id': rel['id'],
+                    'properties': rel.get('properties', {})
+                }
+                
+                session.run(query, params)
+        
+        # Generate query suggestions using validator for safety
+        suggested_queries = validator.get_forensic_queries()
+        
+        # Execute the first suggested query to get initial graph data
+        graph_data = {"nodes": [], "relationships": [], "node_count": 0, "relationship_count": 0}
+        executed_query = None
+        
+        if suggested_queries:
+            first_query = suggested_queries[0]
+            executed_query = first_query
+            
+            # Validate the query before execution
+            validation_result = validator.validate_query(first_query['query'])
+            if validation_result["is_valid"]:
+                safe_query = validation_result["sanitized_query"]
+            else:
+                safe_query = validator.get_safe_query("all_relationships")
+                print(f"Query validation failed, using safe fallback: {validation_result['errors']}")
+            
+            graph_result = execute_cypher_query(safe_query)
+            
+            if graph_result['success']:
+                graph_data = {
+                    "nodes": graph_result['nodes'],
+                    "relationships": graph_result['relationships'],
+                    "node_count": graph_result['node_count'],
+                    "relationship_count": graph_result['relationship_count']
+                }
+        
+        # Get database overview
+        db_overview = get_database_overview()
+        
+        # Determine if real UFDR data was used
+        data_source = "Real UFDR Data" if ufdr_content else "Realistic Forensic Sample"
+        
+        return JSONResponse(content={
+            "success": True,
+            "session_id": session_id,
+            "data_source": data_source,
+            "analysis": {"primary_focus": "forensic_investigation", "safe_queries_used": True},
+            "suggested_queries": suggested_queries,
+            "executed_query": executed_query,
+            "graph_data": graph_data,
+            "database_stats": db_overview.get('stats', {}),
+            "total_messages_analyzed": len(chat_messages),
+            "forensic_nodes_created": len(nodes),
+            "forensic_relationships_created": len(relationships)
+        })
+        
+    except Exception as e:
+        print(f"Graph generation error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        # Return error response with some mock data
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "error": str(e),
+                "session_id": session_id,
+                "suggested_queries": [
+                    {
+                        "query": "MATCH (n) RETURN n LIMIT 10",
+                        "title": "Sample Nodes",
+                        "description": "Basic node overview",
+                        "type": "overview"
+                    }
+                ],
+                "graph_data": {
+                    "nodes": [],
+                    "relationships": [],
+                    "node_count": 0,
+                    "relationship_count": 0
+                }
+            }
+        )
+
+@app.post("/execute-query/")
+async def execute_custom_query(session_id: str = Form(...), cypher_query: str = Form(...)):
+    """
+    Execute a custom Cypher query and return graph data.
+    
+    Args:
+        session_id: The session ID for this case
+        cypher_query: The Cypher query to execute
+        
+    Returns:
+        Graph data with nodes and relationships
+    """
+    try:
+        from neo4j_service import execute_cypher_query, get_neo4j_service
+        
+        # Clean up the query - remove any newlines and extra spaces
+        cleaned_query = ' '.join(cypher_query.strip().split())
+        
+        # Basic query validation - check for dangerous operations
+        dangerous_keywords = ['DELETE', 'DROP', 'CREATE', 'MERGE', 'SET', 'REMOVE']
+        query_upper = cleaned_query.upper()
+        
+        for keyword in dangerous_keywords:
+            if keyword in query_upper and not query_upper.startswith('CREATE '):
+                raise HTTPException(status_code=400, detail=f"Query contains restricted operation: {keyword}")
+        
+        # Execute the query
+        result = execute_cypher_query(cleaned_query)
+        
+        if not result['success']:
+            raise HTTPException(status_code=400, detail=f"Query execution failed: {result.get('error', 'Unknown error')}")
+        
+        return JSONResponse(content={
+            "success": result['success'],
+            "session_id": session_id,
+            "query": cleaned_query,
+            "graph_data": {
+                "nodes": result['nodes'],
+                "relationships": result['relationships'],
+                "node_count": result['node_count'],
+                "relationship_count": result['relationship_count']
+            },
+            "execution_time": result.get('execution_time', 0)
+        })
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Query execution error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        return JSONResponse(content={
+            "success": result['success'],
+            "session_id": session_id,
+            "query": cleaned_query,
+            "graph_data": {
+                "nodes": result['nodes'],
+                "relationships": result['relationships'],
+                "node_count": result['node_count'],
+                "relationship_count": result['relationship_count']
+            },
+            "execution_time": result.get('execution_time', 0)
+        })
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Query execution error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "error": str(e),
+                "session_id": session_id,
+                "query": cypher_query,
+                "graph_data": {
+                    "nodes": [],
+                    "relationships": [],
+                    "node_count": 0,
+                    "relationship_count": 0
+                }
+            }
+        )
+
+@app.get("/database-stats/")
+async def get_database_statistics():
+    """
+    Get Neo4j database statistics and overview.
+    
+    Returns:
+        Database statistics including node and relationship counts
+    """
+    try:
+        from neo4j_service import get_database_overview, get_neo4j_service
+        
+        # Ensure connection and sample data
+        neo4j_service = get_neo4j_service()
+        if not neo4j_service.connect():
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "success": False,
+                    "error": "Neo4j database not available",
+                    "stats": {
+                        "total_nodes": 0,
+                        "total_relationships": 0,
+                        "node_counts_by_label": {},
+                        "relationship_counts_by_type": {}
+                    }
+                }
+            )
+        
+        # Create sample data if needed
+        neo4j_service.create_sample_data()
+        
+        # Get database overview
+        overview = get_database_overview()
+        
+        return JSONResponse(content={
+            "success": True,
+            "stats": overview.get('stats', {}),
+            "database_connected": True
+        })
+        
+    except Exception as e:
+        print(f"Database stats error: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "error": str(e),
+                "stats": {
+                    "total_nodes": 0,
+                    "total_relationships": 0,
+                    "node_counts_by_label": {},
+                    "relationship_counts_by_type": {}
+                }
+            }
+        )
+
+@app.get("/test-simple-query/")
+async def test_simple_query():
+    """
+    Test endpoint to execute a simple query and check database connectivity.
+    """
+    try:
+        from neo4j_service import execute_cypher_query, get_neo4j_service
+        
+        # Test simple query
+        result = execute_cypher_query("MATCH (n) RETURN n LIMIT 5")
+        
+        return JSONResponse(content={
+            "success": result['success'],
+            "query": "MATCH (n) RETURN n LIMIT 5",
+            "node_count": result['node_count'],
+            "relationship_count": result['relationship_count'],
+            "sample_nodes": result.get('nodes', [])[:3]  # First 3 nodes for preview
+        })
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "error": str(e),
+                "query": "MATCH (n) RETURN n LIMIT 5"
+            }
+        )
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

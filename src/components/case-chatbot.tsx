@@ -15,9 +15,10 @@ import {
   Clock,
   Globe,
   ChevronDown,
+  BarChart3,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { queryDocuments } from "@/lib/backend-service";
+import { queryDocuments, generateGraph, saveGraphData } from "@/lib/backend-service";
 
 interface Message {
   id: string;
@@ -52,6 +53,12 @@ const quickActions = [
     icon: Lightbulb,
     label: "Key Insights",
     prompt: "What are the key insights from this case?",
+  },
+  {
+    icon: BarChart3,
+    label: "Generate Graph",
+    prompt: "GENERATE_GRAPH_ACTION", // Special action identifier
+    special: true,
   },
 ];
 
@@ -97,6 +104,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("english");
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [isGeneratingGraph, setIsGeneratingGraph] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -282,7 +290,150 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
   };
 
   const handleQuickAction = (prompt: string) => {
-    handleSendMessage(prompt);
+    if (prompt === "GENERATE_GRAPH_ACTION") {
+      handleGenerateGraph();
+    } else {
+      handleSendMessage(prompt);
+    }
+  };
+
+  const handleGenerateGraph = async () => {
+    if (isGeneratingGraph || messages.length === 0) {
+      return;
+    }
+
+    setIsGeneratingGraph(true);
+
+    try {
+      // Get the session ID for this case from localStorage
+      const sessionId = localStorage.getItem(`case_${caseId}_session`);
+      
+      if (!sessionId) {
+        throw new Error("No session found for this case. Please ensure a UFDR file has been uploaded.");
+      }
+
+      // Prepare chat history for graph generation
+      const chatHistory = messages.map(msg => ({
+        content: msg.content,
+        sender: msg.sender,
+        timestamp: msg.timestamp
+      }));
+
+      // Add a message to show graph generation started
+      const generationMessage: Message = {
+        id: Date.now().toString(),
+        content: "🔄 Generating Neo4j graph visualization based on our conversation...",
+        sender: "ai",
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, generationMessage]);
+
+      // Generate the graph
+      let result;
+      try {
+        console.log("Attempting to generate graph with:", { chatHistory, sessionId });
+        result = await generateGraph(chatHistory, sessionId);
+        console.log("Graph generation result:", result);
+      } catch (networkError) {
+        console.error("Network error during graph generation:", networkError);
+        const errorMessage = networkError instanceof Error ? networkError.message : 'Could not connect to backend service';
+        throw new Error(`Network error: ${errorMessage}`);
+      }
+
+      if (result.success) {
+        // Save graph data for use in the graphs section
+        saveGraphData(caseId, result.graph_data);
+
+        // Save suggested queries for use in the graphs section
+        try {
+          localStorage.setItem(`suggested_queries_${caseId}`, JSON.stringify(result.suggested_queries));
+        } catch (error) {
+          console.error("Error saving suggested queries:", error);
+        }
+
+        // Create success message with graph details
+        const successMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: `✅ **Graph Generated Successfully!**
+
+**Analysis Summary:**
+- Primary Focus: ${result.analysis.primary_focus || 'General investigation'}
+- Messages Analyzed: ${result.total_messages_analyzed}
+- Nodes Found: ${result.graph_data.node_count}
+- Relationships Found: ${result.graph_data.relationship_count}
+
+**Generated Queries:**
+${result.suggested_queries.map((query, idx) => 
+  `${idx + 1}. **${query.title}**: ${query.description}`
+).join('\n')}
+
+The graph visualization has been saved and can be viewed in the **Graphs** section. Click on the Graphs tab to see the interactive Neo4j visualization!`,
+          sender: "ai",
+          timestamp: new Date().toISOString(),
+        };
+
+        // Update the generation message with success
+        setMessages((prev) => prev.map(msg => 
+          msg.id === generationMessage.id ? successMessage : msg
+        ));
+
+        // Store successful generation timestamp
+        localStorage.setItem(`graph_generated_${caseId}`, new Date().toISOString());
+
+      } else {
+        // Handle error case
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: `❌ **Graph Generation Failed**
+
+Error: ${result.error || 'Unknown error occurred'}
+
+${result.mock_data ? 
+  'The system is running in mock mode. Please ensure Neo4j database is properly configured.' : 
+  'Please try again or check the backend connection.'
+}`,
+          sender: "ai",
+          timestamp: new Date().toISOString(),
+        };
+
+        setMessages((prev) => prev.map(msg => 
+          msg.id === generationMessage.id ? errorMessage : msg
+        ));
+      }
+
+    } catch (error) {
+      console.error("Graph generation error:", error);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: `❌ **Graph Generation Error**
+
+${error instanceof Error ? error.message : 'An unexpected error occurred during graph generation.'}
+
+Please ensure:
+- A UFDR file has been uploaded for this case
+- The backend service is running
+- Neo4j database is accessible`,
+        sender: "ai",
+        timestamp: new Date().toISOString(),
+      };
+
+      // Update or add error message
+      setMessages((prev) => {
+        const generationMsgIndex = prev.findIndex(msg => 
+          msg.content.includes("Generating Neo4j graph visualization")
+        );
+        if (generationMsgIndex !== -1) {
+          return prev.map((msg, idx) => 
+            idx === generationMsgIndex ? errorMessage : msg
+          );
+        } else {
+          return [...prev, errorMessage];
+        }
+      });
+    } finally {
+      setIsGeneratingGraph(false);
+    }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -533,17 +684,52 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
               <div className="space-y-3">
                 {quickActions.map((action, index) => {
                   const ActionIcon = action.icon;
+                  const isGraphAction = action.prompt === "GENERATE_GRAPH_ACTION";
+                  const isDisabled = isGraphAction && (isGeneratingGraph || messages.length === 0);
+                  
                   return (
                     <button
                       key={index}
                       onClick={() => handleQuickAction(action.prompt)}
-                      className="w-full p-3 text-left bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600 transition-colors"
+                      disabled={isDisabled}
+                      className={`w-full p-3 text-left rounded-lg border transition-colors ${
+                        isGraphAction 
+                          ? isDisabled
+                            ? "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 cursor-not-allowed opacity-50"
+                            : "bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-200 dark:border-emerald-700 hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-900/30 dark:hover:to-teal-900/30"
+                          : "bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-600"
+                      }`}
                     >
                       <div className="flex items-center space-x-3">
-                        <ActionIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
-                          {action.label}
-                        </span>
+                        <ActionIcon className={`h-5 w-5 ${
+                          isGraphAction 
+                            ? isGeneratingGraph 
+                              ? "text-emerald-400 animate-pulse"
+                              : "text-emerald-600 dark:text-emerald-400"
+                            : "text-indigo-600 dark:text-indigo-400"
+                        }`} />
+                        <div className="flex-1">
+                          <span className={`text-sm font-medium ${
+                            isGraphAction 
+                              ? "text-emerald-900 dark:text-emerald-100"
+                              : "text-gray-900 dark:text-slate-100"
+                          }`}>
+                            {isGeneratingGraph && isGraphAction ? "Generating..." : action.label}
+                          </span>
+                          {isGraphAction && (
+                            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                              {messages.length === 0 
+                                ? "Start a conversation first" 
+                                : isGeneratingGraph 
+                                  ? "Creating Neo4j visualization..."
+                                  : "Create graph from chat history"
+                              }
+                            </p>
+                          )}
+                        </div>
+                        {isGeneratingGraph && isGraphAction && (
+                          <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                        )}
                       </div>
                     </button>
                   );
