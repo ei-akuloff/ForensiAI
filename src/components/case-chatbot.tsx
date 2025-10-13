@@ -15,9 +15,10 @@ import {
   Clock,
   Globe,
   ChevronDown,
+  BarChart3,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { queryDocuments } from "@/lib/backend-service";
+import { queryDocuments, generateGraph, saveGraphData } from "@/lib/backend-service";
 
 interface Message {
   id: string;
@@ -53,6 +54,12 @@ const quickActions = [
     label: "Key Insights",
     prompt: "What are the key insights from this case?",
   },
+  {
+    icon: BarChart3,
+    label: "Generate Graph",
+    prompt: "GENERATE_GRAPH_ACTION", // Special action identifier
+    special: true,
+  },
 ];
 
 const supportedLanguages = [
@@ -76,7 +83,7 @@ const supportedLanguages = [
 
 const defaultMessages: Message[] = [{
   id: "1",
-  content: "Hello! I'm ForensiAI Assistant with multilingual capabilities. I can analyze this case and respond in multiple languages including Hindi, Marathi, Gujarati, Tamil, Telugu, Bengali, Spanish, French, German, and English. What would you like to know?\n\nनमस्ते! मैं बहुभाषी ForensiAI असिस्टेंट हूं। मैं इस केस का विश्लेषण कर सकता हूं।",
+  content: "Hello! I'm your ForensiAI Assistant. I can help you analyze this case and answer questions about the uploaded evidence. What would you like to know about this investigation?",
   sender: "ai",
   timestamp: new Date().toISOString(),
   suggestions: [
@@ -84,8 +91,8 @@ const defaultMessages: Message[] = [{
     "Show me the timeline",
     "Any suspicious activity?",
     "Summary of findings",
-    "इस केस में क्या मिला?",
-    "कोई संदिग्ध गतिविधि?",
+    "Generate a detailed report",
+    "What evidence was found?",
   ],
 }];
 
@@ -95,8 +102,9 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("english");
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [isGeneratingGraph, setIsGeneratingGraph] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -282,7 +290,150 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
   };
 
   const handleQuickAction = (prompt: string) => {
-    handleSendMessage(prompt);
+    if (prompt === "GENERATE_GRAPH_ACTION") {
+      handleGenerateGraph();
+    } else {
+      handleSendMessage(prompt);
+    }
+  };
+
+  const handleGenerateGraph = async () => {
+    if (isGeneratingGraph || messages.length === 0) {
+      return;
+    }
+
+    setIsGeneratingGraph(true);
+
+    try {
+      // Get the session ID for this case from localStorage
+      const sessionId = localStorage.getItem(`case_${caseId}_session`);
+      
+      if (!sessionId) {
+        throw new Error("No session found for this case. Please ensure a UFDR file has been uploaded.");
+      }
+
+      // Prepare chat history for graph generation
+      const chatHistory = messages.map(msg => ({
+        content: msg.content,
+        sender: msg.sender,
+        timestamp: msg.timestamp
+      }));
+
+      // Add a message to show graph generation started
+      const generationMessage: Message = {
+        id: Date.now().toString(),
+        content: "🔄 Generating Neo4j graph visualization based on our conversation...",
+        sender: "ai",
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, generationMessage]);
+
+      // Generate the graph
+      let result;
+      try {
+        console.log("Attempting to generate graph with:", { chatHistory, sessionId });
+        result = await generateGraph(chatHistory, sessionId);
+        console.log("Graph generation result:", result);
+      } catch (networkError) {
+        console.error("Network error during graph generation:", networkError);
+        const errorMessage = networkError instanceof Error ? networkError.message : 'Could not connect to backend service';
+        throw new Error(`Network error: ${errorMessage}`);
+      }
+
+      if (result.success) {
+        // Save graph data for use in the graphs section
+        saveGraphData(caseId, result.graph_data);
+
+        // Save suggested queries for use in the graphs section
+        try {
+          localStorage.setItem(`suggested_queries_${caseId}`, JSON.stringify(result.suggested_queries));
+        } catch (error) {
+          console.error("Error saving suggested queries:", error);
+        }
+
+        // Create success message with graph details
+        const successMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: `✅ **Graph Generated Successfully!**
+
+**Analysis Summary:**
+- Primary Focus: ${result.analysis.primary_focus || 'General investigation'}
+- Messages Analyzed: ${result.total_messages_analyzed}
+- Nodes Found: ${result.graph_data.node_count}
+- Relationships Found: ${result.graph_data.relationship_count}
+
+**Generated Queries:**
+${result.suggested_queries.map((query, idx) => 
+  `${idx + 1}. **${query.title}**: ${query.description}`
+).join('\n')}
+
+The graph visualization has been saved and can be viewed in the **Graphs** section. Click on the Graphs tab to see the interactive Neo4j visualization!`,
+          sender: "ai",
+          timestamp: new Date().toISOString(),
+        };
+
+        // Update the generation message with success
+        setMessages((prev) => prev.map(msg => 
+          msg.id === generationMessage.id ? successMessage : msg
+        ));
+
+        // Store successful generation timestamp
+        localStorage.setItem(`graph_generated_${caseId}`, new Date().toISOString());
+
+      } else {
+        // Handle error case
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: `❌ **Graph Generation Failed**
+
+Error: ${result.error || 'Unknown error occurred'}
+
+${result.mock_data ? 
+  'The system is running in mock mode. Please ensure Neo4j database is properly configured.' : 
+  'Please try again or check the backend connection.'
+}`,
+          sender: "ai",
+          timestamp: new Date().toISOString(),
+        };
+
+        setMessages((prev) => prev.map(msg => 
+          msg.id === generationMessage.id ? errorMessage : msg
+        ));
+      }
+
+    } catch (error) {
+      console.error("Graph generation error:", error);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: `❌ **Graph Generation Error**
+
+${error instanceof Error ? error.message : 'An unexpected error occurred during graph generation.'}
+
+Please ensure:
+- A UFDR file has been uploaded for this case
+- The backend service is running
+- Neo4j database is accessible`,
+        sender: "ai",
+        timestamp: new Date().toISOString(),
+      };
+
+      // Update or add error message
+      setMessages((prev) => {
+        const generationMsgIndex = prev.findIndex(msg => 
+          msg.content.includes("Generating Neo4j graph visualization")
+        );
+        if (generationMsgIndex !== -1) {
+          return prev.map((msg, idx) => 
+            idx === generationMsgIndex ? errorMessage : msg
+          );
+        } else {
+          return [...prev, errorMessage];
+        }
+      });
+    } finally {
+      setIsGeneratingGraph(false);
+    }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -311,29 +462,41 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">
-          AI Assistant
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          Ask questions about the case evidence and get AI-powered insights.
-        </p>
+    <div className="space-y-8 animate-fade-in">
+      {/* Header Section */}
+      <div className="relative">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <MessageSquare className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold gradient-text mb-2">
+              AI Assistant
+            </h1>
+            <p className="text-slate-600 dark:text-slate-300 text-lg">
+              Intelligent analysis and insights powered by advanced AI technology
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Chat Interface */}
         <div className="xl:col-span-3">
-          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
-            <CardHeader>
+          <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+            
+            <CardHeader className="relative">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-                  <MessageSquare className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Case Analysis Chat</span>
+                <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-slate-100">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <MessageSquare className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <span className="text-xl font-semibold">Case Analysis Chat</span>
                 </CardTitle>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   {/* Language Selector */}
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-white/20 dark:border-slate-600/50">
                     <Globe className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                     <select
                       value={selectedLanguage}
@@ -389,7 +552,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                       <div
                         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                           message.sender === "user"
-                            ? "bg-indigo-600 text-white"
+                            ? "bg-emerald-600 text-white"
                             : "bg-emerald-600 text-white"
                         }`}
                       >
@@ -403,7 +566,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                         <div
                           className={`p-4 rounded-lg ${
                             message.sender === "user"
-                              ? "bg-indigo-600 text-white"
+                              ? "bg-emerald-600 text-white"
                               : "bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700"
                           }`}
                         >
@@ -480,7 +643,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                       scrollToBottom(true);
                       setShowScrollButton(false);
                     }}
-                    className="absolute bottom-4 right-4 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 z-10"
+                    className="absolute bottom-4 right-4 bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 z-10"
                     title="New messages below - Click to scroll to latest"
                   >
                     <ChevronDown className="h-4 w-4" />
@@ -499,7 +662,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                 <Button
                   type="submit"
                   disabled={!inputValue.trim() || isTyping}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -513,7 +676,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
           <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-                <Lightbulb className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                <Lightbulb className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                 <span>Quick Actions</span>
               </CardTitle>
             </CardHeader>
@@ -521,17 +684,52 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
               <div className="space-y-3">
                 {quickActions.map((action, index) => {
                   const ActionIcon = action.icon;
+                  const isGraphAction = action.prompt === "GENERATE_GRAPH_ACTION";
+                  const isDisabled = isGraphAction && (isGeneratingGraph || messages.length === 0);
+                  
                   return (
                     <button
                       key={index}
                       onClick={() => handleQuickAction(action.prompt)}
-                      className="w-full p-3 text-left bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600 transition-colors"
+                      disabled={isDisabled}
+                      className={`w-full p-3 text-left rounded-lg border transition-colors ${
+                        isGraphAction 
+                          ? isDisabled
+                            ? "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 cursor-not-allowed opacity-50"
+                            : "bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-200 dark:border-emerald-700 hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-900/30 dark:hover:to-teal-900/30"
+                          : "bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-600"
+                      }`}
                     >
                       <div className="flex items-center space-x-3">
-                        <ActionIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
-                          {action.label}
-                        </span>
+                        <ActionIcon className={`h-5 w-5 ${
+                          isGraphAction 
+                            ? isGeneratingGraph 
+                              ? "text-emerald-400 animate-pulse"
+                              : "text-emerald-600 dark:text-emerald-400"
+                            : "text-indigo-600 dark:text-indigo-400"
+                        }`} />
+                        <div className="flex-1">
+                          <span className={`text-sm font-medium ${
+                            isGraphAction 
+                              ? "text-emerald-900 dark:text-emerald-100"
+                              : "text-gray-900 dark:text-slate-100"
+                          }`}>
+                            {isGeneratingGraph && isGraphAction ? "Generating..." : action.label}
+                          </span>
+                          {isGraphAction && (
+                            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                              {messages.length === 0 
+                                ? "Start a conversation first" 
+                                : isGeneratingGraph 
+                                  ? "Creating Neo4j visualization..."
+                                  : "Create graph from chat history"
+                              }
+                            </p>
+                          )}
+                        </div>
+                        {isGeneratingGraph && isGraphAction && (
+                          <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                        )}
                       </div>
                     </button>
                   );

@@ -47,9 +47,9 @@ const getEventIcon = (type: TimelineEvent["type"]) => {
 const getEventColor = (type: TimelineEvent["type"]) => {
   switch (type) {
     case "upload":
-      return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
     case "analysis":
-      return "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400";
+      return "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400";
     case "discovery":
       return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
     case "completion":
@@ -64,9 +64,9 @@ const getEventColor = (type: TimelineEvent["type"]) => {
 const getEventBgColor = (type: TimelineEvent["type"]) => {
   switch (type) {
     case "upload":
-      return "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700";
+      return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700";
     case "analysis":
-      return "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700";
+      return "bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-700";
     case "discovery":
       return "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700";
     case "completion":
@@ -145,29 +145,41 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">
-          Case Timeline
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          Chronological overview of all case activities and discoveries.
-        </p>
+    <div className="space-y-8 animate-fade-in">
+      {/* Header Section */}
+      <div className="relative">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <Clock className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold gradient-text mb-2">
+              Case Timeline
+            </h1>
+            <p className="text-slate-600 dark:text-slate-300 text-lg">
+              Chronological overview of all forensic activities and key discoveries
+            </p>
+          </div>
+        </div>
       </div>
 
-      <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-            <Clock className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-            <span>Activity Timeline</span>
+      <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+        
+        <CardHeader className="relative">
+          <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-slate-100">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            </div>
+            <span className="text-xl font-semibold">Activity Timeline</span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative">
           <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700"></div>
+            {/* Enhanced Timeline Line */}
+            <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-200 via-indigo-200 to-blue-200 dark:from-purple-800 dark:via-indigo-800 dark:to-blue-800 rounded-full"></div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               {timelineEvents.map((event, index) => {
                 const EventIcon = getEventIcon(event.type);
                 const { date, time } = formatDateTime(event.timestamp);
@@ -175,9 +187,10 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
                 return (
                   <div
                     key={event.id}
-                    className="relative flex items-start space-x-4"
+                    className="relative flex items-start space-x-6 animate-slide-up group/item"
+                    style={{animationDelay: `${index * 0.1}s`}}
                   >
-                    {/* Timeline Icon */}
+                    {/* Enhanced Timeline Icon */}
                     <div
                       className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full ${getEventBgColor(
                         event.type

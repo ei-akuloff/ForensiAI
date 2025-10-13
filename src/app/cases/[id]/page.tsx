@@ -67,8 +67,12 @@ export default function CaseDetailsPage() {
 
   return (
     <ClientWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <div className="flex" style={{ height: 'calc(100vh - 64px)' }}>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-white to-teal-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-emerald-900/50 relative overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(16,185,129,0.05),transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_40%,rgba(16,185,129,0.1),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(20,184,166,0.05),transparent_50%)] dark:bg-[radial-gradient(circle_at_70%_60%,rgba(20,184,166,0.1),transparent_50%)]"></div>
+        
+        <div className="relative z-10 flex" style={{ height: 'calc(100vh - 64px)' }}>
           {/* Sidebar - Desktop */}
           <div className="hidden lg:block">
             <Sidebar

@@ -50,36 +50,48 @@ export function CaseList({ cases: propCases }: CaseListProps) {
   const getStatusColor = (status: Case["status"]) => {
     return status === "completed"
       ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-      : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
   };
 
   return (
     <ClientWrapper>
-      <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
-        <CardHeader>
+      <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-up" style={{animationDelay: '0.2s'}}>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+        
+        <CardHeader className="relative">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <CardTitle className="text-xl font-semibold text-gray-900 dark:text-slate-100">
-              Past Cases
-            </CardTitle>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center">
+                <File className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300">
+                Case History
+              </CardTitle>
+            </div>
             <div className="relative w-full sm:w-80">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 h-4 w-4" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 h-5 w-5" />
               <Input
-                placeholder="Search cases..."
+                placeholder="Search cases by name or description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600"
+                className="pl-12 h-12 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-2 border-white/20 dark:border-slate-600/50 focus:border-emerald-400 dark:focus:border-emerald-500 transition-all duration-300"
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative">
           {filteredCases.length === 0 ? (
-            <div className="text-center py-8">
-              <File className="h-12 w-12 text-slate-400 dark:text-slate-500 mx-auto mb-4" />
-              <p className="text-slate-500 dark:text-slate-400">
+            <div className="text-center py-12">
+              <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <File className="h-10 w-10 text-slate-400 dark:text-slate-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                {searchTerm ? "No matches found" : "No cases yet"}
+              </h3>
+              <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                 {searchTerm
-                  ? "No cases found matching your search."
-                  : "No cases yet."}
+                  ? "Try adjusting your search terms or check the spelling."
+                  : "Start by uploading your first UFDR file to create a case."}
               </p>
             </div>
           ) : (
@@ -146,7 +158,7 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 px-3 border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+                                className="h-8 px-3 border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
                               >
                                 <Eye className="h-3 w-3 mr-1" />
                                 View

@@ -5,17 +5,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, FileText, X } from "lucide-react";
 import { CaseCreationModal, CaseFormData } from "./case-creation-modal";
+import { DecryptionModal, DecryptionData } from "./decryption-modal";
 
 interface UploadBoxProps {
   onFileUpload?: (file: File) => void;
   onCaseCreated?: (caseData: CaseFormData) => void;
+  onDecryptionSuccess?: (data: DecryptionData) => void;
 }
 
-export function UploadBox({ onFileUpload, onCaseCreated }: UploadBoxProps) {
+export function UploadBox({ onFileUpload, onCaseCreated, onDecryptionSuccess }: UploadBoxProps) {
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [error, setError] = useState<string>("");
   const [showCaseModal, setShowCaseModal] = useState(false);
+  const [showDecryptionModal, setShowDecryptionModal] = useState(false);
+  const [caseData, setCaseData] = useState<CaseFormData | null>(null);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -84,14 +88,30 @@ export function UploadBox({ onFileUpload, onCaseCreated }: UploadBoxProps) {
     setError("");
   };
 
-  const handleCaseCreated = (caseData: CaseFormData) => {
-    onCaseCreated?.(caseData);
+  const handleCaseCreated = (formData: CaseFormData) => {
+    setCaseData(formData);
     setShowCaseModal(false);
+    // Show decryption modal after case creation
+    setShowDecryptionModal(true);
+  };
+
+  const handleDecryptionSuccess = (decryptionData: DecryptionData) => {
+    // Call the parent callback with the complete case data
+    if (caseData) {
+      onCaseCreated?.(caseData);
+    }
+    onDecryptionSuccess?.(decryptionData);
+    setShowDecryptionModal(false);
+    setCaseData(null);
   };
 
   const handleModalClose = () => {
     setShowCaseModal(false);
     // Don't remove the file when modal is cancelled, just close the modal
+  };
+
+  const handleDecryptionModalClose = () => {
+    setShowDecryptionModal(false);
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -103,19 +123,30 @@ export function UploadBox({ onFileUpload, onCaseCreated }: UploadBoxProps) {
   };
 
   return (
-    <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
-      <CardContent className="p-6">
-        <div className="text-center space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-            Upload UFDR File
-          </h3>
+    <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg transition-all duration-300 overflow-hidden">
+      {/* Gradient background overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10"></div>
+      
+      <CardContent className="relative p-8">
+        <div className="text-center space-y-6">
+          <div className="space-y-2">
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-2xl flex items-center justify-center transition-transform duration-300">
+              <Upload className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 transition-colors duration-300">
+              Upload UFDR File
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Drag and drop your forensic data file or click to browse
+            </p>
+          </div>
 
           {!uploadedFile ? (
             <div
-              className={`border-2 border-dashed rounded-lg p-8 transition-colors ${
+              className={`relative border-2 border-dashed rounded-2xl p-12 transition-all duration-300 ${
                 dragActive
-                  ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
-                  : "border-slate-300 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-500"
+                  ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 scale-[1.02]"
+                  : "border-slate-300 dark:border-slate-600"
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
@@ -123,8 +154,8 @@ export function UploadBox({ onFileUpload, onCaseCreated }: UploadBoxProps) {
               onDrop={handleDrop}
             >
               <div className="flex flex-col items-center space-y-4">
-                <div className="p-3 bg-gradient-to-r from-indigo-100 to-blue-100 dark:from-indigo-900/30 dark:to-blue-900/30 rounded-full">
-                  <Upload className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+                <div className="p-3 bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-full">
+                  <Upload className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
                 </div>
 
                 <div className="space-y-2">
@@ -138,7 +169,7 @@ export function UploadBox({ onFileUpload, onCaseCreated }: UploadBoxProps) {
 
                 <Button
                   variant="outline"
-                  className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+                  className="border-indigo-200 text-indigo-600 dark:border-indigo-700 dark:text-indigo-400"
                   onClick={() =>
                     document.getElementById("file-upload")?.click()
                   }
@@ -175,7 +206,7 @@ export function UploadBox({ onFileUpload, onCaseCreated }: UploadBoxProps) {
                   variant="outline"
                   size="sm"
                   onClick={removeFile}
-                  className="h-8 w-8 p-0 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                  className="h-8 w-8 p-0 border-red-200 text-red-600 dark:border-red-700 dark:text-red-400"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -199,7 +230,15 @@ export function UploadBox({ onFileUpload, onCaseCreated }: UploadBoxProps) {
       <CaseCreationModal
         isOpen={showCaseModal}
         onClose={handleModalClose}
-        onCreateCase={handleCaseCreated}
+        onSubmit={handleCaseCreated}
+        fileName={uploadedFile?.name || ""}
+      />
+
+      {/* Decryption Modal */}
+      <DecryptionModal
+        isOpen={showDecryptionModal}
+        onClose={handleDecryptionModalClose}
+        onDecryptionSuccess={handleDecryptionSuccess}
         fileName={uploadedFile?.name || ""}
       />
     </Card>
