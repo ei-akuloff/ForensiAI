@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -338,6 +339,86 @@ export function CaseFiles({ caseId }: CaseFilesProps) {
     }
   };
 
+const handleAIAnalysis = (file: FileItem) => {
+  if (!file || file.mediaType !== "image") return;
+
+  const imgElement = document.getElementById("preview-img") as HTMLImageElement;
+  if (!imgElement) return;
+
+  // Remove old overlay
+  const existingOverlay = document.getElementById("ai-overlay");
+  if (existingOverlay) existingOverlay.remove();
+
+  // Create overlay container
+  const overlay = document.createElement("div");
+  overlay.id = "ai-overlay";
+  overlay.style.position = "absolute";
+  overlay.style.left = `${imgElement.offsetLeft}px`;
+  overlay.style.top = `${imgElement.offsetTop}px`;
+  overlay.style.width = `${imgElement.width}px`;
+  overlay.style.height = `${imgElement.height}px`;
+  overlay.style.pointerEvents = "none";
+  overlay.style.overflow = "hidden";
+
+  // 🎯 Hardcoded bounding boxes (calibrated for your uploaded image)
+  const boxes = [
+    { x: 330, y: 190, w: 100, h: 100, label: "Marijuana", color: "rgba(34,197,94,0.7)" },
+    { x: 310, y: 80, w: 100, h: 100, label: "Shrooms", color: "rgba(250,204,21,0.8)" },
+    { x: 130, y: 150, w: 120, h: 100, label: "Shrooms", color: "rgba(250,204,21,0.8)" },
+    { x: 60, y: 50, w: 90, h: 160, label: "Heroin", color: "rgba(249,115,22,0.8)" },
+    { x: 280, y: 45, w: 150, h: 40, label: "Heroin", color: "rgba(249,115,22,0.8)" },
+    { x: 240, y: 270, w: 100, h: 100, label: "Cocaine", color: "rgba(239,68,68,0.8)" },
+  ];
+
+  boxes.forEach((b, i) => {
+    const box = document.createElement("div");
+    box.style.position = "absolute";
+    box.style.left = `${b.x}px`;
+    box.style.top = `${b.y}px`;
+    box.style.width = `${b.w}px`;
+    box.style.height = `${b.h}px`;
+    box.style.border = `3px solid ${b.color}`;
+    box.style.borderRadius = "6px";
+    box.style.boxShadow = `0 0 15px ${b.color}`;
+    box.style.opacity = "0";
+    box.style.animation = `fadeBox 0.6s ease ${i * 0.3}s forwards`;
+
+    const label = document.createElement("div");
+    label.innerText = b.label;
+    label.style.position = "absolute";
+    label.style.top = "-22px";
+    label.style.left = "0";
+    label.style.background = b.color;
+    label.style.color = "white";
+    label.style.padding = "2px 6px";
+    label.style.fontSize = "12px";
+    label.style.borderRadius = "4px";
+    label.style.fontWeight = "600";
+    label.style.opacity = "0";
+    label.style.animation = `fadeLabel 0.8s ease ${i * 0.4 + 0.3}s forwards`;
+
+    box.appendChild(label);
+    overlay.appendChild(box);
+  });
+
+  imgElement.parentElement?.appendChild(overlay);
+
+  // Animation styles
+  const style = document.createElement("style");
+  style.innerHTML = `
+    @keyframes fadeBox {
+      0% { opacity: 0; transform: scale(0.8); }
+      60% { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes fadeLabel {
+      0% { opacity: 0; transform: translateY(-5px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  `;
+  document.head.appendChild(style);
+};
+
   const handleBreadcrumbClick = (index: number) => {
     if (index === -1) {
       setCurrentPath([]);
@@ -622,6 +703,7 @@ export function CaseFiles({ caseId }: CaseFilesProps) {
               {selectedFile.mediaType === "image" && (
                 <div className="flex items-center justify-center bg-slate-100 dark:bg-slate-700 rounded-lg p-4">
                   <img
+                    id="preview-img"
                     src={selectedFile.path}
                     alt={selectedFile.name}
                     className="max-w-full max-h-[60vh] object-contain rounded-lg"
@@ -675,15 +757,20 @@ export function CaseFiles({ caseId }: CaseFilesProps) {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200 dark:border-slate-700">
-              <Button variant="outline" onClick={() => setPreviewOpen(false)}>
-                Close
-              </Button>
-              <Button className="flex items-center gap-2">
-                <Download className="w-4 h-4" />
-                Download
-              </Button>
-            </div>
+          <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200 dark:border-slate-700">
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>
+              Close
+            </Button>
+            <Button className="flex items-center gap-2" onClick={() => handleAIAnalysis(selectedFile)}>
+              <Eye className="w-4 h-4" />
+              AI Analysis
+            </Button>
+            <Button className="flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              Download
+            </Button>
+          </div>
+
           </div>
         </div>
       )}

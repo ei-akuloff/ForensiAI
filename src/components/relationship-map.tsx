@@ -206,88 +206,96 @@ export function RelationshipMap({ caseId }: RelationshipMapProps) {
       .enter().append("text")
       .attr("font-size", "9px")
       .attr("font-weight", "500")
-      .attr("fill", "#374151")
+      .attr("fill", "#ffffffff")
       .attr("text-anchor", "middle")
       .attr("dy", "-5")
       .style("pointer-events", "none")
       .text((d) => d.type.charAt(0).toUpperCase() + d.type.slice(1));
+// 1. Name → Image Mapping
+const imageMap: Record<string, string> = {
+  "Priya Desai": "/images/pd.png",
+  "Sakshi Khan": "/images/sk.jpg",
+  "Tanvi Verma": "/images/tv.jpg",
+  "Rahul Iyer": "/images/ri.jpg",
+  "Aarav Sharma": "/images/as.jpg",
+  "Vikram Joshi": "/images/vj.jpg",
+  "Nidhi Rao": "/images/nr.jpg",
+  "Riya Patel": "/images/rp.jpg",
+  default: "/images/pd.png"
+};
 
-    // Create node groups (containing icon, background, and label)
-    const nodeGroup = container.append("g")
-      .selectAll("g")
-      .data(peopleWithIds)
-      .enter().append("g")
-      .attr("class", "node-group")
-      .style("cursor", "pointer")
-      .call(d3.drag<SVGGElement, Person>()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended))
-      .on("click", function(event, d) {
-        event.stopPropagation();
-        setSelectedPerson(d);
-        setShowPersonPanel(true);
-        setShowRelationshipPanel(false);
-      });
+// 2. Optional circular clipping
+svg.append("defs")
+  .append("clipPath")
+  .attr("id", "circle-clip")
+  .append("circle")
+  .attr("r", 35)
+  .attr("cx", 0)
+  .attr("cy", 0);
 
-    // Create background circles for nodes
-    const nodeBackground = nodeGroup.append("circle")
-      .attr("r", 35)
-      .attr("fill", (d) => getPersonColor(d.type, d.suspicious))
-      .attr("stroke", (d) => d.suspicious ? "#ef4444" : "#fff")
-      .attr("stroke-width", 3)
-      .attr("opacity", 0.9);
+// Create node groups
+const nodeGroup = container.append("g")
+  .selectAll("g")
+  .data(peopleWithIds)
+  .enter()
+  .append("g")
+  .attr("class", "node-group")
+  .style("cursor", "pointer")
+  .call(d3.drag<SVGGElement, Person>()
+    .on("start", dragstarted)
+    .on("drag", dragged)
+    .on("end", dragended))
+  .on("click", function(event, d) {
+    event.stopPropagation();
+    setSelectedPerson(d);
+    setShowPersonPanel(true);
+    setShowRelationshipPanel(false);
+  });
 
-    // Create user icons
-    const nodeIcon = nodeGroup.append("g")
-      .attr("transform", "translate(0, 0)");
+// Border circle
+const nodeBorder = nodeGroup.append("circle")
+  .attr("r", 37)
+  .attr("fill", "none")
+  .attr("stroke", d => d.suspicious ? "#ef4444" : "#fff")
+  .attr("stroke-width", 4);
 
-    // Add user icons based on type and suspicious status
-    nodeIcon.each(function(d) {
-      const iconGroup = d3.select(this);
-      const iconSize = 24;
-      
-      if (d.suspicious) {
-        iconGroup.append("path")
-          .attr("d", "M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 6.5V7.5C15 8.3 14.3 9 13.5 9H10.5C9.7 9 9 8.3 9 7.5V6.5L3 7V9H21ZM7 15C7 13.9 7.9 13 9 13H15C16.1 13 17 13.9 17 15V16H7V15Z")
-          .attr("fill", "#fff")
-          .attr("transform", `scale(${iconSize/24})`);
-      } else {
-        iconGroup.append("path")
-          .attr("d", "M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z")
-          .attr("fill", "#fff")
-          .attr("transform", `scale(${iconSize/24})`);
-      }
-    });
+// Image circle
+const nodeImage = nodeGroup.append("image")
+  .attr("href", d => imageMap[d.name] || imageMap.default)
+  .attr("x", -35)
+  .attr("y", -35)
+  .attr("width", 70)
+  .attr("height", 70)
+  .attr("clip-path", "url(#circle-clip)");
 
-    // Create node labels with better positioning
-    const nodeLabel = nodeGroup.append("text")
-      .attr("font-size", "11px")
-      .attr("font-weight", "600")
-      .attr("fill", "#1f2937")
-      .attr("text-anchor", "middle")
-      .attr("dy", "50")
-      .style("pointer-events", "none")
-      .text((d) => {
-        const name = d.name || d.phone || "Unknown";
-        return name.length > 12 ? name.substring(0, 12) + "..." : name;
-      });
+// Node labels (centered **just below** the circle)
+const nodeLabel = nodeGroup.append("text")
+  .attr("font-size", "11px")
+  .attr("font-weight", "600")
+  .attr("fill", "#ffffffff")
+  .attr("text-anchor", "middle")
+  .attr("dy", 50) // 35 (radius) + 15 spacing
+  .style("pointer-events", "none")
+  .text(d => {
+    const name = d.name || d.phone || "Unknown";
+    return name.length > 12 ? name.substring(0, 12) + "..." : name;
+  });
 
-    // Create frequency indicator
-    const frequencyIndicator = nodeGroup.append("circle")
-      .attr("r", 8)
-      .attr("cx", 25)
-      .attr("cy", -25)
-      .attr("fill", (d) => {
-        switch (d.frequency) {
-          case "high": return "#10b981";
-          case "medium": return "#f59e0b";
-          case "low": return "#6b7280";
-          default: return "#6b7280";
-        }
-      })
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 2);
+// Frequency indicator (top-right corner of circle)
+const frequencyIndicator = nodeGroup.append("circle")
+  .attr("r", 8)
+  .attr("cx", 25)
+  .attr("cy", -25)
+  .attr("fill", d => {
+    switch (d.frequency) {
+      case "high": return "#10b981";
+      case "medium": return "#f59e0b";
+      case "low": return "#6b7280";
+      default: return "#6b7280";
+    }
+  })
+  .attr("stroke", "#fff")
+  .attr("stroke-width", 2);
 
     // Add frequency text
     const frequencyText = nodeGroup.append("text")
