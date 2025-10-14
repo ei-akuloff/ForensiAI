@@ -28,7 +28,7 @@ export default function Home() {
         <div className="text-center space-y-6">
           <div className="animate-slide-up">
             <h1 className="text-6xl md:text-7xl font-bold gradient-text mb-6 tracking-tight font-orbitron">
-              ForensiAI
+              TriNetra
             </h1>
             <div className="w-24 h-1.5 bg-gradient-to-r from-matrix-cyan via-matrix-emerald to-matrix-cyan mx-auto rounded-full mb-8 matrix-pulse"></div>
           </div>

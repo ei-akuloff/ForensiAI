@@ -236,12 +236,12 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="mb-12 animate-fade-in">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-matrix-cyan to-matrix-emerald rounded-2xl flex items-center justify-center matrix-glow-cyan">
-              <TrendingUp className="w-6 h-6 text-matrix-bg" />
+            <div className="w-20 h-20 bg-gradient-to-br from-matrix-cyan to-matrix-emerald rounded-2xl flex items-center justify-center matrix-glow-cyan">
+              <TrendingUp className="w-10 h-10 text-matrix-bg" />
             </div>
             <div>
               <h1 className="text-4xl font-bold gradient-text mb-2 font-orbitron tracking-wide">
-                [[ DASHBOARD ]]
+                DASHBOARD
               </h1>
               <p className="matrix-text-muted text-lg font-space-mono">
                 WELCOME BACK! HERE'S AN OVERVIEW OF YOUR FORENSIC ANALYSIS CASES.

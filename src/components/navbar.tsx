@@ -8,7 +8,8 @@ import { ClientWrapper } from "@/components/client-wrapper";
 
 export function Navbar() {
   const pathname = usePathname();
-  const isDashboard = pathname?.startsWith("/dashboard") || pathname?.startsWith("/cases");
+  const isDashboard =
+    pathname?.startsWith("/dashboard") || pathname?.startsWith("/cases");
 
   return (
     <ClientWrapper>
@@ -17,16 +18,11 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo/Brand */}
             <Link
-              href={isDashboard ? "/dashboard" : "/"}
-              className="group flex items-center space-x-3 transition-all duration-300 hover:scale-105 matrix-hover"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-matrix-cyan to-matrix-emerald rounded-lg flex items-center justify-center matrix-glow-cyan transition-all duration-300">
-                <Eye className="w-5 h-5 text-matrix-bg" />
-              </div>
-              <h1 className="text-xl font-bold gradient-text tracking-tight font-orbitron">
-                Trinetra
-              </h1>
-            </Link>
+                      href="/dashboard"
+                      className="matrix-text-primary hover:matrix-text-emerald transition-colors font-space-mono text-4xl tracking-tight"
+                    >
+                      TriNetra
+                    </Link>
 
             {/* Right side - Navigation Links + Theme Toggle */}
             <div className="flex items-center space-x-6">
@@ -43,9 +39,9 @@ export function Navbar() {
                     <button
                       onClick={() => {
                         // Clear any user session data if needed
-                        if (typeof window !== 'undefined') {
+                        if (typeof window !== "undefined") {
                           // You can add more logout logic here like clearing tokens, etc.
-                          localStorage.removeItem('user_session');
+                          localStorage.removeItem("user_session");
                         }
                         window.location.href = "/";
                       }}
