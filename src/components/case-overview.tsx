@@ -71,7 +71,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
           </div>
           <div>
             <h1 className="text-3xl font-bold gradient-text mb-2 font-orbitron tracking-wide">
-              [[ CASE OVERVIEW ]]
+              CASE OVERVIEW
             </h1>
             <p className="matrix-text-muted text-lg font-space-mono">
               COMPREHENSIVE FORENSIC ANALYSIS DETAILS AND EVIDENCE SUMMARY
@@ -89,14 +89,14 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
               <div className="w-10 h-10 bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 matrix-glow-cyan">
                 <FileText className="h-5 w-5 text-matrix-cyan" />
               </div>
-              <span className="text-xl font-semibold font-orbitron tracking-wide">[[ CASE INFORMATION ]]</span>
+              <span className="text-xl font-semibold font-orbitron tracking-wide">CASE INFORMATION</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="relative space-y-6">
             <div className="grid grid-cols-1 gap-6">
               <div className="bg-matrix-surface/50 rounded-xl p-4 border border-matrix-border">
                 <label className="text-sm font-semibold matrix-text-muted uppercase tracking-wider font-space-mono">
-                  [[ Case ID ]]
+                  Case ID
                 </label>
                 <p className="text-lg font-mono matrix-text-primary mt-1 font-semibold font-space-mono">
                   {caseData.id}
@@ -104,7 +104,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
               </div>
               <div className="bg-matrix-surface/50 rounded-xl p-4 border border-matrix-border">
                 <label className="text-sm font-semibold matrix-text-muted uppercase tracking-wider font-space-mono">
-                  [[ Status ]]
+                  Status
                 </label>
                 <div className="flex items-center space-x-3 mt-2">
                   <StatusIcon className="h-5 w-5 text-matrix-cyan" />
@@ -117,7 +117,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
 
             <div>
               <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                [[ Case Name ]]
+                Case Name
               </label>
               <p className="matrix-text-primary font-space-mono">
                 {caseData.name}
@@ -126,7 +126,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
 
             <div>
               <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                [[ Description ]]
+                Description
               </label>
               <p className="matrix-text-primary font-space-mono">
                 {caseData.description || "No description available"}
@@ -138,7 +138,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
                 <Calendar className="h-4 w-4 text-matrix-cyan" />
                 <div>
                   <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                    [[ Date Opened ]]
+                    Date Opened
                   </label>
                   <p className="matrix-text-primary text-sm font-space-mono">
                     {formatDate(caseData.dateOpened)}
@@ -150,7 +150,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
                   <AlertTriangle className="h-4 w-4 text-matrix-cyan" />
                   <div>
                     <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                      [[ Priority ]]
+                      Priority
                     </label>
                     <div className="mt-1">
                       <Badge className={getPriorityColor(caseData.priority)}>
@@ -169,13 +169,13 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
           <CardHeader className="matrix-header">
             <CardTitle className="flex items-center space-x-2 matrix-text-primary">
               <HardDrive className="h-5 w-5 text-matrix-cyan" />
-              <span className="font-orbitron tracking-wide">[[ EVIDENCE DETAILS ]]</span>
+              <span className="font-orbitron tracking-wide">EVIDENCE DETAILS</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                [[ File Name ]]
+                File Name
               </label>
               <p className="matrix-text-primary font-mono text-sm font-space-mono">
                 {caseData.fileName || "evidence_file.ufdr"}
@@ -184,7 +184,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
 
             <div>
               <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                [[ File Size ]]
+                File Size
               </label>
               <p className="matrix-text-primary font-space-mono">
                 {caseData.fileSize || "N/A"}
@@ -196,7 +196,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
                 <User className="h-4 w-4 text-matrix-cyan" />
                 <div>
                   <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                    [[ Lead Investigator ]]
+                    Lead Investigator
                   </label>
                   <p className="matrix-text-primary font-space-mono">
                     {caseData.leadInvestigator || caseData.investigator}
@@ -208,7 +208,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
             {caseData.department && (
               <div>
                 <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                  [[ Department ]]
+                  Department
                 </label>
                 <p className="matrix-text-primary font-space-mono">
                   {caseData.department}
@@ -219,7 +219,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
             {caseData.caseType && (
               <div>
                 <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                  [[ Case Type ]]
+                  Case Type
                 </label>
                 <p className="matrix-text-primary font-space-mono">
                   {caseData.caseType}
@@ -232,7 +232,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
                 <MapPin className="h-4 w-4 text-matrix-cyan" />
                 <div>
                   <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                    [[ Location ]]
+                    Location
                   </label>
                   <p className="matrix-text-primary font-space-mono">
                     {caseData.location}
@@ -251,7 +251,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                  [[ Files Analyzed ]]
+                  Files Analyzed
                 </p>
                 <p className="text-2xl font-bold matrix-text-primary font-orbitron">
                   1,247
@@ -267,7 +267,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                  [[ Evidence Found ]]
+                  Evidence Found
                 </p>
                 <p className="text-2xl font-bold matrix-text-primary font-orbitron">
                   89
@@ -283,7 +283,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                  [[ Processing Time ]]
+                  Processing Time
                 </p>
                 <p className="text-2xl font-bold matrix-text-primary font-orbitron">
                   4.2h

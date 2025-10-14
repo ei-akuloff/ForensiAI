@@ -93,7 +93,7 @@ export function CaseSelectionModal({
             <div className="flex flex-row items-center justify-between space-y-0 pb-6 px-6 pt-6 border-b border-cyan-500/20">
               <div>
                 <h2 className="text-xl font-bold text-cyan-400 font-mono tracking-wider uppercase">
-                  [[ Case Database Selection ]]
+                  Case Database Selection
                 </h2>
                 <div className="text-xs text-emerald-400/70 font-mono mt-1">
                   FILE: {fileName}

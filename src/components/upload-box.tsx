@@ -170,7 +170,7 @@ export function UploadBox({ onFileUpload, onCaseCreated, onAddToExistingCase, on
               <Upload className="w-8 h-8 text-matrix-cyan animate-pulse" />
             </div>
             <h3 className="text-xl font-bold matrix-text-primary font-orbitron tracking-wide uppercase group-hover:text-matrix-emerald transition-colors duration-300">
-              [[ Upload UFDR File ]]
+              Upload UFDR File
             </h3>
             <p className="text-sm matrix-text-muted font-space-mono">
               DRAG AND DROP YOUR FORENSIC DATA FILE OR CLICK TO BROWSE

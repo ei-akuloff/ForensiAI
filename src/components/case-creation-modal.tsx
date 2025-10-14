@@ -101,7 +101,7 @@ export function CaseCreationModal({ isOpen, onClose, onSubmit, fileName }: CaseC
             <div className="flex flex-row items-center justify-between space-y-0 pb-6 px-6 pt-6 border-b border-cyan-500/20">
               <div>
                 <h2 className="text-xl font-bold text-cyan-400 font-mono tracking-wider uppercase">
-                  [[ Create New Case ]]
+                  Create New Case
                 </h2>
                 <div className="text-xs text-emerald-400/70 font-mono mt-1">
                   FORENSIC_PROTOCOL_INITIALIZED
@@ -120,7 +120,7 @@ export function CaseCreationModal({ isOpen, onClose, onSubmit, fileName }: CaseC
                 {/* File Name Display */}
                 <div className="matrix-card border-emerald-500/30 p-4">
                   <div className="text-sm font-mono text-emerald-400 uppercase tracking-wide">
-                    [[ Uploaded File ]]
+                    Uploaded File
                   </div>
                   <div className="text-sm text-cyan-400 mt-2 font-mono bg-black/40 p-2 rounded border border-cyan-500/20">
                     {fileName}
@@ -130,7 +130,7 @@ export function CaseCreationModal({ isOpen, onClose, onSubmit, fileName }: CaseC
                 {/* Case Number */}
                 <div className="space-y-2">
                   <label htmlFor="caseNo" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
-                    [[ Case Number * ]]
+                    Case Number *
                   </label>
                   <input
                     id="caseNo"
@@ -148,7 +148,7 @@ export function CaseCreationModal({ isOpen, onClose, onSubmit, fileName }: CaseC
                 {/* Lead Investigator */}
                 <div className="space-y-2">
                   <label htmlFor="leadInvestigator" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
-                    [[ Lead Investigator * ]]
+                    Lead Investigator *
                   </label>
                   <input
                     id="leadInvestigator"
@@ -166,7 +166,7 @@ export function CaseCreationModal({ isOpen, onClose, onSubmit, fileName }: CaseC
                 {/* Case Title */}
                 <div className="space-y-2">
                   <label htmlFor="caseTitle" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
-                    [[ Case Title * ]]
+                    Case Title *
                   </label>
                   <input
                     id="caseTitle"
@@ -184,7 +184,7 @@ export function CaseCreationModal({ isOpen, onClose, onSubmit, fileName }: CaseC
                 {/* Department */}
                 <div className="space-y-2">
                   <label htmlFor="department" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
-                    [[ Department * ]]
+                    Department *
                   </label>
                   <input
                     id="department"
@@ -204,7 +204,7 @@ export function CaseCreationModal({ isOpen, onClose, onSubmit, fileName }: CaseC
                   {/* Priority */}
                   <div className="space-y-2">
                     <label htmlFor="priority" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
-                      [[ Priority ]]
+                      Priority
                     </label>
                     <select
                       id="priority"
@@ -222,7 +222,7 @@ export function CaseCreationModal({ isOpen, onClose, onSubmit, fileName }: CaseC
                   {/* Case Type */}
                   <div className="space-y-2">
                     <label htmlFor="caseType" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
-                      [[ Case Type ]]
+                      Case Type
                     </label>
                     <select
                       id="caseType"
@@ -243,7 +243,7 @@ export function CaseCreationModal({ isOpen, onClose, onSubmit, fileName }: CaseC
                 {/* Description */}
                 <div className="space-y-2">
                   <label htmlFor="description" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
-                    [[ Description * ]]
+                    Description *
                   </label>
                   <textarea
                     id="description"

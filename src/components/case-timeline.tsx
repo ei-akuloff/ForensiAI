@@ -171,7 +171,7 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
           </div>
           <div>
             <h1 className="text-3xl font-bold gradient-text mb-2 font-orbitron tracking-wide">
-              [[ CASE TIMELINE ]]
+              CASE TIMELINE
             </h1>
             <p className="matrix-text-muted text-lg font-space-mono">
               CHRONOLOGICAL OVERVIEW OF ALL FORENSIC ACTIVITIES AND KEY DISCOVERIES
@@ -235,15 +235,15 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
                 <div className="w-10 h-10 bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 matrix-glow-cyan">
                   <Clock className="h-5 w-5 text-matrix-cyan" />
                 </div>
-                <span className="text-xl font-semibold">[[ ACTIVITY TIMELINE ]]</span>
+                <span className="text-xl font-semibold">ACTIVITY TIMELINE</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="relative">
               <div className="relative">
                 {/* Enhanced Timeline Line */}
-                <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-200 via-indigo-200 to-blue-200 dark:from-purple-800 dark:via-indigo-800 dark:to-blue-800 rounded-full"></div>
+                <div className="absolute left-7 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-200 via-indigo-200 to-blue-200 dark:from-purple-800 dark:via-indigo-800 dark:to-blue-800 rounded-full"></div>
 
-                <div className="space-y-8">
+                <div className="space-y-12">
                   {timelineEvents.map((event, index) => {
                     const EventIcon = getEventIcon(event.type);
                     const { date, time } = formatDateTime(event.timestamp);
@@ -251,16 +251,16 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
                     return (
                       <div
                         key={event.id}
-                        className="relative flex items-start space-x-6 animate-slide-up group/item"
+                        className="relative flex items-start space-x-8 animate-slide-up group/item mb-8"
                         style={{ animationDelay: `${index * 0.1}s` }}
                       >
                         {/* Enhanced Timeline Icon */}
                         <div
-                          className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full ${getEventBgColor(
+                          className={`relative z-20 flex items-center justify-center w-14 h-14 rounded-full ${getEventBgColor(
                             event.type
-                          )} border-2`}
+                          )} border-3 shadow-lg`}
                         >
-                          <EventIcon className="h-5 w-5" />
+                          <EventIcon className="h-6 w-6" />
                         </div>
 
                         {/* Event Content */}
@@ -274,7 +274,7 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1">
                                   <h3 className="font-semibold matrix-text-primary font-space-mono uppercase tracking-wider">
-                                    [[ {event.title} ]]
+                                    {event.title}
                                   </h3>
                                   <p className="text-sm matrix-text-muted mt-1 font-space-mono">
                                     {event.description}
@@ -328,7 +328,7 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
               <CardContent className="p-4 text-center">
                 <Upload className="h-6 w-6 text-matrix-cyan mx-auto mb-2 matrix-glow-cyan" />
                 <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                  [[ TOTAL EVENTS ]]
+                  TOTAL EVENTS
                 </p>
                 <p className="text-xl font-bold matrix-text-primary font-orbitron">
                   {timelineEvents.length}
@@ -340,7 +340,7 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
               <CardContent className="p-4 text-center">
                 <Search className="h-6 w-6 text-purple-400 mx-auto mb-2 matrix-glow" />
                 <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                  [[ ANALYSIS TIME ]]
+                  ANALYSIS TIME
                 </p>
                 <p className="text-xl font-bold matrix-text-primary font-orbitron">
                   7h 20m
@@ -352,7 +352,7 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
               <CardContent className="p-4 text-center">
                 <FileText className="h-6 w-6 text-amber-400 mx-auto mb-2 matrix-glow" />
                 <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                  [[ DISCOVERIES ]]
+                  DISCOVERIES
                 </p>
                 <p className="text-xl font-bold matrix-text-primary font-orbitron">
                   15
@@ -364,7 +364,7 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
               <CardContent className="p-4 text-center">
                 <AlertTriangle className="h-6 w-6 text-red-400 mx-auto mb-2 matrix-glow-red" />
                 <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
-                  [[ ALERTS ]]
+                  ALERTS
                 </p>
                 <p className="text-xl font-bold matrix-text-primary font-orbitron">
                   1

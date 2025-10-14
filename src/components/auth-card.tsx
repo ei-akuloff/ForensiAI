@@ -35,13 +35,13 @@ export function AuthCard({ title, description, children }: AuthCardProps) {
               </svg>
             </div>
             <h1 className="text-3xl font-bold gradient-text tracking-tight font-orbitron">
-              [[ FORENSIAI ]]
+              FORENSIAI
             </h1>
             <div className="w-16 h-1.5 bg-gradient-to-r from-matrix-cyan to-matrix-emerald mx-auto mt-3 rounded-full matrix-glow-cyan"></div>
           </div>
           <div className="space-y-3">
             <CardTitle className="text-2xl font-bold matrix-text-primary font-orbitron tracking-wide">
-              [[ {title.toUpperCase()} ]]
+              {title.toUpperCase()}
             </CardTitle>
             {description && (
               <CardDescription className="matrix-text-muted text-base leading-relaxed font-space-mono">

@@ -394,7 +394,7 @@ const frequencyIndicator = nodeGroup.append("circle")
         <div>
           <h2 className="text-2xl font-bold matrix-text-primary flex items-center gap-2 font-orbitron tracking-wide">
             <Network className="h-6 w-6 text-matrix-cyan matrix-glow-cyan" />
-            [[ RELATIONSHIP NETWORK ]]
+            RELATIONSHIP NETWORK
           </h2>
           <p className="text-sm matrix-text-muted mt-1 font-space-mono">
             INTERACTIVE MAP SHOWING CONNECTIONS BETWEEN PEOPLE IN THE FORENSIC DATA
@@ -416,7 +416,7 @@ const frequencyIndicator = nodeGroup.append("circle")
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-red-400">
               <AlertTriangle className="h-5 w-5 matrix-glow-red" />
-              <span className="font-medium font-space-mono uppercase tracking-wider">[[ ANALYSIS ERROR ]]</span>
+              <span className="font-medium font-space-mono uppercase tracking-wider">ANALYSIS ERROR</span>
             </div>
             <p className="text-sm text-red-400 mt-1 font-space-mono">{error}</p>
           </CardContent>
@@ -441,7 +441,7 @@ const frequencyIndicator = nodeGroup.append("circle")
           {/* Summary */}
           <Card className="matrix-panel">
             <CardHeader className="matrix-header">
-              <CardTitle className="text-lg matrix-text-primary font-orbitron tracking-wide">[[ ANALYSIS SUMMARY ]]</CardTitle>
+              <CardTitle className="text-lg matrix-text-primary font-orbitron tracking-wide">ANALYSIS SUMMARY</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="matrix-text-muted font-space-mono">{analysis.summary}</p>
@@ -456,7 +456,7 @@ const frequencyIndicator = nodeGroup.append("circle")
                 <div className="text-2xl font-bold matrix-text-primary font-orbitron">
                   {analysis.people.length}
                 </div>
-                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">[[ PEOPLE ]]</div>
+                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">PEOPLE</div>
               </CardContent>
             </Card>
             
@@ -466,7 +466,7 @@ const frequencyIndicator = nodeGroup.append("circle")
                 <div className="text-2xl font-bold matrix-text-primary font-orbitron">
                   {analysis.relationships.length}
                 </div>
-                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">[[ CONNECTIONS ]]</div>
+                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">CONNECTIONS</div>
               </CardContent>
             </Card>
             
@@ -476,7 +476,7 @@ const frequencyIndicator = nodeGroup.append("circle")
                 <div className="text-2xl font-bold matrix-text-primary font-orbitron">
                   {analysis.people.filter(p => p.suspicious).length}
                 </div>
-                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">[[ SUSPICIOUS ]]</div>
+                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">SUSPICIOUS</div>
               </CardContent>
             </Card>
             
@@ -486,7 +486,7 @@ const frequencyIndicator = nodeGroup.append("circle")
                 <div className="text-2xl font-bold matrix-text-primary font-orbitron">
                   {analysis.relationships.reduce((sum, r) => sum + r.communication_count, 0)}
                 </div>
-                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">[[ COMMUNICATIONS ]]</div>
+                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">COMMUNICATIONS</div>
               </CardContent>
             </Card>
           </div>
@@ -494,7 +494,7 @@ const frequencyIndicator = nodeGroup.append("circle")
           {/* Network Graph */}
           <Card className="matrix-panel">
             <CardHeader className="matrix-header">
-              <CardTitle className="text-lg matrix-text-primary font-orbitron tracking-wide">[[ INTERACTIVE NETWORK MAP ]]</CardTitle>
+              <CardTitle className="text-lg matrix-text-primary font-orbitron tracking-wide">INTERACTIVE NETWORK MAP</CardTitle>
               <p className="text-sm matrix-text-muted font-space-mono">
                 DRAG NODES TO EXPLORE CONNECTIONS. ZOOM WITH MOUSE WHEEL.
               </p>
@@ -510,7 +510,7 @@ const frequencyIndicator = nodeGroup.append("circle")
           <Card className="matrix-panel">
             <CardHeader>
               <CardTitle className="text-lg matrix-text-primary font-['Orbitron'] tracking-wider uppercase">
-                [[ Legend ]]
+                Legend
               </CardTitle>
             </CardHeader>
             <CardContent>

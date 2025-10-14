@@ -206,7 +206,7 @@ export function CaseExport({ caseData }: CaseExportProps) {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold matrix-text-primary mb-2 font-orbitron tracking-wide">
-          [[ EXPORT & DOWNLOAD ]]
+          EXPORT & DOWNLOAD
         </h1>
         <p className="matrix-text-muted font-space-mono">
           DOWNLOAD REPORTS, EVIDENCE PACKAGES, AND ANALYSIS DATA FOR CASE{" "}
@@ -222,7 +222,7 @@ export function CaseExport({ caseData }: CaseExportProps) {
               <Download className="h-6 w-6 text-matrix-cyan animate-pulse" />
               <div>
                 <h3 className="text-lg font-semibold matrix-text-primary font-orbitron">
-                  [[ READY FOR EXPORT ]]
+                  READY FOR EXPORT
                 </h3>
                 <p className="text-sm matrix-text-muted font-space-mono">
                   {availableCount} FILES AVAILABLE • TOTAL SIZE: ~
@@ -347,7 +347,7 @@ export function CaseExport({ caseData }: CaseExportProps) {
               <FileText className="h-6 w-6 text-matrix-cyan" />
             </div>
             <p className="text-sm font-medium matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
-              [Reports]
+              Reports
             </p>
             <p className="text-xl font-bold matrix-text-primary font-mono">
               {
@@ -365,7 +365,7 @@ export function CaseExport({ caseData }: CaseExportProps) {
               <Archive className="h-6 w-6 text-matrix-emerald" />
             </div>
             <p className="text-sm font-medium matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
-              [Evidence]
+              Evidence
             </p>
             <p className="text-xl font-bold matrix-text-primary font-mono">
               {
@@ -383,7 +383,7 @@ export function CaseExport({ caseData }: CaseExportProps) {
               <Database className="h-6 w-6 text-purple-400" />
             </div>
             <p className="text-sm font-medium matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
-              [Data Files]
+              Data Files
             </p>
             <p className="text-xl font-bold matrix-text-primary font-mono">
               {
@@ -401,7 +401,7 @@ export function CaseExport({ caseData }: CaseExportProps) {
               <FileSpreadsheet className="h-6 w-6 text-yellow-500" />
             </div>
             <p className="text-sm font-medium matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
-              [Summaries]
+              Summaries
             </p>
             <p className="text-xl font-bold matrix-text-primary font-mono">
               {

@@ -441,7 +441,7 @@ const handleAIAnalysis = (file: FileItem) => {
           </div>
           <div>
             <h1 className="text-3xl font-bold gradient-text mb-2 font-orbitron tracking-wide">
-              [[ FILE EXPLORER ]]
+              FILE EXPLORER
             </h1>
             <p className="matrix-text-muted text-lg font-space-mono">
               BROWSE AND PREVIEW EXTRACTED FORENSIC FILES AND MEDIA
@@ -461,7 +461,7 @@ const handleAIAnalysis = (file: FileItem) => {
                 className="flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-matrix-surface/50 transition-colors matrix-text-primary font-space-mono"
               >
                 <Home className="w-4 h-4 text-matrix-cyan" />
-                <span className="text-sm font-medium">[[ ROOT ]]</span>
+                <span className="text-sm font-medium">ROOT</span>
               </button>
               {currentPath.map((pathId, index) => {
                 const pathItem = getCurrentFolder();
@@ -472,7 +472,7 @@ const handleAIAnalysis = (file: FileItem) => {
                       onClick={() => handleBreadcrumbClick(index)}
                       className="px-3 py-1.5 rounded-lg hover:bg-matrix-surface/50 transition-colors text-sm font-medium matrix-text-primary font-space-mono"
                     >
-                      [[ {pathItem.name.toUpperCase()} ]]
+                      {pathItem.name.toUpperCase()}
                     </button>
                   </div>
                 );
@@ -611,7 +611,7 @@ const handleAIAnalysis = (file: FileItem) => {
                   3
                 </p>
                 <p className="text-sm text-matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
-                  [Photos]
+                  Photos
                 </p>
               </div>
             </div>
@@ -629,7 +629,7 @@ const handleAIAnalysis = (file: FileItem) => {
                   3
                 </p>
                 <p className="text-sm text-matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
-                  [Chats]
+                  Chats
                 </p>
               </div>
             </div>
@@ -647,7 +647,7 @@ const handleAIAnalysis = (file: FileItem) => {
                   2
                 </p>
                 <p className="text-sm text-matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
-                  [Calls]
+                  Calls
                 </p>
               </div>
             </div>
@@ -665,7 +665,7 @@ const handleAIAnalysis = (file: FileItem) => {
                   2
                 </p>
                 <p className="text-sm text-matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
-                  [Documents]
+                  Documents
                 </p>
               </div>
             </div>

@@ -157,7 +157,7 @@ export function Sidebar({
       {/* Footer */}
       <div className="p-4 border-t border-matrix-border">
         <div className="text-xs matrix-text-muted text-center font-space-mono">
-          [[ FORENSIAI v2.0 ]]
+          FORENSIAI v2.0
         </div>
       </div>
     </div>

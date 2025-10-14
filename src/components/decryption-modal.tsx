@@ -131,7 +131,7 @@ export function DecryptionModal({
                 <Shield className="w-5 h-5 text-cyan-400" />
                 <div>
                   <h2 className="text-xl font-bold text-cyan-400 font-mono tracking-wider uppercase">
-                    [[ File Verification ]]
+                    File Verification
                   </h2>
                   <div className="text-xs text-emerald-400/70 font-mono mt-1">
                     SECURITY_PROTOCOL_ACTIVE
@@ -154,7 +154,7 @@ export function DecryptionModal({
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-emerald-400 font-mono">
-                      [[ VERIFICATION SUCCESSFUL ]]
+                      VERIFICATION SUCCESSFUL
                     </h3>
                     <p className="text-sm text-cyan-400 mt-2 font-mono">
                       {decryptionKey 
@@ -169,7 +169,7 @@ export function DecryptionModal({
                   {/* File Name Display */}
                   <div className="matrix-card border-red-500/30 p-4">
                     <div className="text-sm font-mono text-red-400 uppercase tracking-wide">
-                      [[ Encrypted File ]]
+                      Encrypted File
                     </div>
                     <div className="text-sm text-cyan-400 mt-2 font-mono bg-black/40 p-2 rounded border border-cyan-500/20">
                       {fileName}
@@ -179,7 +179,7 @@ export function DecryptionModal({
                   {/* Decryption Key Upload */}
                   <div className="space-y-3">
                     <label className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
-                      [[ Decryption Key File ]]
+                      Decryption Key File
                     </label>
                     {!decryptionKey ? (
                       <div className="matrix-upload-zone">
@@ -222,7 +222,7 @@ export function DecryptionModal({
                   {/* Hash Value Input */}
                   <div className="space-y-3">
                     <label className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
-                      [[ Hash Value (Manual Entry) ]]
+                      Hash Value (Manual Entry)
                     </label>
                     <input
                       type="text"
@@ -237,7 +237,7 @@ export function DecryptionModal({
                   {/* Hash File Upload */}
                   <div className="space-y-3">
                     <label className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
-                      [[ Hash File Upload ]]
+                      Hash File Upload
                     </label>
                     {!hashFile ? (
                       <div className="matrix-upload-zone">

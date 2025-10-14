@@ -66,6 +66,25 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Ensure proper text spacing and prevent overlapping */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  margin-bottom: 0.5em;
+}
+
+p {
+  line-height: 1.6;
+  margin-bottom: 1em;
+}
+
+/* Ensure all text elements have proper spacing */
+.matrix-text-primary,
+.matrix-text-muted,
+.gradient-text {
+  line-height: 1.4;
 }
 
 body::before {
@@ -305,67 +324,78 @@ body::after {
 }
 
 .matrix-input {
-  background: hsl(var(--matrix-surface) / 0.5);
-  border: 1px solid hsl(var(--matrix-border));
+  background: hsl(var(--matrix-surface) / 0.9) !important;
+  border: 1px solid hsl(var(--matrix-border)) !important;
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
-  color: hsl(var(--matrix-text));
+  color: hsl(var(--matrix-text)) !important;
   font-family: 'Space Mono', monospace;
   transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  width: 100%;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
 }
 
 .matrix-input:focus {
-  border-color: hsl(var(--matrix-cyan));
-  box-shadow: 0 0 20px hsl(var(--matrix-glow-cyan));
-  background: hsl(var(--matrix-surface) / 0.8);
+  border-color: hsl(var(--matrix-cyan)) !important;
+  box-shadow: 0 0 20px hsl(var(--matrix-glow-cyan)) !important;
+  background: hsl(var(--matrix-surface) / 1.0) !important;
+  outline: none;
+  z-index: 2;
 }
 
 .matrix-textarea {
   width: 100%;
   padding: 12px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(0, 255, 255, 0.3);
+  background: hsl(var(--matrix-surface) / 0.9);
+  border: 1px solid hsl(var(--matrix-border));
   border-radius: 6px;
-  color: #00ffff;
+  color: hsl(var(--matrix-text));
   font-family: 'Space Mono', monospace;
   font-size: 14px;
   resize: none;
   transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
   box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1);
 }
 
 .matrix-textarea:focus {
   outline: none;
-  border-color: #00ffff;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.1);
+  border-color: hsl(var(--matrix-cyan));
+  box-shadow: 0 0 20px hsl(var(--matrix-glow-cyan)), inset 0 0 20px rgba(0, 255, 255, 0.1);
+  background: hsl(var(--matrix-surface) / 1.0);
 }
 
 .matrix-textarea::placeholder {
-  color: rgba(0, 255, 255, 0.5);
+  color: hsl(var(--matrix-text-muted));
 }
 
 .matrix-select {
   width: 100%;
   padding: 12px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(0, 255, 255, 0.3);
+  background: hsl(var(--matrix-surface) / 0.9);
+  border: 1px solid hsl(var(--matrix-border));
   border-radius: 6px;
-  color: #00ffff;
+  color: hsl(var(--matrix-text));
   font-family: 'Space Mono', monospace;
   font-size: 14px;
   transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
   box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1);
 }
 
 .matrix-select:focus {
   outline: none;
-  border-color: #00ffff;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.1);
+  border-color: hsl(var(--matrix-cyan));
+  box-shadow: 0 0 20px hsl(var(--matrix-glow-cyan)), inset 0 0 20px rgba(0, 255, 255, 0.1);
+  background: hsl(var(--matrix-surface) / 1.0);
 }
 
 .matrix-select option {
-  background: #0a0f1a;
-  color: #00ffff;
+  background: hsl(var(--matrix-surface));
+  color: hsl(var(--matrix-text));
   padding: 8px;
 }
 
@@ -435,6 +465,8 @@ body::after {
   background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 255, 136, 0.1) 100%);
   border-bottom: 1px solid rgba(0, 255, 255, 0.2);
   position: relative;
+  overflow: visible;
+  z-index: 1;
 }
 
 .matrix-header::after {
@@ -446,6 +478,77 @@ body::after {
   height: 1px;
   background: linear-gradient(90deg, transparent, #00ffff, transparent);
   animation: scanLine 4s ease-in-out infinite;
+}
+
+/* Ensure proper text containment */
+.matrix-input {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.matrix-input::placeholder {
+  color: hsl(var(--matrix-text-muted)) !important;
+  opacity: 0.8 !important;
+}
+
+/* Force consistent styling for all inputs */
+input.matrix-input,
+input[type="text"].matrix-input,
+input[type="email"].matrix-input,
+input[type="password"].matrix-input {
+  background: hsl(var(--matrix-surface) / 0.9) !important;
+  border: 1px solid hsl(var(--matrix-border)) !important;
+  color: hsl(var(--matrix-text)) !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Ensure all matrix inputs have the same base styling */
+.matrix-input,
+input.matrix-input {
+  box-sizing: border-box;
+  display: block;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Override browser autofill styles */
+.matrix-input:-webkit-autofill,
+.matrix-input:-webkit-autofill:hover,
+.matrix-input:-webkit-autofill:focus,
+.matrix-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px hsl(var(--matrix-surface)) inset !important;
+  -webkit-text-fill-color: hsl(var(--matrix-text)) !important;
+  caret-color: hsl(var(--matrix-text)) !important;
+}
+
+/* Additional consistency rules */
+.matrix-input:not(:focus):not(:active) {
+  background: hsl(var(--matrix-surface) / 0.9) !important;
+}
+
+/* Case List specific styles */
+.case-list-container {
+  position: relative;
+  z-index: 1;
+  margin-top: 2rem;
+}
+
+.case-list-header {
+  position: relative;
+  z-index: 2;
+  padding-bottom: 1.5rem;
+}
+
+/* Fix search input positioning */
+.case-list-header .matrix-input {
+  position: relative;
+  z-index: 1;
+}
+
+.case-list-header .relative > div {
+  position: static;
 }
 
 .matrix-text-primary {

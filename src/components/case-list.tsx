@@ -82,29 +82,33 @@ export function CaseList({ cases: propCases }: CaseListProps) {
   return (
     <ClientWrapper>
       <Card
-        className="matrix-panel group backdrop-blur-sm shadow-2xl hover:shadow-matrix-cyan/20 transition-all duration-300 animate-slide-up border-matrix-border"
+        className="matrix-panel group backdrop-blur-sm shadow-2xl hover:shadow-matrix-cyan/20 transition-all duration-300 animate-slide-up border-matrix-border case-list-container"
         style={{ animationDelay: "0.2s" }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-matrix-cyan/5 to-matrix-emerald/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
 
-        <CardHeader className="relative matrix-header">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center matrix-glow-cyan">
-                <File className="w-5 h-5 text-matrix-cyan" />
+        <CardHeader className="relative matrix-header case-list-header pb-6">
+          <div className="w-full">
+            <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0 md:space-x-6">
+              <div className="flex items-center gap-3 flex-shrink-0 min-w-0">
+                <div className="w-10 h-10 bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center matrix-glow-cyan">
+                  <File className="w-5 h-5 text-matrix-cyan" />
+                </div>
+                <CardTitle className="text-2xl font-bold matrix-text-primary group-hover:text-matrix-emerald transition-colors duration-300 font-orbitron tracking-wide truncate">
+                  CASE HISTORY
+                </CardTitle>
               </div>
-              <CardTitle className="text-2xl font-bold matrix-text-primary group-hover:text-matrix-emerald transition-colors duration-300 font-orbitron tracking-wide">
-                [[ CASE HISTORY ]]
-              </CardTitle>
-            </div>
-            <div className="relative w-full sm:w-80">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-matrix-text-muted h-5 w-5" />
-              <Input
-                placeholder="Search cases by name or description..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="matrix-input pl-12 h-12 bg-matrix-surface/60 backdrop-blur-sm border-2 border-matrix-border focus:border-matrix-cyan transition-all duration-300 font-space-mono"
-              />
+              <div className="w-full md:w-80 lg:w-96 flex-shrink-0">
+                <div className="relative bg-matrix-surface/95 rounded-lg border border-matrix-border">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-matrix-text-muted h-4 w-4 z-10" />
+                  <Input
+                    placeholder="Search cases..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="bg-transparent border-0 pl-10 h-12 text-matrix-text placeholder:text-matrix-text-muted font-space-mono w-full focus:ring-2 focus:ring-matrix-cyan/50 focus:outline-none"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -115,7 +119,7 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                 <File className="h-10 w-10 text-matrix-text-muted" />
               </div>
               <h3 className="text-lg font-semibold matrix-text-primary mb-2 font-orbitron">
-                {searchTerm ? "[[ NO MATCHES FOUND ]]" : "[[ NO CASES YET ]]"}
+                {searchTerm ? "NO MATCHES FOUND" : "NO CASES YET"}
               </h3>
               <p className="matrix-text-muted max-w-md mx-auto font-space-mono text-sm">
                 {searchTerm
@@ -325,7 +329,7 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                   <div className="matrix-modal w-full max-w-2xl bg-matrix-surface/95 border-2 border-matrix-cyan/50 rounded shadow-2xl shadow-matrix-cyan/20 p-6">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-lg font-semibold matrix-text-primary font-orbitron tracking-wide">
-                        [[ DECRYPT FILE FOR CASE {showDecryptFor} ]]
+                        DECRYPT FILE FOR CASE {showDecryptFor}
                       </h3>
                       <button
                         className="matrix-text-muted hover:matrix-text-primary font-space-mono"

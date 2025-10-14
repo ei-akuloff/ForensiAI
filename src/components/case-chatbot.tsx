@@ -342,7 +342,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
           </div>
           <div>
             <h1 className="text-3xl font-bold gradient-text mb-2 font-orbitron tracking-wide">
-              [[ AI ASSISTANT ]]
+              AI ASSISTANT
             </h1>
             <p className="matrix-text-muted text-lg font-space-mono">
               INTELLIGENT ANALYSIS AND INSIGHTS POWERED BY ADVANCED AI TECHNOLOGY
@@ -362,7 +362,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                   <div className="w-10 h-10 bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 matrix-glow-cyan">
                     <MessageSquare className="h-5 w-5 text-matrix-cyan" />
                   </div>
-                  <span className="text-xl font-semibold font-orbitron tracking-wide">[[ CASE ANALYSIS CHAT ]]</span>
+                  <span className="text-xl font-semibold font-orbitron tracking-wide">CASE ANALYSIS CHAT</span>
                 </CardTitle>
                 <div className="flex items-center space-x-3">
                   {/* Language Selector */}
@@ -547,7 +547,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
             <CardHeader className="matrix-header">
               <CardTitle className="flex items-center space-x-2 matrix-text-primary font-orbitron tracking-wide">
                 <Lightbulb className="h-5 w-5 text-matrix-cyan matrix-glow-cyan" />
-                <span>[[ QUICK ACTIONS ]]</span>
+                <span>QUICK ACTIONS</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
