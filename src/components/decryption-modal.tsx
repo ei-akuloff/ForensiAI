@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { X, Upload, Key, Shield, CheckCircle } from "lucide-react";
+import { Upload, Key, Shield, CheckCircle } from "lucide-react";
 
 export interface DecryptionData {
   decryptionKey: string;
@@ -45,30 +41,16 @@ export function DecryptionModal({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setHashFile(file);
-      setHashValue(""); // Clear manual input when file is uploaded
+      setHashValue("");
       setError("");
     }
   };
 
-  const handleHashChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setHashValue(e.target.value);
-    setHashFile(null); // Clear file when manual input is used
-    setError("");
-  };
-
-  const validateInputs = (): boolean => {
-    // Hash is now optional - either file or manual input
-    // Validate hash format if manually entered
-    if (hashValue.trim() && (hashValue.length !== 64 || !/^[a-fA-F0-9]+$/.test(hashValue))) {
-      setError("Please enter a valid SHA-256 hash (64 hexadecimal characters)");
-      return false;
+  const handleDecryption = async () => {
+    if (!decryptionKey && !hashValue && !hashFile) {
+      setError("Please provide either a decryption key file or hash value for verification");
+      return;
     }
-    // Decryption key file is optional
-    return true;
-  };
-
-  const handleDecryptAndCheck = async () => {
-    if (!validateInputs()) return;
 
     setIsProcessing(true);
     setError("");
@@ -77,28 +59,13 @@ export function DecryptionModal({
       let keyData = "";
       let hashValueToUse = "";
 
-      // Read decryption key file if provided
       if (decryptionKey) {
-        const keyText = await decryptionKey.text();
-        try {
-          const keyJson = JSON.parse(keyText);
-          if (!keyJson.key_base64 || !keyJson.iv_base64) {
-            throw new Error("Invalid key format: missing key_base64 or iv_base64");
-          }
-          keyData = keyText; // Send the full JSON as string
-        } catch (e) {
-          setError("Invalid key file format. Expected JSON with key_base64 and iv_base64 fields.");
-          return;
-        }
-      } else {
-        // No key provided - will try to decrypt without key or use default method
-        keyData = "";
+        keyData = await decryptionKey.text();
       }
 
-      // Read hash file if provided
       if (hashFile) {
         const hashText = await hashFile.text();
-        hashValueToUse = hashText.trim().split()[0]; // Get first word (hash value)
+        hashValueToUse = hashText.trim().split(' ')[0];
       } else if (hashValue) {
         hashValueToUse = hashValue;
       }
@@ -146,236 +113,199 @@ export function DecryptionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md overflow-y-auto animate-fade-in">
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-lg my-8 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 shadow-2xl shadow-emerald-500/10 animate-slide-up">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 rounded-2xl"></div>
+        <div className="w-full max-w-lg my-8 matrix-glass border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 animate-matrix-slide-up backdrop-blur-xl relative overflow-hidden">
+          {/* Matrix scanning line animation */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent transform -skew-x-12 animate-matrix-scan"></div>
           
-          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-6 px-6 pt-6">
-            <CardTitle className="text-xl font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent flex items-center gap-2">
-              <Shield className="w-5 h-5 text-emerald-600" />
-              File Verification
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClose}
-              className="h-8 w-8 p-0 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
+          {/* Cyber grid overlay */}
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: 'linear-gradient(cyan 1px, transparent 1px), linear-gradient(90deg, cyan 1px, transparent 1px)',
+            backgroundSize: '20px 20px'
+          }}></div>
           
-          <CardContent className="relative p-6">
-            {success ? (
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-                </div>
+          <div className="relative z-10">
+            <div className="flex flex-row items-center justify-between space-y-0 pb-6 px-6 pt-6 border-b border-cyan-500/20">
+              <div className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-cyan-400" />
                 <div>
-                  <h3 className="text-lg font-semibold text-green-700 dark:text-green-300">
-                    Verification Successful!
-                  </h3>
-                  <p className="text-sm text-green-600 dark:text-green-400 mt-2">
-                    {decryptionKey 
-                      ? "Hash verification and decryption completed successfully. File has been uploaded."
-                      : "Hash verification successful. File has been uploaded."
-                    }
-                  </p>
+                  <h2 className="text-xl font-bold text-cyan-400 font-mono tracking-wider uppercase">
+                    [[ File Verification ]]
+                  </h2>
+                  <div className="text-xs text-emerald-400/70 font-mono mt-1">
+                    SECURITY_PROTOCOL_ACTIVE
+                  </div>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-6">
-                {/* File Name Display */}
-                <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700/50 p-4 rounded-lg">
-                  <Label className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
-                    Encrypted File
-                  </Label>
-                  <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-1 font-mono">
-                    {fileName}
-                  </p>
-                </div>
-
-                {/* Decryption Key Upload */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium flex items-center gap-2">
-                    <Key className="w-4 h-4" />
-                    Decryption Key File (.key.json or .key.txt) (Optional)
-                  </Label>
-                  
-                  {!decryptionKey ? (
-                    <div className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-6 text-center hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors">
-                      <Upload className="w-8 h-8 mx-auto text-slate-400 mb-2" />
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
-                        Upload your decryption key file (optional)
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => document.getElementById("key-upload")?.click()}
-                        className="border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
-                      >
-                        Choose File
-                      </Button>
-                      <input
-                        id="key-upload"
-                        type="file"
-                        onChange={handleKeyFileUpload}
-                        className="hidden"
-                        accept=".key.json,.json,.key.txt,.txt"
-                      />
-                    </div>
-                  ) : (
-                    <div className="border border-slate-200 dark:border-slate-600 rounded-lg p-3 bg-slate-50 dark:bg-slate-700/50">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-                            <Key className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
-                              {decryptionKey.name}
-                            </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
-                              {(decryptionKey.size / 1024).toFixed(1)} KB
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={removeKeyFile}
-                          className="h-8 w-8 p-0 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Hash Value Section */}
-                <div className="space-y-4">
-                  <Label className="text-sm font-medium flex items-center gap-2">
-                    <Shield className="w-4 h-4" />
-                    Hash Value (SHA-256) (Optional)
-                  </Label>
-                  
-                  {/* Hash File Upload */}
-                  {!hashFile ? (
-                    <div className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-4 text-center hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors">
-                      <Upload className="w-6 h-6 mx-auto text-slate-400 mb-2" />
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                        Upload SHA-256 hash file (.sha256.txt) (optional)
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => document.getElementById("hash-upload")?.click()}
-                        className="border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
-                      >
-                        Choose Hash File
-                      </Button>
-                      <input
-                        id="hash-upload"
-                        type="file"
-                        onChange={handleHashFileUpload}
-                        className="hidden"
-                        accept=".txt,.hash,.sha256,.sha256.txt"
-                      />
-                    </div>
-                  ) : (
-                    <div className="border border-slate-200 dark:border-slate-600 rounded-lg p-3 bg-slate-50 dark:bg-slate-700/50">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-                            <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
-                              {hashFile.name}
-                            </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
-                              {(hashFile.size / 1024).toFixed(1)} KB
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={removeHashFile}
-                          className="h-8 w-8 p-0 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* OR Divider */}
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 h-px bg-slate-200 dark:bg-slate-600"></div>
-                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">OR</span>
-                    <div className="flex-1 h-px bg-slate-200 dark:bg-slate-600"></div>
+              <button
+                onClick={handleClose}
+                className="h-10 w-10 p-0 text-cyan-400 hover:text-red-400 hover:bg-red-500/10 border border-cyan-500/30 hover:border-red-500/50 rounded bg-black/40 transition-all duration-300 font-mono text-lg"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="relative p-6">
+              {success ? (
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-emerald-500/20 border border-emerald-500/50 rounded-full flex items-center justify-center animate-pulse">
+                    <CheckCircle className="w-8 h-8 text-emerald-400" />
                   </div>
-
-                  {/* Manual Hash Input */}
-                  <div className="space-y-2">
-                    <Label htmlFor="hashValue" className="text-sm font-medium">
-                      Enter Hash Manually
-                    </Label>
-                    <Input
-                      id="hashValue"
-                      type="text"
-                      value={hashValue}
-                      onChange={handleHashChange}
-                      placeholder="Enter 64-character SHA-256 hash..."
-                      className="font-mono text-sm"
-                      maxLength={64}
-                      disabled={!!hashFile}
-                    />
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Hash value is required for file verification
+                  <div>
+                    <h3 className="text-lg font-bold text-emerald-400 font-mono">
+                      [[ VERIFICATION SUCCESSFUL ]]
+                    </h3>
+                    <p className="text-sm text-cyan-400 mt-2 font-mono">
+                      {decryptionKey 
+                        ? "HASH_VERIFICATION_COMPLETE >> DECRYPTION_SUCCESS >> FILE_UPLOADED"
+                        : "HASH_VERIFICATION_COMPLETE >> FILE_UPLOADED"
+                      }
                     </p>
                   </div>
                 </div>
-
-                {/* Error Message */}
-                {error && (
-                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/50 p-3 rounded-lg">
-                    <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              ) : (
+                <div className="space-y-6">
+                  {/* File Name Display */}
+                  <div className="matrix-card border-red-500/30 p-4">
+                    <div className="text-sm font-mono text-red-400 uppercase tracking-wide">
+                      [[ Encrypted File ]]
+                    </div>
+                    <div className="text-sm text-cyan-400 mt-2 font-mono bg-black/40 p-2 rounded border border-cyan-500/20">
+                      {fileName}
+                    </div>
                   </div>
-                )}
 
-                {/* Action Buttons */}
-                <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleClose}
-                    disabled={isProcessing}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleDecryptAndCheck}
-                    disabled={isProcessing}
-                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                        Processing...
-                      </>
+                  {/* Decryption Key Upload */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                      [[ Decryption Key File ]]
+                    </label>
+                    {!decryptionKey ? (
+                      <div className="matrix-upload-zone">
+                        <input
+                          type="file"
+                          accept=".key,.txt"
+                          onChange={handleKeyFileUpload}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <div className="flex flex-col items-center justify-center space-y-2">
+                          <Key className="w-8 h-8 text-cyan-400/60" />
+                          <p className="text-sm font-mono text-cyan-400/80">
+                            DROP KEY FILE OR CLICK TO SELECT
+                          </p>
+                          <p className="text-xs font-mono text-emerald-400/60">
+                            .key, .txt files accepted
+                          </p>
+                        </div>
+                      </div>
                     ) : (
-                      decryptionKey ? "Decrypt & Verify Hash" : "Verify Hash"
+                      <div className="matrix-file-display">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Key className="w-4 h-4 text-emerald-400" />
+                            <span className="text-sm font-mono text-emerald-400">
+                              {decryptionKey.name}
+                            </span>
+                          </div>
+                          <button
+                            onClick={removeKeyFile}
+                            className="text-red-400 hover:text-red-300 font-mono text-sm"
+                          >
+                            REMOVE
+                          </button>
+                        </div>
+                      </div>
                     )}
-                  </Button>
+                  </div>
+
+                  {/* Hash Value Input */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                      [[ Hash Value (Manual Entry) ]]
+                    </label>
+                    <input
+                      type="text"
+                      value={hashValue}
+                      onChange={(e) => setHashValue(e.target.value)}
+                      placeholder="Enter SHA256 hash value..."
+                      disabled={!!hashFile}
+                      className={`matrix-input ${hashFile ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    />
+                  </div>
+
+                  {/* Hash File Upload */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                      [[ Hash File Upload ]]
+                    </label>
+                    {!hashFile ? (
+                      <div className="matrix-upload-zone">
+                        <input
+                          type="file"
+                          accept=".sha256,.hash,.txt"
+                          onChange={handleHashFileUpload}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <div className="flex flex-col items-center justify-center space-y-2">
+                          <Upload className="w-8 h-8 text-cyan-400/60" />
+                          <p className="text-sm font-mono text-cyan-400/80">
+                            DROP HASH FILE OR CLICK TO SELECT
+                          </p>
+                          <p className="text-xs font-mono text-emerald-400/60">
+                            .sha256, .hash, .txt files accepted
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="matrix-file-display">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Upload className="w-4 h-4 text-emerald-400" />
+                            <span className="text-sm font-mono text-emerald-400">
+                              {hashFile.name}
+                            </span>
+                          </div>
+                          <button
+                            onClick={removeHashFile}
+                            className="text-red-400 hover:text-red-300 font-mono text-sm"
+                          >
+                            REMOVE
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {error && (
+                    <div className="matrix-card border-red-500/50 bg-red-500/10 p-3">
+                      <p className="text-sm text-red-400 font-mono">
+                        ERROR: {error}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-end space-x-4 pt-6 border-t border-cyan-500/20">
+                    <button
+                      onClick={handleClose}
+                      className="px-6 py-2 bg-matrix-surface/60 border border-matrix-border text-matrix-text-muted hover:text-matrix-cyan hover:border-matrix-cyan font-mono uppercase tracking-wider transition-all duration-300"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDecryption}
+                      disabled={isProcessing || (!decryptionKey && !hashValue && !hashFile)}
+                      className="px-6 py-2 matrix-button font-mono uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isProcessing ? "PROCESSING..." : "VERIFY & DECRYPT"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

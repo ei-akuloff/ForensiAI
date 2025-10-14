@@ -22,42 +22,48 @@ export function StatsCard({
   trend,
 }: StatsCardProps) {
   return (
-    <Card className="group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 dark:hover:shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 overflow-hidden">
-      {/* Gradient background overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <Card className="group matrix-panel matrix-hover relative overflow-hidden">
+      {/* Matrix scanning line animation */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/15 to-transparent transform -skew-x-12 animate-matrix-scan"></div>
       
-      <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors duration-300">
+      {/* Cyber grid overlay */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: 'linear-gradient(cyan 1px, transparent 1px), linear-gradient(90deg, cyan 1px, transparent 1px)',
+        backgroundSize: '25px 25px'
+      }}></div>
+      
+      <CardHeader className="relative z-10 flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider group-hover:matrix-text-primary transition-colors duration-300">
           {title}
         </CardTitle>
-        <div className="relative p-3 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl group-hover:scale-110 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-500/20">
-          <Icon className="h-5 w-5 text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300" />
-          {/* Subtle glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+        <div className="relative p-3 bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl group-hover:scale-110 transition-all duration-300 matrix-glow-cyan">
+          <Icon className="h-5 w-5 text-matrix-cyan group-hover:text-matrix-emerald transition-colors duration-300 animate-pulse" />
+          {/* Matrix glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-matrix-cyan/30 to-matrix-emerald/30 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
         </div>
       </CardHeader>
-      <CardContent className="relative">
-        <div className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300">
+      <CardContent className="relative z-10">
+        <div className="text-3xl font-bold matrix-text-primary mb-2 group-hover:matrix-text-emerald transition-colors duration-300 font-orbitron">
           {value}
         </div>
         {description && (
-          <p className="text-xs text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors duration-300">
+          <p className="text-xs matrix-text-muted group-hover:matrix-text-primary transition-colors duration-300 font-space-mono">
             {description}
           </p>
         )}
         {trend && (
           <div className="flex items-center mt-2">
             <span
-              className={`text-xs font-medium ${
+              className={`text-xs font-medium font-space-mono ${
                 trend.isPositive
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-red-600 dark:text-red-400"
+                  ? "text-matrix-emerald"
+                  : "text-red-400"
               }`}
             >
               {trend.isPositive ? "+" : ""}
               {trend.value}%
             </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
+            <span className="text-xs matrix-text-muted ml-1 font-space-mono">
               from last month
             </span>
           </div>

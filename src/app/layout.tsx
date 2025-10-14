@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Orbitron, Space_Mono } from "next/font/google";
 // @ts-ignore
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -15,6 +15,18 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
+
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -33,17 +45,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} ${spaceMono.variable} antialiased dark`}
         suppressHydrationWarning
       >
         <ThemeProvider
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <ClientOnly>
             <CaseProvider>
-              <div className="min-h-screen flex flex-col">
+              <div className="min-h-screen flex flex-col relative">
+                {/* Global Matrix Scan Lines */}
+                <div className="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-matrix-cyan to-transparent animate-matrix-scan opacity-20 z-40" style={{animationDelay: '0s'}}></div>
+                <div className="fixed bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-matrix-emerald to-transparent animate-matrix-scan opacity-20 z-40" style={{animationDelay: '1.5s'}}></div>
+                
                 <Navbar />
                 <main className="flex-1">{children}</main>
               </div>

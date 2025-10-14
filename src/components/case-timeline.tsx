@@ -53,34 +53,34 @@ const getEventIcon = (type: TimelineEvent["type"]) => {
 const getEventColor = (type: TimelineEvent["type"]) => {
   switch (type) {
     case "upload":
-      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
+      return "bg-matrix-emerald/20 text-matrix-emerald border border-matrix-emerald/50";
     case "analysis":
-      return "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400";
+      return "bg-matrix-cyan/20 text-matrix-cyan border border-matrix-cyan/50";
     case "discovery":
-      return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+      return "bg-yellow-500/20 text-yellow-400 border border-yellow-500/50";
     case "completion":
-      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
+      return "bg-matrix-emerald/20 text-matrix-emerald border border-matrix-emerald/50";
     case "alert":
-      return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+      return "bg-red-500/20 text-red-400 border border-red-500/50";
     default:
-      return "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400";
+      return "bg-matrix-surface/50 text-matrix-text-muted border border-matrix-border";
   }
 };
 
 const getEventBgColor = (type: TimelineEvent["type"]) => {
   switch (type) {
     case "upload":
-      return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700";
+      return "bg-matrix-emerald/10 border-matrix-emerald/30";
     case "analysis":
-      return "bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-700";
+      return "bg-matrix-cyan/10 border-matrix-cyan/30";
     case "discovery":
-      return "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700";
+      return "bg-yellow-500/10 border-yellow-500/30";
     case "completion":
-      return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700";
+      return "bg-matrix-emerald/10 border-matrix-emerald/30";
     case "alert":
-      return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700";
+      return "bg-red-500/10 border-red-500/30";
     default:
-      return "bg-slate-50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-700";
+      return "bg-matrix-surface/30 border-matrix-border";
   }
 };
 
@@ -166,16 +166,15 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
       {/* Header Section */}
       <div className="relative">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-            <Clock className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 bg-gradient-to-br from-matrix-cyan to-matrix-emerald rounded-2xl flex items-center justify-center shadow-lg shadow-matrix-cyan/30 matrix-glow-cyan">
+            <Clock className="w-6 h-6 text-matrix-bg" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold gradient-text mb-2">
-              Case Timeline
+            <h1 className="text-3xl font-bold gradient-text mb-2 font-orbitron tracking-wide">
+              [[ CASE TIMELINE ]]
             </h1>
-            <p className="text-slate-600 dark:text-slate-300 text-lg">
-              Chronological overview of all forensic activities and key
-              discoveries
+            <p className="matrix-text-muted text-lg font-space-mono">
+              CHRONOLOGICAL OVERVIEW OF ALL FORENSIC ACTIVITIES AND KEY DISCOVERIES
             </p>
           </div>
         </div>
@@ -185,18 +184,26 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
           <Button
             variant={activeTab === "case" ? "default" : "outline"}
             onClick={() => setActiveTab("case")}
-            className="flex items-center gap-2"
+            className={`flex items-center gap-2 font-space-mono text-xs uppercase tracking-wider ${
+              activeTab === "case" 
+                ? "matrix-button bg-matrix-emerald/20 text-matrix-emerald border-matrix-emerald/50" 
+                : "border-matrix-border text-matrix-text-muted hover:text-matrix-cyan hover:border-matrix-cyan"
+            }`}
           >
             <Clock className="h-4 w-4" />
-            Case Events
+            CASE EVENTS
           </Button>
           <Button
             variant={activeTab === "messenger" ? "default" : "outline"}
             onClick={() => setActiveTab("messenger")}
-            className="flex items-center gap-2"
+            className={`flex items-center gap-2 font-space-mono text-xs uppercase tracking-wider ${
+              activeTab === "messenger" 
+                ? "matrix-button bg-matrix-emerald/20 text-matrix-emerald border-matrix-emerald/50" 
+                : "border-matrix-border text-matrix-text-muted hover:text-matrix-cyan hover:border-matrix-cyan"
+            }`}
           >
             <MessageSquare className="h-4 w-4" />
-            Messenger Timeline
+            MESSENGER TIMELINE
           </Button>
           <Button
             variant={activeTab === "calls" ? "default" : "outline"}
@@ -220,15 +227,15 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
 
       {activeTab === "case" && (
         <>
-          <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+          <Card className="group matrix-panel matrix-hover shadow-lg shadow-matrix-cyan/10 transition-all duration-300 animate-slide-up">
+            <div className="absolute inset-0 bg-gradient-to-br from-matrix-cyan/5 to-matrix-emerald/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
 
-            <CardHeader className="relative">
-              <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-slate-100">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <CardHeader className="relative matrix-header">
+              <CardTitle className="flex items-center space-x-3 matrix-text-primary font-orbitron tracking-wide">
+                <div className="w-10 h-10 bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 matrix-glow-cyan">
+                  <Clock className="h-5 w-5 text-matrix-cyan" />
                 </div>
-                <span className="text-xl font-semibold">Activity Timeline</span>
+                <span className="text-xl font-semibold">[[ ACTIVITY TIMELINE ]]</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="relative">
@@ -259,17 +266,17 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
                         {/* Event Content */}
                         <div className="flex-1 min-w-0">
                           <Card
-                            className={`${getEventBgColor(
+                            className={`matrix-panel matrix-hover ${getEventBgColor(
                               event.type
-                            )} shadow-sm`}
+                            )} shadow-lg shadow-matrix-cyan/10`}
                           >
                             <CardContent className="p-4">
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1">
-                                  <h3 className="font-semibold text-gray-900 dark:text-slate-100">
-                                    {event.title}
+                                  <h3 className="font-semibold matrix-text-primary font-space-mono uppercase tracking-wider">
+                                    [[ {event.title} ]]
                                   </h3>
-                                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                                  <p className="text-sm matrix-text-muted mt-1 font-space-mono">
                                     {event.description}
                                   </p>
                                 </div>
@@ -278,19 +285,19 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
                                 </Badge>
                               </div>
 
-                              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                              <div className="flex items-center justify-between text-xs matrix-text-muted font-space-mono">
                                 <div className="flex items-center space-x-4">
                                   <div className="flex items-center space-x-1">
-                                    <Calendar className="h-3 w-3" />
+                                    <Calendar className="h-3 w-3 text-matrix-cyan" />
                                     <span>{date}</span>
                                   </div>
                                   <div className="flex items-center space-x-1">
-                                    <Clock className="h-3 w-3" />
+                                    <Clock className="h-3 w-3 text-matrix-cyan" />
                                     <span>{time}</span>
                                   </div>
                                   {event.user && (
                                     <div className="flex items-center space-x-1">
-                                      <User className="h-3 w-3" />
+                                      <User className="h-3 w-3 text-matrix-cyan" />
                                       <span>{event.user}</span>
                                     </div>
                                   )}
@@ -298,8 +305,8 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
                               </div>
 
                               {event.details && (
-                                <div className="mt-3 p-3 bg-white/50 dark:bg-slate-900/30 rounded-lg">
-                                  <p className="text-sm text-slate-700 dark:text-slate-300">
+                                <div className="mt-3 p-3 bg-matrix-surface/20 rounded-lg border border-matrix-border">
+                                  <p className="text-sm matrix-text-muted font-space-mono">
                                     {event.details}
                                   </p>
                                 </div>
@@ -317,49 +324,49 @@ export function CaseTimeline({ caseId }: CaseTimelineProps) {
 
           {/* Timeline Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700">
+            <Card className="matrix-panel matrix-hover bg-gradient-to-r from-matrix-cyan/5 to-matrix-emerald/5">
               <CardContent className="p-4 text-center">
-                <Upload className="h-6 w-6 text-blue-500 dark:text-blue-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                  Total Events
+                <Upload className="h-6 w-6 text-matrix-cyan mx-auto mb-2 matrix-glow-cyan" />
+                <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                  [[ TOTAL EVENTS ]]
                 </p>
-                <p className="text-xl font-bold text-blue-700 dark:text-blue-300">
+                <p className="text-xl font-bold matrix-text-primary font-orbitron">
                   {timelineEvents.length}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-purple-200 dark:border-purple-700">
+            <Card className="matrix-panel matrix-hover bg-gradient-to-r from-purple-500/5 to-matrix-cyan/5">
               <CardContent className="p-4 text-center">
-                <Search className="h-6 w-6 text-purple-500 dark:text-purple-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                  Analysis Time
+                <Search className="h-6 w-6 text-purple-400 mx-auto mb-2 matrix-glow" />
+                <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                  [[ ANALYSIS TIME ]]
                 </p>
-                <p className="text-xl font-bold text-purple-700 dark:text-purple-300">
+                <p className="text-xl font-bold matrix-text-primary font-orbitron">
                   7h 20m
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-700">
+            <Card className="matrix-panel matrix-hover bg-gradient-to-r from-amber-500/5 to-matrix-emerald/5">
               <CardContent className="p-4 text-center">
-                <FileText className="h-6 w-6 text-amber-500 dark:text-amber-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
-                  Discoveries
+                <FileText className="h-6 w-6 text-amber-400 mx-auto mb-2 matrix-glow" />
+                <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                  [[ DISCOVERIES ]]
                 </p>
-                <p className="text-xl font-bold text-amber-700 dark:text-amber-300">
+                <p className="text-xl font-bold matrix-text-primary font-orbitron">
                   15
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border-red-200 dark:border-red-700">
+            <Card className="matrix-panel matrix-hover bg-gradient-to-r from-red-500/5 to-pink-500/5">
               <CardContent className="p-4 text-center">
-                <AlertTriangle className="h-6 w-6 text-red-500 dark:text-red-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-red-600 dark:text-red-400">
-                  Alerts
+                <AlertTriangle className="h-6 w-6 text-red-400 mx-auto mb-2 matrix-glow-red" />
+                <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                  [[ ALERTS ]]
                 </p>
-                <p className="text-xl font-bold text-red-700 dark:text-red-300">
+                <p className="text-xl font-bold matrix-text-primary font-orbitron">
                   1
                 </p>
               </CardContent>

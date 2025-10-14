@@ -4,30 +4,40 @@ import CaseDecrypt from '../components/case-decrypt';
 
 export default function Home() {
   return (
-    <div className="font-sans flex flex-col items-center justify-center min-h-screen relative overflow-hidden">
-      {/* Background gradient and pattern */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-green-50 dark:from-slate-900 dark:via-slate-800 dark:to-emerald-900"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,197,94,0.1),transparent_70%)]"></div>
+    <div className="font-orbitron flex flex-col items-center justify-center min-h-screen relative overflow-hidden">
+      {/* Matrix Background */}
+      <div className="absolute inset-0 bg-matrix-bg"></div>
       
-      {/* Floating elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-emerald-400 to-green-400 rounded-full opacity-20 animate-float"></div>
-      <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full opacity-20 animate-float" style={{animationDelay: '1s'}}></div>
-      <div className="absolute bottom-40 left-20 w-12 h-12 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full opacity-20 animate-float" style={{animationDelay: '2s'}}></div>
+      {/* Animated Matrix Grid */}
+      <div className="absolute inset-0 opacity-30" style={{
+        backgroundImage: 'linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px)',
+        backgroundSize: '50px 50px',
+        animation: 'matrixPulse 20s linear infinite'
+      }}></div>
+
+      {/* Floating Matrix Elements */}
+      <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-matrix-cyan to-matrix-emerald rounded-lg opacity-30 animate-matrix-float matrix-glow-cyan"></div>
+      <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-r from-matrix-emerald to-matrix-cyan rounded-lg opacity-30 animate-matrix-float matrix-glow-green" style={{animationDelay: '2s'}}></div>
+      <div className="absolute bottom-40 left-20 w-12 h-12 bg-gradient-to-r from-matrix-cyan to-matrix-emerald rounded-lg opacity-30 animate-matrix-float" style={{animationDelay: '4s'}}></div>
+      
+      {/* Scan Lines */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-matrix-cyan to-transparent animate-matrix-scan opacity-60"></div>
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-matrix-emerald to-transparent animate-matrix-scan opacity-60" style={{animationDelay: '1.5s'}}></div>
       
       <main className="relative z-10 flex flex-col gap-12 items-center text-center max-w-5xl px-8 py-20 animate-fade-in">
         <div className="text-center space-y-6">
           <div className="animate-slide-up">
-            <h1 className="text-6xl md:text-7xl font-bold gradient-text mb-6 tracking-tight">
+            <h1 className="text-6xl md:text-7xl font-bold gradient-text mb-6 tracking-tight font-orbitron">
               ForensiAI
             </h1>
-            <div className="w-24 h-1.5 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 mx-auto rounded-full mb-8 animate-glow"></div>
+            <div className="w-24 h-1.5 bg-gradient-to-r from-matrix-cyan via-matrix-emerald to-matrix-cyan mx-auto rounded-full mb-8 matrix-pulse"></div>
           </div>
           
           <div className="animate-slide-up" style={{animationDelay: '0.2s'}}>
-            <p className="text-slate-600 dark:text-slate-300 text-xl md:text-2xl mb-6 leading-relaxed max-w-3xl">
+            <p className="matrix-text-primary text-xl md:text-2xl mb-6 leading-relaxed max-w-3xl font-space-mono">
               Advanced forensic analysis powered by cutting-edge AI technology
             </p>
-            <p className="text-slate-500 dark:text-slate-400 text-base md:text-lg leading-relaxed max-w-2xl">
+            <p className="matrix-text-muted text-base md:text-lg leading-relaxed max-w-2xl font-space-mono">
               Streamline your investigations with intelligent case management, automated analysis, and real-time insights
             </p>
           </div>
@@ -35,56 +45,55 @@ export default function Home() {
 
         <div className="flex gap-6 items-center flex-col sm:flex-row animate-slide-up" style={{animationDelay: '0.4s'}}>
           <Link
-            className="group relative rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold text-base h-14 px-8 flex items-center justify-center transition-all duration-300 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-105 min-w-[140px]"
+            className="matrix-button group relative rounded-xl bg-gradient-to-r from-matrix-cyan/20 to-matrix-emerald/20 hover:from-matrix-cyan/30 hover:to-matrix-emerald/30 text-matrix-cyan font-semibold text-base h-14 px-8 flex items-center justify-center transition-all duration-300 matrix-glow-cyan hover:matrix-glow-green min-w-[140px] border border-matrix-cyan/50 hover:border-matrix-emerald/50"
             href="/login"
           >
-            <span className="relative z-10">Sign In</span>
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-700 to-green-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <span className="relative z-10 font-space-mono uppercase tracking-wider">Sign In</span>
           </Link>
           <Link
-            className="group relative rounded-xl border-2 border-emerald-600 dark:border-emerald-400 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-semibold text-base h-14 px-8 flex items-center justify-center transition-all duration-300 hover:scale-105 min-w-[140px] hover:border-emerald-700 dark:hover:border-emerald-300"
+            className="matrix-button group relative rounded-xl border-2 border-matrix-emerald/50 bg-matrix-surface/80 backdrop-blur-sm hover:bg-matrix-emerald/10 text-matrix-emerald font-semibold text-base h-14 px-8 flex items-center justify-center transition-all duration-300 hover:scale-105 min-w-[140px] hover:border-matrix-emerald matrix-hover"
             href="/signup"
           >
-            Create Account
+            <span className="font-space-mono uppercase tracking-wider">Create Account</span>
           </Link>
         </div>
 
         {/* Feature highlights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 w-full animate-slide-up" style={{animationDelay: '0.6s'}}>
-          <div className="group bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 card-hover">
-            <div className="w-12 h-12 bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/50 dark:to-green-900/50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="group matrix-panel matrix-hover backdrop-blur-sm rounded-2xl p-6">
+            <div className="w-12 h-12 bg-gradient-to-r from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 matrix-glow-cyan">
+              <svg className="w-6 h-6 text-matrix-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">AI-Powered Analysis</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Advanced machine learning algorithms for faster and more accurate forensic analysis</p>
+            <h3 className="text-lg font-semibold matrix-text-primary mb-2 font-orbitron tracking-wide">[[ AI-POWERED ANALYSIS ]]</h3>
+            <p className="text-sm matrix-text-muted font-space-mono">ADVANCED MACHINE LEARNING ALGORITHMS FOR FASTER AND MORE ACCURATE FORENSIC ANALYSIS</p>
           </div>
           
-          <div className="group bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 card-hover">
-            <div className="w-12 h-12 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/50 dark:to-emerald-900/50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="group matrix-panel matrix-hover backdrop-blur-sm rounded-2xl p-6">
+            <div className="w-12 h-12 bg-gradient-to-r from-matrix-emerald/20 to-matrix-cyan/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 matrix-glow-emerald">
+              <svg className="w-6 h-6 text-matrix-emerald" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Secure Processing</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400">End-to-end encryption ensures your sensitive data remains protected throughout the analysis</p>
+            <h3 className="text-lg font-semibold matrix-text-primary mb-2 font-orbitron tracking-wide">[[ SECURE PROCESSING ]]</h3>
+            <p className="text-sm matrix-text-muted font-space-mono">END-TO-END ENCRYPTION ENSURES YOUR SENSITIVE DATA REMAINS PROTECTED THROUGHOUT THE ANALYSIS</p>
           </div>
           
-          <div className="group bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 card-hover">
-            <div className="w-12 h-12 bg-gradient-to-r from-teal-100 to-emerald-100 dark:from-teal-900/50 dark:to-emerald-900/50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-6 h-6 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="group matrix-panel matrix-hover backdrop-blur-sm rounded-2xl p-6">
+            <div className="w-12 h-12 bg-gradient-to-r from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 matrix-glow-cyan">
+              <svg className="w-6 h-6 text-matrix-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Real-time Insights</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Get instant results and interactive visualizations to accelerate your investigation workflow</p>
+            <h3 className="text-lg font-semibold matrix-text-primary mb-2 font-orbitron tracking-wide">[[ REAL-TIME INSIGHTS ]]</h3>
+            <p className="text-sm matrix-text-muted font-space-mono">GET INSTANT RESULTS AND INTERACTIVE VISUALIZATIONS TO ACCELERATE YOUR INVESTIGATION WORKFLOW</p>
           </div>
         </div>
 
         <div className="mt-12 text-center animate-slide-up" style={{animationDelay: '0.8s'}}>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-medium">
-            Explore Demo Features:
+          <p className="text-sm matrix-text-muted mb-6 font-medium font-space-mono uppercase tracking-wider">
+            [[ EXPLORE DEMO FEATURES ]]
           </p>
           <div className="flex gap-6 justify-center flex-wrap">
             <Link

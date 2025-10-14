@@ -220,25 +220,31 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-white to-green-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-emerald-900/50 relative overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(34,197,94,0.05),transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_40%,rgba(34,197,94,0.1),transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(16,185,129,0.05),transparent_50%)] dark:bg-[radial-gradient(circle_at_70%_60%,rgba(16,185,129,0.1),transparent_50%)]"></div>
+    <div className="min-h-screen bg-matrix-bg relative overflow-hidden">
+      {/* Matrix Background Elements */}
+      <div className="absolute inset-0 opacity-20" style={{
+        backgroundImage: 'linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px)',
+        backgroundSize: '50px 50px',
+        animation: 'matrixGrid 30s linear infinite'
+      }}></div>
+      
+      {/* Floating scan lines */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-matrix-cyan to-transparent animate-matrix-scan opacity-40"></div>
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-matrix-emerald to-transparent animate-matrix-scan opacity-40" style={{animationDelay: '2s'}}></div>
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-12 animate-fade-in">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-green-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-              <TrendingUp className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-matrix-cyan to-matrix-emerald rounded-2xl flex items-center justify-center matrix-glow-cyan">
+              <TrendingUp className="w-6 h-6 text-matrix-bg" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold gradient-text mb-2">
-                Dashboard
+              <h1 className="text-4xl font-bold gradient-text mb-2 font-orbitron tracking-wide">
+                [[ DASHBOARD ]]
               </h1>
-              <p className="text-slate-600 dark:text-slate-300 text-lg">
-                Welcome back! Here's an overview of your forensic analysis
-                cases.
+              <p className="matrix-text-muted text-lg font-space-mono">
+                WELCOME BACK! HERE'S AN OVERVIEW OF YOUR FORENSIC ANALYSIS CASES.
               </p>
             </div>
           </div>
@@ -274,8 +280,8 @@ export default function DashboardPage() {
 
         {/* Upload Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-6">
-            Upload Forensic Data
+          <h2 className="text-xl font-semibold matrix-text-primary mb-6 font-orbitron tracking-wide">
+            [[ UPLOAD FORENSIC DATA ]]
           </h2>
 
           <div className="max-w-2xl mx-auto">

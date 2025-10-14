@@ -129,15 +129,15 @@ const exportOptions: ExportOption[] = [
 const getTypeColor = (type: ExportOption["type"]) => {
   switch (type) {
     case "report":
-      return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+      return "bg-blue-500/20 text-blue-400 border border-blue-500/50";
     case "evidence":
-      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
+      return "bg-matrix-emerald/20 text-matrix-emerald border border-matrix-emerald/50";
     case "data":
-      return "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400";
+      return "bg-purple-500/20 text-purple-400 border border-purple-500/50";
     case "summary":
-      return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+      return "bg-yellow-500/20 text-yellow-400 border border-yellow-500/50";
     default:
-      return "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400";
+      return "bg-matrix-surface/50 text-matrix-text-muted border border-matrix-border";
   }
 };
 
@@ -205,27 +205,27 @@ export function CaseExport({ caseData }: CaseExportProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">
-          Export & Download
+        <h1 className="text-2xl font-bold matrix-text-primary mb-2 font-orbitron tracking-wide">
+          [[ EXPORT & DOWNLOAD ]]
         </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          Download reports, evidence packages, and analysis data for case{" "}
+        <p className="matrix-text-muted font-space-mono">
+          DOWNLOAD REPORTS, EVIDENCE PACKAGES, AND ANALYSIS DATA FOR CASE{" "}
           {caseData.id}.
         </p>
       </div>
 
       {/* Export Summary */}
-      <Card className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border-indigo-200 dark:border-indigo-700">
+      <Card className="matrix-panel border-matrix-cyan/50 shadow-2xl shadow-matrix-cyan/20">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <Download className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+              <Download className="h-6 w-6 text-matrix-cyan animate-pulse" />
               <div>
-                <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100">
-                  Ready for Export
+                <h3 className="text-lg font-semibold matrix-text-primary font-orbitron">
+                  [[ READY FOR EXPORT ]]
                 </h3>
-                <p className="text-sm text-indigo-700 dark:text-indigo-300">
-                  {availableCount} files available • Total size: ~
+                <p className="text-sm matrix-text-muted font-space-mono">
+                  {availableCount} FILES AVAILABLE • TOTAL SIZE: ~
                   {totalSize.toFixed(1)} GB
                 </p>
               </div>
@@ -235,26 +235,26 @@ export function CaseExport({ caseData }: CaseExportProps) {
                 onClick={handlePrint}
                 variant="outline"
                 size="sm"
-                className="border-indigo-300 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-600 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+                className="border-matrix-border text-matrix-text-muted hover:bg-matrix-surface/30 hover:border-matrix-cyan hover:text-matrix-cyan font-space-mono text-xs uppercase tracking-wider"
               >
                 <Printer className="h-4 w-4 mr-2" />
-                Print
+                PRINT
               </Button>
               <Button
                 onClick={handleShare}
                 variant="outline"
                 size="sm"
-                className="border-indigo-300 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-600 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+                className="border-matrix-border text-matrix-text-muted hover:bg-matrix-surface/30 hover:border-matrix-cyan hover:text-matrix-cyan font-space-mono text-xs uppercase tracking-wider"
               >
                 <Share2 className="h-4 w-4 mr-2" />
-                Share
+                SHARE
               </Button>
               <Button
                 onClick={handleBulkDownload}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="matrix-button font-space-mono text-xs uppercase tracking-wider"
               >
                 <Download className="h-4 w-4 mr-2" />
-                Download All
+                DOWNLOAD ALL
               </Button>
             </div>
           </div>
@@ -270,9 +270,9 @@ export function CaseExport({ caseData }: CaseExportProps) {
           return (
             <Card
               key={option.id}
-              className={`bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg transition-all duration-200 ${
+              className={`matrix-card matrix-hover border-matrix-border shadow-lg transition-all duration-200 ${
                 option.available
-                  ? "hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-600"
+                  ? "hover:shadow-xl hover:border-matrix-cyan matrix-glow-cyan"
                   : "opacity-60"
               }`}
             >
@@ -282,20 +282,20 @@ export function CaseExport({ caseData }: CaseExportProps) {
                     <div
                       className={`p-2 rounded-lg ${
                         option.available
-                          ? "bg-indigo-100 dark:bg-indigo-900/30"
-                          : "bg-slate-100 dark:bg-slate-700"
+                          ? "bg-matrix-cyan/20 matrix-glow-cyan"
+                          : "bg-matrix-surface/50"
                       }`}
                     >
                       <OptionIcon
                         className={`h-5 w-5 ${
                           option.available
-                            ? "text-indigo-600 dark:text-indigo-400"
-                            : "text-slate-400"
+                            ? "text-matrix-cyan"
+                            : "text-matrix-text-muted"
                         }`}
                       />
                     </div>
                     <div>
-                      <CardTitle className="text-lg text-gray-900 dark:text-slate-100">
+                      <CardTitle className="text-lg matrix-text-primary font-space-mono">
                         {option.title}
                       </CardTitle>
                       <div className="flex items-center space-x-2 mt-1">
@@ -341,13 +341,15 @@ export function CaseExport({ caseData }: CaseExportProps) {
 
       {/* Export Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700">
+        <Card className="matrix-panel">
           <CardContent className="p-4 text-center">
-            <FileText className="h-6 w-6 text-blue-500 dark:text-blue-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
-              Reports
+            <div className="w-8 h-8 bg-matrix-cyan/20 rounded-lg flex items-center justify-center mx-auto mb-2 border border-matrix-cyan/30 matrix-glow-cyan">
+              <FileText className="h-6 w-6 text-matrix-cyan" />
+            </div>
+            <p className="text-sm font-medium matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
+              [Reports]
             </p>
-            <p className="text-xl font-bold text-blue-700 dark:text-blue-300">
+            <p className="text-xl font-bold matrix-text-primary font-mono">
               {
                 exportOptions.filter(
                   (opt) => opt.type === "report" && opt.available
@@ -357,13 +359,15 @@ export function CaseExport({ caseData }: CaseExportProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-emerald-200 dark:border-emerald-700">
+        <Card className="matrix-panel">
           <CardContent className="p-4 text-center">
-            <Archive className="h-6 w-6 text-emerald-500 dark:text-emerald-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-              Evidence
+            <div className="w-8 h-8 bg-matrix-emerald/20 rounded-lg flex items-center justify-center mx-auto mb-2 border border-matrix-emerald/30 matrix-glow-emerald">
+              <Archive className="h-6 w-6 text-matrix-emerald" />
+            </div>
+            <p className="text-sm font-medium matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
+              [Evidence]
             </p>
-            <p className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
+            <p className="text-xl font-bold matrix-text-primary font-mono">
               {
                 exportOptions.filter(
                   (opt) => opt.type === "evidence" && opt.available
@@ -373,13 +377,15 @@ export function CaseExport({ caseData }: CaseExportProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-purple-200 dark:border-purple-700">
+        <Card className="matrix-panel">
           <CardContent className="p-4 text-center">
-            <Database className="h-6 w-6 text-purple-500 dark:text-purple-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
-              Data Files
+            <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center mx-auto mb-2 border border-purple-500/30 matrix-glow-purple">
+              <Database className="h-6 w-6 text-purple-400" />
+            </div>
+            <p className="text-sm font-medium matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
+              [Data Files]
             </p>
-            <p className="text-xl font-bold text-purple-700 dark:text-purple-300">
+            <p className="text-xl font-bold matrix-text-primary font-mono">
               {
                 exportOptions.filter(
                   (opt) => opt.type === "data" && opt.available
@@ -389,13 +395,15 @@ export function CaseExport({ caseData }: CaseExportProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-700">
+        <Card className="matrix-panel">
           <CardContent className="p-4 text-center">
-            <FileSpreadsheet className="h-6 w-6 text-amber-500 dark:text-amber-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
-              Summaries
+            <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center mx-auto mb-2 border border-yellow-500/30 matrix-glow-yellow">
+              <FileSpreadsheet className="h-6 w-6 text-yellow-500" />
+            </div>
+            <p className="text-sm font-medium matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
+              [Summaries]
             </p>
-            <p className="text-xl font-bold text-amber-700 dark:text-amber-300">
+            <p className="text-xl font-bold matrix-text-primary font-mono">
               {
                 exportOptions.filter(
                   (opt) => opt.type === "summary" && opt.available

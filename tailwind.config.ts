@@ -9,9 +9,25 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'orbitron': ['var(--font-orbitron)', 'Orbitron', 'sans-serif'],
+        'space-mono': ['var(--font-space-mono)', 'Space Mono', 'monospace'],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        matrix: {
+          bg: '#0a0f1a',
+          surface: '#101419', 
+          panel: '#181d24',
+          border: '#1f252e',
+          text: '#40e0d0',
+          'text-muted': 'rgba(64, 224, 208, 0.6)',
+          cyan: '#00ffff',
+          emerald: '#00ff88',
+          'glow-cyan': 'rgba(0, 255, 255, 0.5)',
+          'glow-emerald': 'rgba(0, 255, 136, 0.5)',
+        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -87,6 +103,27 @@ const config: Config = {
           "0%": { transform: "scale(0.95)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
         },
+        "matrix-glow": {
+          "0%, 100%": { 
+            boxShadow: "0 0 20px rgba(0, 255, 255, 0.3)" 
+          },
+          "50%": { 
+            boxShadow: "0 0 40px rgba(0, 255, 255, 0.6), 0 0 60px rgba(0, 255, 255, 0.3)" 
+          },
+        },
+        "matrix-scan": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(200%)" },
+        },
+        "matrix-float": {
+          "0%, 100%": { transform: "translateY(0px) rotate(0deg)" },
+          "33%": { transform: "translateY(-10px) rotate(1deg)" },
+          "66%": { transform: "translateY(5px) rotate(-1deg)" },
+        },
+        "matrix-pulse": {
+          "0%, 100%": { opacity: "0.3" },
+          "50%": { opacity: "0.6" },
+        },
       },
       animation: {
         "float": "float 3s ease-in-out infinite",
@@ -94,6 +131,10 @@ const config: Config = {
         "slide-up": "slideUp 0.6s ease-out",
         "fade-in": "fadeIn 0.8s ease-out",
         "scale-in": "scaleIn 0.5s ease-out",
+        "matrix-glow": "matrix-glow 2s ease-in-out infinite",
+        "matrix-scan": "matrix-scan 3s linear infinite",
+        "matrix-float": "matrix-float 6s ease-in-out infinite",
+        "matrix-pulse": "matrix-pulse 4s ease-in-out infinite",
       },
     },
   },

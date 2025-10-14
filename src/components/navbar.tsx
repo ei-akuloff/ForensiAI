@@ -11,20 +11,20 @@ export function Navbar() {
 
   return (
     <ClientWrapper>
-      <nav className="sticky top-0 z-50 w-full border-b border-white/20 dark:border-slate-700/50 bg-white/80 backdrop-blur-lg dark:bg-slate-900/80 shadow-lg shadow-black/5">
+      <nav className="sticky top-0 z-50 w-full border-b border-matrix-border bg-matrix-surface/90 backdrop-blur-xl shadow-2xl shadow-matrix-cyan/5 matrix-header">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo/Brand */}
             <Link
               href={isDashboard ? "/dashboard" : "/"}
-              className="group flex items-center space-x-3 transition-all duration-300 hover:scale-105"
+              className="group flex items-center space-x-3 transition-all duration-300 hover:scale-105 matrix-hover"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-emerald-600 to-green-600 rounded-lg flex items-center justify-center group-hover:shadow-lg group-hover:shadow-emerald-500/30 transition-all duration-300">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <div className="w-8 h-8 bg-gradient-to-r from-matrix-cyan to-matrix-emerald rounded-lg flex items-center justify-center matrix-glow-cyan transition-all duration-300">
+                <svg className="w-5 h-5 text-matrix-bg" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
               </div>
-              <h1 className="text-xl font-bold gradient-text tracking-tight">
+              <h1 className="text-xl font-bold gradient-text tracking-tight font-orbitron">
                 ForensiAI
               </h1>
             </Link>
@@ -37,7 +37,7 @@ export function Navbar() {
                   <>
                     <Link
                       href="/dashboard"
-                      className="text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors"
+                      className="matrix-text-primary hover:matrix-text-emerald transition-colors font-space-mono text-sm uppercase tracking-wider"
                     >
                       Dashboard
                     </Link>
@@ -50,7 +50,7 @@ export function Navbar() {
                         }
                         window.location.href = "/";
                       }}
-                      className="text-slate-600 hover:text-red-600 dark:text-slate-300 dark:hover:text-red-400 transition-colors"
+                      className="matrix-text-primary hover:text-red-400 transition-colors font-space-mono text-sm uppercase tracking-wider"
                     >
                       Logout
                     </button>
@@ -59,13 +59,13 @@ export function Navbar() {
                   <>
                     <Link
                       href="/login"
-                      className="text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors"
+                      className="matrix-text-primary hover:matrix-text-emerald transition-colors font-space-mono text-sm uppercase tracking-wider"
                     >
                       Sign In
                     </Link>
                     <Link
                       href="/signup"
-                      className="bg-gradient-to-r from-indigo-800 to-blue-500 hover:from-indigo-900 hover:to-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg"
+                      className="matrix-button px-4 py-2 rounded-lg text-sm font-space-mono uppercase tracking-wider"
                     >
                       Get Started
                     </Link>
@@ -80,7 +80,7 @@ export function Navbar() {
                   {!isDashboard && (
                     <Link
                       href="/login"
-                      className="text-indigo-600 dark:text-indigo-400 text-sm"
+                      className="matrix-text-primary text-sm font-space-mono uppercase"
                     >
                       Sign In
                     </Link>

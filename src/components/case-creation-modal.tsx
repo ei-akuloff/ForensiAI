@@ -1,11 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { X } from "lucide-react";
 
 export interface CaseFormData {
   caseNo: string;
@@ -25,12 +20,7 @@ interface CaseCreationModalProps {
   fileName: string;
 }
 
-export function CaseCreationModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  fileName,
-}: CaseCreationModalProps) {
+export function CaseCreationModal({ isOpen, onClose, onSubmit, fileName }: CaseCreationModalProps) {
   const [formData, setFormData] = useState<CaseFormData>({
     caseNo: "",
     leadInvestigator: "",
@@ -44,17 +34,17 @@ export function CaseCreationModal({
     fileName: fileName
   });
 
-  const [errors, setErrors] = useState<Partial<CaseFormData>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof CaseFormData, string>>>({});
 
   const handleChange = (field: keyof CaseFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }));
+      setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<CaseFormData> = {};
+  const validateForm = () => {
+    const newErrors: Partial<Record<keyof CaseFormData, string>> = {};
     
     if (!formData.caseNo.trim()) newErrors.caseNo = "Case number is required";
     if (!formData.leadInvestigator.trim()) newErrors.leadInvestigator = "Lead investigator is required";
@@ -95,190 +85,201 @@ export function CaseCreationModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div className="matrix-modal-overlay fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md overflow-y-auto animate-fade-in">
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl my-8 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 shadow-2xl shadow-emerald-500/10 animate-slide-up">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 rounded-2xl"></div>
+        <div className="matrix-modal matrix-form-visible w-full max-w-2xl my-8 matrix-glass border-2 border-cyan-500/50 shadow-2xl shadow-cyan-500/30 animate-matrix-slide-up backdrop-blur-xl relative overflow-hidden">
+          {/* Matrix scanning line animation */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/15 to-transparent transform -skew-x-12 animate-matrix-scan"></div>
           
-          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-6 px-6 pt-6">
-            <CardTitle className="text-xl font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              Create New Case
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCancel}
-              className="h-8 w-8 p-0 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
+          {/* Cyber grid overlay */}
+          <div className="absolute inset-0 opacity-15" style={{
+            backgroundImage: 'linear-gradient(cyan 1px, transparent 1px), linear-gradient(90deg, cyan 1px, transparent 1px)',
+            backgroundSize: '20px 20px'
+          }}></div>
           
-          <CardContent className="relative p-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* File Name Display */}
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700/50 p-4 rounded-lg">
-                <Label className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
-                  Uploaded File
-                </Label>
-                <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-1 font-mono">
-                  {fileName}
-                </p>
-              </div>
-
-              {/* Case Number */}
-              <div className="space-y-2">
-                <Label htmlFor="caseNo" className="text-sm font-medium">
-                  Case Number *
-                </Label>
-                <Input
-                  id="caseNo"
-                  type="text"
-                  value={formData.caseNo}
-                  onChange={(e) => handleChange("caseNo", e.target.value)}
-                  placeholder="e.g., 2024-001"
-                  className={errors.caseNo ? "border-red-500" : ""}
-                />
-                {errors.caseNo && (
-                  <p className="text-sm text-red-600 dark:text-red-400">{errors.caseNo}</p>
-                )}
-              </div>
-
-              {/* Lead Investigator */}
-              <div className="space-y-2">
-                <Label htmlFor="leadInvestigator" className="text-sm font-medium">
-                  Lead Investigator *
-                </Label>
-                <Input
-                  id="leadInvestigator"
-                  type="text"
-                  value={formData.leadInvestigator}
-                  onChange={(e) => handleChange("leadInvestigator", e.target.value)}
-                  placeholder="e.g., Agent Smith"
-                  className={errors.leadInvestigator ? "border-red-500" : ""}
-                />
-                {errors.leadInvestigator && (
-                  <p className="text-sm text-red-600 dark:text-red-400">{errors.leadInvestigator}</p>
-                )}
-              </div>
-
-              {/* Case Title */}
-              <div className="space-y-2">
-                <Label htmlFor="caseTitle" className="text-sm font-medium">
-                  Case Title *
-                </Label>
-                <Input
-                  id="caseTitle"
-                  type="text"
-                  value={formData.caseTitle}
-                  onChange={(e) => handleChange("caseTitle", e.target.value)}
-                  placeholder="e.g., Mobile Device Analysis"
-                  className={errors.caseTitle ? "border-red-500" : ""}
-                />
-                {errors.caseTitle && (
-                  <p className="text-sm text-red-600 dark:text-red-400">{errors.caseTitle}</p>
-                )}
-              </div>
-
-              {/* Department */}
-              <div className="space-y-2">
-                <Label htmlFor="department" className="text-sm font-medium">
-                  Department *
-                </Label>
-                <Input
-                  id="department"
-                  type="text"
-                  value={formData.department}
-                  onChange={(e) => handleChange("department", e.target.value)}
-                  placeholder="e.g., Cybercrime Unit"
-                  className={errors.department ? "border-red-500" : ""}
-                />
-                {errors.department && (
-                  <p className="text-sm text-red-600 dark:text-red-400">{errors.department}</p>
-                )}
-              </div>
-
-              {/* Priority and Case Type Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Priority */}
-                <div className="space-y-2">
-                  <Label htmlFor="priority" className="text-sm font-medium">
-                    Priority
-                  </Label>
-                  <select
-                    id="priority"
-                    value={formData.priority}
-                    onChange={(e) => handleChange("priority", e.target.value as CaseFormData["priority"])}
-                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    <option value="Critical">Critical</option>
-                  </select>
-                </div>
-
-                {/* Case Type */}
-                <div className="space-y-2">
-                  <Label htmlFor="caseType" className="text-sm font-medium">
-                    Case Type
-                  </Label>
-                  <select
-                    id="caseType"
-                    value={formData.caseType}
-                    onChange={(e) => handleChange("caseType", e.target.value as CaseFormData["caseType"])}
-                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  >
-                    <option value="Mobile Device">Mobile Device</option>
-                    <option value="Computer Forensics">Computer Forensics</option>
-                    <option value="Network Analysis">Network Analysis</option>
-                    <option value="Digital Evidence">Digital Evidence</option>
-                    <option value="Cloud Storage">Cloud Storage</option>
-                    <option value="Other">Other</option>
-                  </select>
+          <div className="relative z-10">
+            <div className="flex flex-row items-center justify-between space-y-0 pb-6 px-6 pt-6 border-b border-cyan-500/20">
+              <div>
+                <h2 className="text-xl font-bold text-cyan-400 font-mono tracking-wider uppercase">
+                  [[ Create New Case ]]
+                </h2>
+                <div className="text-xs text-emerald-400/70 font-mono mt-1">
+                  FORENSIC_PROTOCOL_INITIALIZED
                 </div>
               </div>
+              <button
+                onClick={handleCancel}
+                className="h-10 w-10 p-0 text-cyan-400 hover:text-red-400 hover:bg-red-500/10 border border-cyan-500/30 hover:border-red-500/50 rounded bg-black/40 transition-all duration-300 font-mono text-lg"
+              >
+                ×
+              </button>
+            </div>
 
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-sm font-medium">
-                  Description *
-                </Label>
-                <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleChange("description", e.target.value)}
-                  placeholder="Provide a detailed description of the case..."
-                  rows={4}
-                  className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none ${
-                    errors.description ? "border-red-500" : "border-slate-300 dark:border-slate-600"
-                  }`}
-                />
-                {errors.description && (
-                  <p className="text-sm text-red-600 dark:text-red-400">{errors.description}</p>
-                )}
-              </div>
+            <div className="relative p-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* File Name Display */}
+                <div className="matrix-card border-emerald-500/30 p-4">
+                  <div className="text-sm font-mono text-emerald-400 uppercase tracking-wide">
+                    [[ Uploaded File ]]
+                  </div>
+                  <div className="text-sm text-cyan-400 mt-2 font-mono bg-black/40 p-2 rounded border border-cyan-500/20">
+                    {fileName}
+                  </div>
+                </div>
 
-              {/* Action Buttons */}
-              <div className="flex justify-end space-x-4 pt-6 border-t border-slate-200 dark:border-slate-700">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="px-6 py-2"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40"
-                >
-                  Create Case
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+                {/* Case Number */}
+                <div className="space-y-2">
+                  <label htmlFor="caseNo" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                    [[ Case Number * ]]
+                  </label>
+                  <input
+                    id="caseNo"
+                    type="text"
+                    value={formData.caseNo}
+                    onChange={(e) => handleChange("caseNo", e.target.value)}
+                    placeholder="e.g., 2024-001"
+                    className={`matrix-input ${errors.caseNo ? "border-red-500 shadow-red-500/20" : ""}`}
+                  />
+                  {errors.caseNo && (
+                    <p className="text-sm text-red-400 font-mono">{errors.caseNo}</p>
+                  )}
+                </div>
+
+                {/* Lead Investigator */}
+                <div className="space-y-2">
+                  <label htmlFor="leadInvestigator" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                    [[ Lead Investigator * ]]
+                  </label>
+                  <input
+                    id="leadInvestigator"
+                    type="text"
+                    value={formData.leadInvestigator}
+                    onChange={(e) => handleChange("leadInvestigator", e.target.value)}
+                    placeholder="e.g., Agent Smith"
+                    className={`matrix-input ${errors.leadInvestigator ? "border-red-500 shadow-red-500/20" : ""}`}
+                  />
+                  {errors.leadInvestigator && (
+                    <p className="text-sm text-red-400 font-mono">{errors.leadInvestigator}</p>
+                  )}
+                </div>
+
+                {/* Case Title */}
+                <div className="space-y-2">
+                  <label htmlFor="caseTitle" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                    [[ Case Title * ]]
+                  </label>
+                  <input
+                    id="caseTitle"
+                    type="text"
+                    value={formData.caseTitle}
+                    onChange={(e) => handleChange("caseTitle", e.target.value)}
+                    placeholder="e.g., Mobile Device Analysis"
+                    className={`matrix-input ${errors.caseTitle ? "border-red-500 shadow-red-500/20" : ""}`}
+                  />
+                  {errors.caseTitle && (
+                    <p className="text-sm text-red-400 font-mono">{errors.caseTitle}</p>
+                  )}
+                </div>
+
+                {/* Department */}
+                <div className="space-y-2">
+                  <label htmlFor="department" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                    [[ Department * ]]
+                  </label>
+                  <input
+                    id="department"
+                    type="text"
+                    value={formData.department}
+                    onChange={(e) => handleChange("department", e.target.value)}
+                    placeholder="e.g., Cybercrime Unit"
+                    className={`matrix-input ${errors.department ? "border-red-500 shadow-red-500/20" : ""}`}
+                  />
+                  {errors.department && (
+                    <p className="text-sm text-red-400 font-mono">{errors.department}</p>
+                  )}
+                </div>
+
+                {/* Priority and Case Type Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Priority */}
+                  <div className="space-y-2">
+                    <label htmlFor="priority" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                      [[ Priority ]]
+                    </label>
+                    <select
+                      id="priority"
+                      value={formData.priority}
+                      onChange={(e) => handleChange("priority", e.target.value as CaseFormData["priority"])}
+                      className="matrix-select"
+                    >
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                      <option value="Critical">Critical</option>
+                    </select>
+                  </div>
+
+                  {/* Case Type */}
+                  <div className="space-y-2">
+                    <label htmlFor="caseType" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                      [[ Case Type ]]
+                    </label>
+                    <select
+                      id="caseType"
+                      value={formData.caseType}
+                      onChange={(e) => handleChange("caseType", e.target.value as CaseFormData["caseType"])}
+                      className="matrix-select"
+                    >
+                      <option value="Mobile Device">Mobile Device</option>
+                      <option value="Computer Forensics">Computer Forensics</option>
+                      <option value="Network Analysis">Network Analysis</option>
+                      <option value="Digital Evidence">Digital Evidence</option>
+                      <option value="Cloud Storage">Cloud Storage</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <label htmlFor="description" className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                    [[ Description * ]]
+                  </label>
+                  <textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleChange("description", e.target.value)}
+                    placeholder="Provide a detailed description of the case..."
+                    rows={4}
+                    className={`matrix-textarea ${
+                      errors.description ? "border-red-500 shadow-red-500/20" : ""
+                    }`}
+                  />
+                  {errors.description && (
+                    <p className="text-sm text-red-400 font-mono">{errors.description}</p>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-4 pt-6 border-t border-cyan-500/20">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="px-6 py-2 bg-black/60 border border-gray-500/50 text-gray-300 hover:text-white hover:border-gray-300 font-mono uppercase tracking-wider transition-all duration-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 matrix-button font-mono uppercase tracking-wider"
+                  >
+                    Create Case
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

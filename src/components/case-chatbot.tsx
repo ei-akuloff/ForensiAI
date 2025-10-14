@@ -337,15 +337,15 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
       {/* Header Section */}
       <div className="relative">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-            <MessageSquare className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 bg-gradient-to-br from-matrix-cyan to-matrix-emerald rounded-2xl flex items-center justify-center shadow-lg shadow-matrix-cyan/30 matrix-glow-cyan">
+            <MessageSquare className="w-6 h-6 text-matrix-bg" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold gradient-text mb-2">
-              AI Assistant
+            <h1 className="text-3xl font-bold gradient-text mb-2 font-orbitron tracking-wide">
+              [[ AI ASSISTANT ]]
             </h1>
-            <p className="text-slate-600 dark:text-slate-300 text-lg">
-              Intelligent analysis and insights powered by advanced AI technology
+            <p className="matrix-text-muted text-lg font-space-mono">
+              INTELLIGENT ANALYSIS AND INSIGHTS POWERED BY ADVANCED AI TECHNOLOGY
             </p>
           </div>
         </div>
@@ -354,25 +354,24 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Chat Interface */}
         <div className="xl:col-span-3">
-          <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+          <Card className="group matrix-panel matrix-hover animate-slide-up">
             
-            <CardHeader className="relative">
+            <CardHeader className="relative matrix-header">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-slate-100">
-                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <MessageSquare className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                <CardTitle className="flex items-center space-x-3 matrix-text-primary">
+                  <div className="w-10 h-10 bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 matrix-glow-cyan">
+                    <MessageSquare className="h-5 w-5 text-matrix-cyan" />
                   </div>
-                  <span className="text-xl font-semibold">Case Analysis Chat</span>
+                  <span className="text-xl font-semibold font-orbitron tracking-wide">[[ CASE ANALYSIS CHAT ]]</span>
                 </CardTitle>
                 <div className="flex items-center space-x-3">
                   {/* Language Selector */}
-                  <div className="flex items-center space-x-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-white/20 dark:border-slate-600/50">
-                    <Globe className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                  <div className="flex items-center space-x-2 bg-matrix-surface/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-matrix-border">
+                    <Globe className="h-4 w-4 text-matrix-cyan" />
                     <select
                       value={selectedLanguage}
                       onChange={(e) => setSelectedLanguage(e.target.value)}
-                      className="text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md px-2 py-1 text-slate-700 dark:text-slate-200"
+                      className="text-sm bg-matrix-surface border border-matrix-border rounded-md px-2 py-1 matrix-text-primary font-space-mono"
                     >
                       {supportedLanguages.map((lang) => (
                         <option key={lang.code} value={lang.code}>
@@ -385,7 +384,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                     variant="outline"
                     size="sm"
                     onClick={clearChatHistory}
-                    className="text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400"
+                    className="matrix-text-muted hover:text-red-400 border-matrix-border hover:border-red-500/50 font-space-mono text-xs uppercase tracking-wider"
                   >
                     Clear Chat
                   </Button>
@@ -397,11 +396,11 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
               <div 
                 ref={messagesContainerRef}
                 onScroll={handleScroll}
-                className="h-[500px] overflow-y-auto mb-4 space-y-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg relative"
+                className="h-[500px] overflow-y-auto mb-4 space-y-4 p-4 bg-matrix-surface/20 rounded-lg relative border border-matrix-border"
               >
                 {!isLoaded ? (
                   <div className="flex items-center justify-center h-full">
-                    <div className="text-slate-500 dark:text-slate-400">Loading chat history...</div>
+                    <div className="matrix-text-muted font-space-mono">LOADING CHAT HISTORY...</div>
                   </div>
                 ) : (
                   messages.map((message) => (
@@ -423,22 +422,22 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                       <div
                         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                           message.sender === "user"
-                            ? "bg-emerald-600 text-white"
-                            : "bg-emerald-600 text-white"
+                            ? "bg-matrix-emerald matrix-glow-emerald"
+                            : "bg-matrix-cyan matrix-glow-cyan"
                         }`}
                       >
                         {message.sender === "user" ? (
-                          <User className="h-4 w-4" />
+                          <User className="h-4 w-4 text-matrix-bg" />
                         ) : (
-                          <Bot className="h-4 w-4" />
+                          <Bot className="h-4 w-4 text-matrix-bg" />
                         )}
                       </div>
                       <div className="flex-1">
                         <div
-                          className={`p-4 rounded-lg ${
+                          className={`p-4 rounded-lg font-space-mono ${
                             message.sender === "user"
-                              ? "bg-emerald-600 text-white"
-                              : "bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700"
+                              ? "bg-matrix-emerald/20 text-matrix-emerald border border-matrix-emerald/50"
+                              : "matrix-panel matrix-text-primary border border-matrix-border"
                           }`}
                         >
                           <div className="text-sm leading-relaxed">
@@ -451,10 +450,10 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                             )}
                           </div>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        <p className="text-xs matrix-text-muted mt-1 font-space-mono">
                           {formatTime(message.timestamp)}
                           {message.sender === "ai" && message.detectedLanguage && (
-                            <span className="ml-2 text-xs bg-slate-200 dark:bg-slate-600 px-1 rounded">
+                            <span className="ml-2 text-xs bg-matrix-surface/50 px-1 rounded border border-matrix-border">
                               {message.detectedLanguage}
                             </span>
                           )}
@@ -469,7 +468,7 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                                 onClick={() =>
                                   handleSuggestionClick(suggestion)
                                 }
-                                className="px-2 py-1 text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                                className="px-2 py-1 text-xs bg-matrix-surface/50 text-matrix-text-muted rounded-md hover:bg-matrix-surface hover:text-matrix-cyan transition-colors border border-matrix-border font-space-mono"
                               >
                                 {suggestion}
                               </button>
@@ -486,18 +485,18 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                 {isTyping && (
                   <div className="flex justify-start">
                     <div className="flex items-start space-x-2">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center">
-                        <Bot className="h-4 w-4" />
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-matrix-cyan matrix-glow-cyan flex items-center justify-center">
+                        <Bot className="h-4 w-4 text-matrix-bg" />
                       </div>
-                      <div className="bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <div className="matrix-panel p-3 rounded-lg">
                         <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-matrix-cyan rounded-full animate-bounce matrix-glow-cyan"></div>
                           <div
-                            className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                            className="w-2 h-2 bg-matrix-cyan rounded-full animate-bounce matrix-glow-cyan"
                             style={{ animationDelay: "0.1s" }}
                           ></div>
                           <div
-                            className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                            className="w-2 h-2 bg-matrix-cyan rounded-full animate-bounce matrix-glow-cyan"
                             style={{ animationDelay: "0.2s" }}
                           ></div>
                         </div>
@@ -528,12 +527,12 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ask about case evidence, timeline, or findings..."
-                  className="flex-1 bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600"
+                  className="flex-1 bg-matrix-surface/30 border-matrix-border text-matrix-text-primary placeholder:text-matrix-text-muted font-space-mono focus:border-matrix-cyan focus:ring-matrix-cyan/20"
                 />
                 <Button
                   type="submit"
                   disabled={!inputValue.trim() || isTyping}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="matrix-button"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -544,11 +543,11 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
 
         {/* Quick Actions */}
         <div className="xl:col-span-1">
-          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-                <Lightbulb className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                <span>Quick Actions</span>
+          <Card className="matrix-panel shadow-lg shadow-matrix-cyan/10">
+            <CardHeader className="matrix-header">
+              <CardTitle className="flex items-center space-x-2 matrix-text-primary font-orbitron tracking-wide">
+                <Lightbulb className="h-5 w-5 text-matrix-cyan matrix-glow-cyan" />
+                <span>[[ QUICK ACTIONS ]]</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -559,11 +558,11 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
                     <button
                       key={index}
                       onClick={() => handleQuickAction(action.prompt)}
-                      className="w-full p-3 text-left bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600 transition-colors"
+                      className="w-full p-3 text-left bg-matrix-surface/20 hover:bg-matrix-surface/40 rounded-lg border border-matrix-border hover:border-matrix-cyan transition-colors matrix-hover font-space-mono"
                     >
                       <div className="flex items-center space-x-3">
-                        <ActionIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                        <ActionIcon className="h-5 w-5 text-matrix-emerald matrix-glow-emerald" />
+                        <span className="text-sm font-medium matrix-text-primary">
                           {action.label}
                         </span>
                       </div>
@@ -579,14 +578,14 @@ export function CaseChatbot({ caseId }: CaseChatbotProps) {
 
                   <button
                     onClick={() => handleQuickAction("Welche Dateien wurden in diesem Fall gefunden?")}
-                    className="p-2 bg-white dark:bg-slate-700 rounded border text-left hover:bg-slate-50 dark:hover:bg-slate-600"
+                    className="p-2 matrix-panel rounded border border-matrix-border text-left hover:bg-matrix-surface/40 hover:border-matrix-cyan transition-colors font-space-mono"
                   >
-                    �� Welche Dateien wurden gefunden?
+                    🇩🇪 WELCHE DATEIEN WURDEN GEFUNDEN?
                   </button>
 
 
           {/* Case Info */}
-          <Card className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border-indigo-200 dark:border-indigo-700 mt-6">
+          <Card className="matrix-panel mt-6 bg-gradient-to-r from-matrix-cyan/5 to-matrix-emerald/5">
             <CardContent className="p-4">
               <div className="text-center">
                 <Bot className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mx-auto mb-2" />

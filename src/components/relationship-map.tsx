@@ -392,44 +392,44 @@ const frequencyIndicator = nodeGroup.append("circle")
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
-            <Network className="h-6 w-6 text-emerald-600" />
-            Relationship Network
+          <h2 className="text-2xl font-bold matrix-text-primary flex items-center gap-2 font-orbitron tracking-wide">
+            <Network className="h-6 w-6 text-matrix-cyan matrix-glow-cyan" />
+            [[ RELATIONSHIP NETWORK ]]
           </h2>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-            Interactive map showing connections between people in the forensic data
+          <p className="text-sm matrix-text-muted mt-1 font-space-mono">
+            INTERACTIVE MAP SHOWING CONNECTIONS BETWEEN PEOPLE IN THE FORENSIC DATA
           </p>
         </div>
         <Button
           onClick={loadAnalysis}
           disabled={loading}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          className="matrix-button font-space-mono"
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-          {loading ? "Analyzing..." : "Refresh Analysis"}
+          {loading ? "ANALYZING..." : "REFRESH ANALYSIS"}
         </Button>
       </div>
 
       {/* Error State */}
       {error && (
-        <Card className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20">
+        <Card className="matrix-panel border-red-500/50 bg-red-500/10">
           <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-              <AlertTriangle className="h-5 w-5" />
-              <span className="font-medium">Analysis Error</span>
+            <div className="flex items-center gap-2 text-red-400">
+              <AlertTriangle className="h-5 w-5 matrix-glow-red" />
+              <span className="font-medium font-space-mono uppercase tracking-wider">[[ ANALYSIS ERROR ]]</span>
             </div>
-            <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error}</p>
+            <p className="text-sm text-red-400 mt-1 font-space-mono">{error}</p>
           </CardContent>
         </Card>
       )}
 
       {/* Loading State */}
       {loading && !analysis && (
-        <Card>
+        <Card className="matrix-panel">
           <CardContent className="p-8 text-center">
             <div className="flex flex-col items-center gap-4">
-              <RefreshCw className="h-8 w-8 text-emerald-600 animate-spin" />
-              <p className="text-slate-600 dark:text-slate-400">Analyzing relationships...</p>
+              <RefreshCw className="h-8 w-8 text-matrix-cyan animate-spin matrix-glow-cyan" />
+              <p className="matrix-text-muted font-space-mono">ANALYZING RELATIONSHIPS...</p>
             </div>
           </CardContent>
         </Card>
@@ -439,64 +439,64 @@ const frequencyIndicator = nodeGroup.append("circle")
       {analysis && (
         <>
           {/* Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Analysis Summary</CardTitle>
+          <Card className="matrix-panel">
+            <CardHeader className="matrix-header">
+              <CardTitle className="text-lg matrix-text-primary font-orbitron tracking-wide">[[ ANALYSIS SUMMARY ]]</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600 dark:text-slate-400">{analysis.summary}</p>
+              <p className="matrix-text-muted font-space-mono">{analysis.summary}</p>
             </CardContent>
           </Card>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
+            <Card className="matrix-panel matrix-hover">
               <CardContent className="p-4 text-center">
-                <Users className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+                <Users className="h-8 w-8 text-matrix-cyan mx-auto mb-2 matrix-glow-cyan" />
+                <div className="text-2xl font-bold matrix-text-primary font-orbitron">
                   {analysis.people.length}
                 </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">People</div>
+                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">[[ PEOPLE ]]</div>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="matrix-panel matrix-hover">
               <CardContent className="p-4 text-center">
-                <Network className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+                <Network className="h-8 w-8 text-matrix-emerald mx-auto mb-2 matrix-glow-emerald" />
+                <div className="text-2xl font-bold matrix-text-primary font-orbitron">
                   {analysis.relationships.length}
                 </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Connections</div>
+                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">[[ CONNECTIONS ]]</div>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="matrix-panel matrix-hover">
               <CardContent className="p-4 text-center">
-                <AlertTriangle className="h-8 w-8 text-red-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+                <AlertTriangle className="h-8 w-8 text-red-400 mx-auto mb-2 matrix-glow" />
+                <div className="text-2xl font-bold matrix-text-primary font-orbitron">
                   {analysis.people.filter(p => p.suspicious).length}
                 </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Suspicious</div>
+                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">[[ SUSPICIOUS ]]</div>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="matrix-panel matrix-hover">
               <CardContent className="p-4 text-center">
-                <MessageSquare className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+                <MessageSquare className="h-8 w-8 text-purple-400 mx-auto mb-2 matrix-glow" />
+                <div className="text-2xl font-bold matrix-text-primary font-orbitron">
                   {analysis.relationships.reduce((sum, r) => sum + r.communication_count, 0)}
                 </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Communications</div>
+                <div className="text-sm matrix-text-muted font-space-mono uppercase tracking-wider">[[ COMMUNICATIONS ]]</div>
               </CardContent>
             </Card>
           </div>
 
           {/* Network Graph */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Interactive Network Map</CardTitle>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Drag nodes to explore connections. Zoom with mouse wheel.
+          <Card className="matrix-panel">
+            <CardHeader className="matrix-header">
+              <CardTitle className="text-lg matrix-text-primary font-orbitron tracking-wide">[[ INTERACTIVE NETWORK MAP ]]</CardTitle>
+              <p className="text-sm matrix-text-muted font-space-mono">
+                DRAG NODES TO EXPLORE CONNECTIONS. ZOOM WITH MOUSE WHEEL.
               </p>
             </CardHeader>
             <CardContent>
@@ -507,50 +507,54 @@ const frequencyIndicator = nodeGroup.append("circle")
           </Card>
 
           {/* Legend */}
-          <Card>
+          <Card className="matrix-panel">
             <CardHeader>
-              <CardTitle className="text-lg">Legend</CardTitle>
+              <CardTitle className="text-lg matrix-text-primary font-['Orbitron'] tracking-wider uppercase">
+                [[ Legend ]]
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Node Types */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">People Types</h4>
+                  <h4 className="font-semibold matrix-text-primary font-['Orbitron'] mb-3 tracking-wide uppercase text-sm">
+                    [People Types]
+                  </h4>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
-                        <User className="h-4 w-4 text-white" />
+                      <div className="w-8 h-8 rounded-full bg-matrix-cyan/20 border border-matrix-cyan/50 flex items-center justify-center matrix-glow-cyan">
+                        <User className="h-4 w-4 text-matrix-cyan" />
                       </div>
                       <div>
-                        <span className="text-sm font-medium">Contacts</span>
-                        <p className="text-xs text-gray-500">Regular contacts</p>
+                        <span className="text-sm font-medium matrix-text-primary font-['Space_Mono']">Contacts</span>
+                        <p className="text-xs matrix-text-muted font-['Space_Mono']">Regular contacts</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                        <Phone className="h-4 w-4 text-white" />
+                      <div className="w-8 h-8 rounded-full bg-matrix-emerald/20 border border-matrix-emerald/50 flex items-center justify-center matrix-glow-emerald">
+                        <Phone className="h-4 w-4 text-matrix-emerald" />
                       </div>
                       <div>
-                        <span className="text-sm font-medium">Callers</span>
-                        <p className="text-xs text-gray-500">Phone call participants</p>
+                        <span className="text-sm font-medium matrix-text-primary font-['Space_Mono']">Callers</span>
+                        <p className="text-xs matrix-text-muted font-['Space_Mono']">Phone call participants</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
-                        <MessageSquare className="h-4 w-4 text-white" />
+                      <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-500/50 flex items-center justify-center matrix-glow-purple">
+                        <MessageSquare className="h-4 w-4 text-purple-400" />
                       </div>
                       <div>
-                        <span className="text-sm font-medium">Chat Participants</span>
-                        <p className="text-xs text-gray-500">Messaging app users</p>
+                        <span className="text-sm font-medium matrix-text-primary font-['Space_Mono']">Chat Participants</span>
+                        <p className="text-xs matrix-text-muted font-['Space_Mono']">Messaging app users</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
-                        <UserX className="h-4 w-4 text-white" />
+                      <div className="w-8 h-8 rounded-full bg-red-500/20 border border-red-500/50 flex items-center justify-center matrix-glow-red">
+                        <UserX className="h-4 w-4 text-red-400" />
                       </div>
                       <div>
-                        <span className="text-sm font-medium">Suspicious</span>
-                        <p className="text-xs text-gray-500">Flagged individuals</p>
+                        <span className="text-sm font-medium matrix-text-primary font-['Space_Mono']">Suspicious</span>
+                        <p className="text-xs matrix-text-muted font-['Space_Mono']">Flagged individuals</p>
                       </div>
                     </div>
                   </div>
@@ -558,34 +562,36 @@ const frequencyIndicator = nodeGroup.append("circle")
 
                 {/* Relationship Types */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Relationship Types</h4>
+                  <h4 className="font-semibold matrix-text-primary font-['Orbitron'] mb-3 tracking-wide uppercase text-sm">
+                    [Relationship Types]
+                  </h4>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-1 bg-yellow-500"></div>
+                      <div className="w-8 h-1 bg-yellow-500 matrix-glow-yellow"></div>
                       <div>
-                        <span className="text-sm font-medium">Family</span>
-                        <p className="text-xs text-gray-500">Family connections</p>
+                        <span className="text-sm font-medium matrix-text-primary font-['Space_Mono']">Family</span>
+                        <p className="text-xs matrix-text-muted font-['Space_Mono']">Family connections</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-1 bg-green-500"></div>
+                      <div className="w-8 h-1 bg-matrix-emerald matrix-glow-emerald"></div>
                       <div>
-                        <span className="text-sm font-medium">Friends</span>
-                        <p className="text-xs text-gray-500">Personal relationships</p>
+                        <span className="text-sm font-medium matrix-text-primary font-['Space_Mono']">Friends</span>
+                        <p className="text-xs matrix-text-muted font-['Space_Mono']">Personal relationships</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-1 bg-blue-500"></div>
+                      <div className="w-8 h-1 bg-matrix-cyan matrix-glow-cyan"></div>
                       <div>
-                        <span className="text-sm font-medium">Business</span>
-                        <p className="text-xs text-gray-500">Professional connections</p>
+                        <span className="text-sm font-medium matrix-text-primary font-['Space_Mono']">Business</span>
+                        <p className="text-xs matrix-text-muted font-['Space_Mono']">Professional connections</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-1 bg-red-500 border-dashed border-2 border-red-500"></div>
+                      <div className="w-8 h-1 bg-red-500 border-dashed border-2 border-red-500 matrix-glow-red"></div>
                       <div>
-                        <span className="text-sm font-medium">Suspicious</span>
-                        <p className="text-xs text-gray-500">Flagged relationships</p>
+                        <span className="text-sm font-medium matrix-text-primary font-['Space_Mono']">Suspicious</span>
+                        <p className="text-xs matrix-text-muted font-['Space_Mono']">Flagged relationships</p>
                       </div>
                     </div>
                   </div>
@@ -593,26 +599,28 @@ const frequencyIndicator = nodeGroup.append("circle")
               </div>
 
               {/* Frequency Legend */}
-              <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-600">
-                <h4 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Communication Frequency</h4>
+              <div className="mt-6 pt-4 border-t border-matrix-border">
+                <h4 className="font-semibold matrix-text-primary font-['Orbitron'] mb-3 tracking-wide uppercase text-sm">
+                  [Communication Frequency]
+                </h4>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center">
-                    <div className="w-6 h-6 rounded-full bg-green-500 mx-auto mb-2 flex items-center justify-center">
-                      <span className="text-xs font-bold text-white">H</span>
+                    <div className="w-6 h-6 rounded-full bg-matrix-emerald border border-matrix-emerald/50 mx-auto mb-2 flex items-center justify-center matrix-glow-emerald">
+                      <span className="text-xs font-bold text-matrix-bg font-['Space_Mono']">H</span>
                     </div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">High</span>
+                    <span className="text-xs matrix-text-muted font-['Space_Mono']">High</span>
                   </div>
                   <div className="text-center">
-                    <div className="w-6 h-6 rounded-full bg-yellow-500 mx-auto mb-2 flex items-center justify-center">
-                      <span className="text-xs font-bold text-white">M</span>
+                    <div className="w-6 h-6 rounded-full bg-yellow-500 border border-yellow-500/50 mx-auto mb-2 flex items-center justify-center matrix-glow-yellow">
+                      <span className="text-xs font-bold text-matrix-bg font-['Space_Mono']">M</span>
                     </div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Medium</span>
+                    <span className="text-xs matrix-text-muted font-['Space_Mono']">Medium</span>
                   </div>
                   <div className="text-center">
-                    <div className="w-6 h-6 rounded-full bg-gray-500 mx-auto mb-2 flex items-center justify-center">
-                      <span className="text-xs font-bold text-white">L</span>
+                    <div className="w-6 h-6 rounded-full bg-gray-500 border border-gray-500/50 mx-auto mb-2 flex items-center justify-center">
+                      <span className="text-xs font-bold text-white font-['Space_Mono']">L</span>
                     </div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Low</span>
+                    <span className="text-xs matrix-text-muted font-['Space_Mono']">Low</span>
                   </div>
                 </div>
               </div>

@@ -76,23 +76,23 @@ export function Sidebar({
   };
 
   return (
-    <div className="w-80 h-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border-r border-white/20 dark:border-slate-700/50 flex flex-col shadow-xl">
+    <div className="w-80 h-full matrix-panel border-r border-matrix-border flex flex-col shadow-2xl shadow-matrix-cyan/10">
       {/* Header */}
-      <div className="p-6 border-b border-white/20 dark:border-slate-700/50">
+      <div className="p-6 border-b border-matrix-border matrix-header">
         <Link
           href="/dashboard"
-          className="group flex items-center space-x-3 text-slate-600 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 transition-all duration-300 mb-6 p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+          className="group flex items-center space-x-3 matrix-text-muted hover:matrix-text-cyan transition-all duration-300 mb-6 p-2 rounded-xl hover:bg-matrix-surface/30 font-space-mono"
         >
-          <div className="w-8 h-8 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          <div className="w-8 h-8 bg-gradient-to-r from-matrix-surface to-matrix-panel rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 matrix-glow-cyan">
             <ArrowLeft className="h-4 w-4" />
           </div>
-          <span className="text-sm font-medium">Back to Dashboard</span>
+          <span className="text-sm font-medium uppercase tracking-wider">Back to Dashboard</span>
         </Link>
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <div className="w-10 h-10 bg-gradient-to-br from-matrix-cyan to-matrix-emerald rounded-xl flex items-center justify-center shadow-lg shadow-matrix-cyan/30 matrix-glow-cyan">
               <svg
-                className="w-5 h-5 text-white"
+                className="w-5 h-5 text-matrix-bg"
                 fill="currentColor"
                 viewBox="0 0 24 24"
               >
@@ -100,23 +100,18 @@ export function Sidebar({
               </svg>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900 dark:text-slate-100">
+              <h1 className="text-lg font-bold matrix-text-primary font-orbitron tracking-wide">
                 {caseData.name}
               </h1>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <div
-              className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-semibold border shadow-sm",
-                caseData.status === "completed"
-                  ? "bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-700 dark:from-emerald-900/30 dark:to-emerald-800/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50"
-                  : "bg-gradient-to-r from-emerald-100 to-teal-200 text-emerald-700 dark:from-emerald-900/30 dark:to-teal-800/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50"
-              )}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold border bg-matrix-emerald/20 text-matrix-emerald border-matrix-emerald/50 font-space-mono"
             >
-              {caseData.status === "completed" ? "Completed" : "Ongoing"}
+              {caseData.status === "completed" ? "COMPLETED" : "ONGOING"}
             </div>
-            <span className="text-xs text-slate-500 dark:text-slate-400">
+            <span className="text-xs matrix-text-muted font-space-mono">
               ID: {caseData.id}
             </span>
           </div>
@@ -135,23 +130,23 @@ export function Sidebar({
                 key={item.id}
                 onClick={() => handleItemClick(item.id)}
                 className={cn(
-                  "w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200",
+                  "w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 font-space-mono",
                   isActive
-                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700/50 shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-200"
+                    ? "bg-gradient-to-r from-matrix-cyan/20 to-matrix-emerald/20 matrix-text-primary border border-matrix-cyan/50 shadow-sm matrix-glow-cyan"
+                    : "matrix-text-muted hover:bg-matrix-surface/30 hover:matrix-text-cyan"
                 )}
               >
                 <Icon
                   className={cn(
                     "h-5 w-5",
                     isActive
-                      ? "text-indigo-600 dark:text-indigo-400"
-                      : "text-slate-500 dark:text-slate-500"
+                      ? "text-matrix-cyan"
+                      : "text-matrix-text-muted"
                   )}
                 />
-                <span className="font-medium">{item.label}</span>
+                <span className="font-medium uppercase tracking-wider text-xs">{item.label}</span>
                 {isActive && (
-                  <div className="ml-auto w-2 h-2 bg-indigo-600 dark:bg-indigo-400 rounded-full"></div>
+                  <div className="ml-auto w-2 h-2 bg-matrix-cyan rounded-full animate-pulse"></div>
                 )}
               </button>
             );
@@ -160,9 +155,9 @@ export function Sidebar({
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-slate-200 dark:border-slate-700">
-        <div className="text-xs text-slate-500 dark:text-slate-400 text-center">
-          ForensiAI v2.0
+      <div className="p-4 border-t border-matrix-border">
+        <div className="text-xs matrix-text-muted text-center font-space-mono">
+          [[ FORENSIAI v2.0 ]]
         </div>
       </div>
     </div>

@@ -153,30 +153,36 @@ export function UploadBox({ onFileUpload, onCaseCreated, onAddToExistingCase, on
   };
 
   return (
-    <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 overflow-hidden">
-      {/* Gradient background overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <Card className="group matrix-panel matrix-hover relative overflow-hidden">
+      {/* Matrix scanning line animation */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/15 to-transparent transform -skew-x-12 animate-matrix-scan"></div>
       
-      <CardContent className="relative p-8">
+      {/* Cyber grid overlay */}
+      <div className="absolute inset-0 opacity-15" style={{
+        backgroundImage: 'linear-gradient(cyan 1px, transparent 1px), linear-gradient(90deg, cyan 1px, transparent 1px)',
+        backgroundSize: '30px 30px'
+      }}></div>
+      
+      <CardContent className="relative z-10 p-8">
         <div className="text-center space-y-6">
           <div className="space-y-2">
-            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <Upload className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-2xl flex items-center justify-center group-hover:scale-110 matrix-glow-cyan transition-all duration-300">
+              <Upload className="w-8 h-8 text-matrix-cyan animate-pulse" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300">
-              Upload UFDR File
+            <h3 className="text-xl font-bold matrix-text-primary font-orbitron tracking-wide uppercase group-hover:text-matrix-emerald transition-colors duration-300">
+              [[ Upload UFDR File ]]
             </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Drag and drop your forensic data file or click to browse
+            <p className="text-sm matrix-text-muted font-space-mono">
+              DRAG AND DROP YOUR FORENSIC DATA FILE OR CLICK TO BROWSE
             </p>
           </div>
 
           {!uploadedFile ? (
             <div
-              className={`relative border-2 border-dashed rounded-2xl p-12 transition-all duration-300 ${
+              className={`matrix-upload-zone relative border-2 border-dashed rounded-2xl p-12 transition-all duration-300 ${
                 dragActive
-                  ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 scale-[1.02]"
-                  : "border-slate-300 dark:border-slate-600 hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-gradient-to-br hover:from-emerald-50/50 hover:to-teal-50/50 dark:hover:from-emerald-900/10 dark:hover:to-teal-900/10"
+                  ? "border-matrix-cyan bg-gradient-to-br from-matrix-cyan/10 to-matrix-emerald/10 scale-[1.02] matrix-glow-cyan"
+                  : "border-matrix-border hover:border-matrix-cyan hover:bg-gradient-to-br hover:from-matrix-cyan/5 hover:to-matrix-emerald/5"
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
@@ -184,27 +190,27 @@ export function UploadBox({ onFileUpload, onCaseCreated, onAddToExistingCase, on
               onDrop={handleDrop}
             >
               <div className="flex flex-col items-center space-y-4">
-                <div className="p-3 bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-full">
-                  <Upload className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+                <div className="p-3 bg-gradient-to-r from-matrix-cyan/20 to-matrix-emerald/20 rounded-full matrix-glow-cyan">
+                  <Upload className="h-8 w-8 text-matrix-cyan animate-pulse" />
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
-                    Drag and drop your UFDR file here
+                  <p className="text-sm font-medium matrix-text-primary font-space-mono">
+                    DRAG AND DROP YOUR UFDR FILE HERE
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    or click to browse
+                  <p className="text-xs matrix-text-muted font-space-mono">
+                    OR CLICK TO BROWSE
                   </p>
                 </div>
 
                 <Button
                   variant="outline"
-                  className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+                  className="matrix-button border-matrix-cyan text-matrix-cyan hover:bg-matrix-cyan/10 font-space-mono"
                   onClick={() =>
                     document.getElementById("file-upload")?.click()
                   }
                 >
-                  Select File
+                  SELECT FILE
                 </Button>
 
                 <input
@@ -217,17 +223,17 @@ export function UploadBox({ onFileUpload, onCaseCreated, onAddToExistingCase, on
               </div>
             </div>
           ) : (
-            <div className="border border-slate-200 dark:border-slate-600 rounded-lg p-4 bg-slate-50 dark:bg-slate-700/50">
+            <div className="matrix-file-display border border-matrix-border rounded-lg p-4 bg-matrix-surface/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-                    <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  <div className="p-2 bg-matrix-emerald/20 rounded-lg matrix-glow-green">
+                    <FileText className="h-5 w-5 text-matrix-emerald" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                    <p className="text-sm font-medium matrix-text-primary font-space-mono">
                       {uploadedFile.name}
                     </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs matrix-text-muted font-space-mono">
                       {formatFileSize(uploadedFile.size)}
                     </p>
                   </div>
@@ -236,7 +242,7 @@ export function UploadBox({ onFileUpload, onCaseCreated, onAddToExistingCase, on
                   variant="outline"
                   size="sm"
                   onClick={removeFile}
-                  className="h-8 w-8 p-0 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                  className="h-8 w-8 p-0 border-red-500/50 text-red-400 hover:bg-red-500/20 hover:border-red-400"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -245,13 +251,13 @@ export function UploadBox({ onFileUpload, onCaseCreated, onAddToExistingCase, on
           )}
 
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-2 rounded">
+            <p className="text-sm text-red-400 bg-red-500/20 border border-red-500/50 p-3 rounded font-space-mono matrix-glow-red">
               {error}
             </p>
           )}
 
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Only UFDR (.ufdr) and encrypted UFDR (.ufdr.enc) files are allowed
+          <p className="text-xs matrix-text-muted font-space-mono">
+            ONLY UFDR (.ufdr) AND ENCRYPTED UFDR (.ufdr.enc) FILES ARE ALLOWED
           </p>
         </div>
       </CardContent>

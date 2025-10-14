@@ -299,20 +299,20 @@ export function CaseFiles({ caseId }: CaseFilesProps) {
 
   const getFileIcon = (item: FileItem) => {
     if (item.type === "folder") {
-      return <Folder className="w-8 h-8 text-amber-500" />;
+      return <Folder className="w-8 h-8 text-matrix-cyan matrix-glow-cyan" />;
     }
 
     switch (item.mediaType) {
       case "image":
-        return <Image className="w-8 h-8 text-emerald-500" />;
+        return <Image className="w-8 h-8 text-matrix-emerald matrix-glow-emerald" />;
       case "video":
-        return <Video className="w-8 h-8 text-purple-500" />;
+        return <Video className="w-8 h-8 text-purple-400 matrix-glow" />;
       case "audio":
-        return <Music className="w-8 h-8 text-blue-500" />;
+        return <Music className="w-8 h-8 text-matrix-cyan matrix-glow-cyan" />;
       case "document":
-        return <FileText className="w-8 h-8 text-red-500" />;
+        return <FileText className="w-8 h-8 text-red-400 matrix-glow" />;
       default:
-        return <File className="w-8 h-8 text-slate-500" />;
+        return <File className="w-8 h-8 text-matrix-text-muted" />;
     }
   };
 
@@ -436,43 +436,43 @@ const handleAIAnalysis = (file: FileItem) => {
       {/* Header */}
       <div className="relative">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-            <Folder className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 bg-gradient-to-br from-matrix-cyan to-matrix-emerald rounded-2xl flex items-center justify-center shadow-lg shadow-matrix-cyan/30 matrix-glow-cyan">
+            <Folder className="w-6 h-6 text-matrix-bg" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold gradient-text mb-2">
-              File Explorer
+            <h1 className="text-3xl font-bold gradient-text mb-2 font-orbitron tracking-wide">
+              [[ FILE EXPLORER ]]
             </h1>
-            <p className="text-slate-600 dark:text-slate-300 text-lg">
-              Browse and preview extracted forensic files and media
+            <p className="matrix-text-muted text-lg font-space-mono">
+              BROWSE AND PREVIEW EXTRACTED FORENSIC FILES AND MEDIA
             </p>
           </div>
         </div>
       </div>
 
       {/* Main Explorer Card */}
-      <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg">
-        <CardHeader className="border-b border-slate-200 dark:border-slate-700">
+      <Card className="matrix-panel backdrop-blur-sm shadow-lg shadow-matrix-cyan/10">
+        <CardHeader className="border-b border-matrix-border matrix-header">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             {/* Breadcrumb Navigation */}
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => handleBreadcrumbClick(-1)}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-matrix-surface/50 transition-colors matrix-text-primary font-space-mono"
               >
-                <Home className="w-4 h-4" />
-                <span className="text-sm font-medium">Root</span>
+                <Home className="w-4 h-4 text-matrix-cyan" />
+                <span className="text-sm font-medium">[[ ROOT ]]</span>
               </button>
               {currentPath.map((pathId, index) => {
                 const pathItem = getCurrentFolder();
                 return (
                   <div key={pathId} className="flex items-center gap-2">
-                    <ChevronRight className="w-4 h-4 text-slate-400" />
+                    <ChevronRight className="w-4 h-4 text-matrix-text-muted" />
                     <button
                       onClick={() => handleBreadcrumbClick(index)}
-                      className="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium"
+                      className="px-3 py-1.5 rounded-lg hover:bg-matrix-surface/50 transition-colors text-sm font-medium matrix-text-primary font-space-mono"
                     >
-                      {pathItem.name}
+                      [[ {pathItem.name.toUpperCase()} ]]
                     </button>
                   </div>
                 );
@@ -502,7 +502,7 @@ const handleAIAnalysis = (file: FileItem) => {
 
           {/* Search Bar */}
           <div className="relative mt-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-matrix-text-muted" />
             <Input
               type="text"
               placeholder="Search files and folders..."
@@ -521,12 +521,12 @@ const handleAIAnalysis = (file: FileItem) => {
                 <button
                   key={item.id}
                   onClick={() => handleItemClick(item)}
-                  className="group flex flex-col items-center p-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200 border-2 border-transparent hover:border-emerald-200 dark:hover:border-emerald-700"
+                  className="group flex flex-col items-center p-4 rounded-lg hover:bg-matrix-surface/30 transition-all duration-200 border-2 border-transparent hover:border-matrix-cyan matrix-hover font-space-mono"
                 >
                   {item.type === "file" &&
                   item.mediaType === "image" &&
                   item.thumbnail ? (
-                    <div className="w-20 h-20 rounded-lg overflow-hidden mb-3 bg-slate-100 dark:bg-slate-700">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden mb-3 bg-matrix-surface/50 border border-matrix-border">
                       <img
                         src={item.thumbnail}
                         alt={item.name}
@@ -538,11 +538,11 @@ const handleAIAnalysis = (file: FileItem) => {
                       {getFileIcon(item)}
                     </div>
                   )}
-                  <span className="text-sm text-center break-all line-clamp-2 font-medium text-slate-700 dark:text-slate-300">
+                  <span className="text-sm text-center break-all line-clamp-2 font-medium matrix-text-primary font-space-mono">
                     {item.name}
                   </span>
                   {item.type === "file" && (
-                    <span className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    <span className="text-xs matrix-text-muted mt-1 font-space-mono">
                       {item.size}
                     </span>
                   )}
@@ -558,22 +558,22 @@ const handleAIAnalysis = (file: FileItem) => {
                 <button
                   key={item.id}
                   onClick={() => handleItemClick(item)}
-                  className="w-full flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200 border border-transparent hover:border-emerald-200 dark:hover:border-emerald-700"
+                  className="w-full flex items-center gap-4 p-3 rounded-lg hover:bg-matrix-surface/30 transition-all duration-200 border border-transparent hover:border-matrix-cyan matrix-hover font-space-mono"
                 >
                   <div className="flex-shrink-0">{getFileIcon(item)}</div>
                   <div className="flex-1 text-left min-w-0">
-                    <p className="font-medium text-slate-700 dark:text-slate-300 truncate">
+                    <p className="font-medium matrix-text-primary truncate">
                       {item.name}
                     </p>
                     {item.type === "file" && (
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                      <p className="text-sm matrix-text-muted">
                         {item.dateModified}
                       </p>
                     )}
                   </div>
                   {item.type === "file" && (
                     <div className="flex-shrink-0">
-                      <span className="text-sm text-slate-600 dark:text-slate-400">
+                      <span className="text-sm matrix-text-muted font-space-mono">
                         {item.size}
                       </span>
                     </div>
@@ -589,9 +589,9 @@ const handleAIAnalysis = (file: FileItem) => {
           {/* Empty State */}
           {(!filteredItems || filteredItems.length === 0) && (
             <div className="flex flex-col items-center justify-center py-16">
-              <Folder className="w-16 h-16 text-slate-300 dark:text-slate-600 mb-4" />
-              <p className="text-slate-500 dark:text-slate-400 text-lg font-medium">
-                {searchQuery ? "No files found" : "This folder is empty"}
+              <Folder className="w-16 h-16 text-matrix-text-muted mb-4" />
+              <p className="matrix-text-muted text-lg font-medium font-space-mono">
+                {searchQuery ? "NO FILES FOUND" : "THIS FOLDER IS EMPTY"}
               </p>
             </div>
           )}
@@ -600,72 +600,72 @@ const handleAIAnalysis = (file: FileItem) => {
 
       {/* File Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 border-emerald-200 dark:border-emerald-700/50">
+        <Card className="matrix-panel">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
-                <Image className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-matrix-cyan/20 rounded-lg flex items-center justify-center border border-matrix-cyan/30 matrix-glow-cyan">
+                <Image className="w-5 h-5 text-matrix-cyan" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+                <p className="text-2xl font-bold text-matrix-text-primary font-mono">
                   3
                 </p>
-                <p className="text-sm text-emerald-600 dark:text-emerald-400">
-                  Photos
+                <p className="text-sm text-matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
+                  [Photos]
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-amber-200 dark:border-amber-700/50">
+        <Card className="matrix-panel">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-matrix-emerald/20 rounded-lg flex items-center justify-center border border-matrix-emerald/30 matrix-glow-emerald">
+                <FileText className="w-5 h-5 text-matrix-emerald" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">
+                <p className="text-2xl font-bold text-matrix-text-primary font-mono">
                   3
                 </p>
-                <p className="text-sm text-amber-600 dark:text-amber-400">
-                  Chats
+                <p className="text-sm text-matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
+                  [Chats]
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-700/50">
+        <Card className="matrix-panel">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                <Music className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-matrix-cyan/20 rounded-lg flex items-center justify-center border border-matrix-cyan/30 matrix-glow-cyan">
+                <Music className="w-5 h-5 text-matrix-cyan" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                <p className="text-2xl font-bold text-matrix-text-primary font-mono">
                   2
                 </p>
-                <p className="text-sm text-blue-600 dark:text-blue-400">
-                  Calls
+                <p className="text-sm text-matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
+                  [Calls]
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-red-200 dark:border-red-700/50">
+        <Card className="matrix-panel">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-matrix-emerald/20 rounded-lg flex items-center justify-center border border-matrix-emerald/30 matrix-glow-emerald">
+                <FileText className="w-5 h-5 text-matrix-emerald" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-red-700 dark:text-red-300">
+                <p className="text-2xl font-bold text-matrix-text-primary font-mono">
                   2
                 </p>
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  Documents
+                <p className="text-sm text-matrix-text-muted font-['Orbitron'] tracking-wider uppercase">
+                  [Documents]
                 </p>
               </div>
             </div>

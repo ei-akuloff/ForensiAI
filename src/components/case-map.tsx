@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { RelationshipMap } from "./relationship-map";
-import { FindMyMap } from "./forensic/find-my-map";
+import { FindMyMap } from "./forensic/find-my-map-simple";
 import { Button } from "@/components/ui/button";
 import { Users, MapPin } from "lucide-react";
 
@@ -28,7 +28,7 @@ export function CaseMap({ caseId }: CaseMapProps) {
             <h1 className="text-3xl font-bold gradient-text mb-2">
               Map Analysis
             </h1>
-            <p className="text-slate-600 dark:text-slate-300 text-lg">
+            <p className="text-matrix-text-muted text-lg font-['Space_Mono']">
               Visual analysis of relationships and location data
             </p>
           </div>

@@ -75,35 +75,35 @@ export function CaseList({ cases: propCases }: CaseListProps) {
 
   const getStatusColor = (status: Case["status"]) => {
     return status === "completed"
-      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
+      ? "bg-matrix-emerald/20 text-matrix-emerald border border-matrix-emerald/50"
+      : "bg-matrix-cyan/20 text-matrix-cyan border border-matrix-cyan/50";
   };
 
   return (
     <ClientWrapper>
       <Card
-        className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-up"
+        className="matrix-panel group backdrop-blur-sm shadow-2xl hover:shadow-matrix-cyan/20 transition-all duration-300 animate-slide-up border-matrix-border"
         style={{ animationDelay: "0.2s" }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-matrix-cyan/5 to-matrix-emerald/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
 
-        <CardHeader className="relative">
+        <CardHeader className="relative matrix-header">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center">
-                <File className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="w-10 h-10 bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center matrix-glow-cyan">
+                <File className="w-5 h-5 text-matrix-cyan" />
               </div>
-              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300">
-                Case History
+              <CardTitle className="text-2xl font-bold matrix-text-primary group-hover:text-matrix-emerald transition-colors duration-300 font-orbitron tracking-wide">
+                [[ CASE HISTORY ]]
               </CardTitle>
             </div>
             <div className="relative w-full sm:w-80">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 h-5 w-5" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-matrix-text-muted h-5 w-5" />
               <Input
                 placeholder="Search cases by name or description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-2 border-white/20 dark:border-slate-600/50 focus:border-emerald-400 dark:focus:border-emerald-500 transition-all duration-300"
+                className="matrix-input pl-12 h-12 bg-matrix-surface/60 backdrop-blur-sm border-2 border-matrix-border focus:border-matrix-cyan transition-all duration-300 font-space-mono"
               />
             </div>
           </div>
@@ -111,13 +111,13 @@ export function CaseList({ cases: propCases }: CaseListProps) {
         <CardContent className="relative">
           {filteredCases.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <File className="h-10 w-10 text-slate-400 dark:text-slate-500" />
+              <div className="w-20 h-20 bg-gradient-to-br from-matrix-surface to-matrix-panel rounded-2xl flex items-center justify-center mx-auto mb-6 matrix-glow-cyan">
+                <File className="h-10 w-10 text-matrix-text-muted" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                {searchTerm ? "No matches found" : "No cases yet"}
+              <h3 className="text-lg font-semibold matrix-text-primary mb-2 font-orbitron">
+                {searchTerm ? "[[ NO MATCHES FOUND ]]" : "[[ NO CASES YET ]]"}
               </h3>
-              <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+              <p className="matrix-text-muted max-w-md mx-auto font-space-mono text-sm">
                 {searchTerm
                   ? "Try adjusting your search terms or check the spelling."
                   : "Start by uploading your first UFDR file to create a case."}
@@ -129,20 +129,20 @@ export function CaseList({ cases: propCases }: CaseListProps) {
               <div className="hidden md:block">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-slate-200 dark:border-slate-700">
-                      <TableHead className="text-slate-600 dark:text-slate-400">
+                    <TableRow className="border-matrix-border">
+                      <TableHead className="matrix-text-muted font-space-mono uppercase tracking-wider text-xs">
                         Case Name
                       </TableHead>
-                      <TableHead className="text-slate-600 dark:text-slate-400">
+                      <TableHead className="matrix-text-muted font-space-mono uppercase tracking-wider text-xs">
                         Date Opened
                       </TableHead>
-                      <TableHead className="text-slate-600 dark:text-slate-400">
+                      <TableHead className="matrix-text-muted font-space-mono uppercase tracking-wider text-xs">
                         Status
                       </TableHead>
-                      <TableHead className="text-slate-600 dark:text-slate-400">
+                      <TableHead className="matrix-text-muted font-space-mono uppercase tracking-wider text-xs">
                         File Size
                       </TableHead>
-                      <TableHead className="text-slate-600 dark:text-slate-400">
+                      <TableHead className="matrix-text-muted font-space-mono uppercase tracking-wider text-xs">
                         Actions
                       </TableHead>
                     </TableRow>
@@ -151,34 +151,34 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                     {filteredCases.map((caseItem) => (
                       <TableRow
                         key={caseItem.id}
-                        className="border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                        className="border-matrix-border hover:bg-matrix-surface/30 hover:matrix-glow-cyan transition-all duration-300"
                       >
                         <TableCell>
                           <div>
-                            <p className="font-medium text-gray-900 dark:text-slate-100">
+                            <p className="font-medium matrix-text-primary font-space-mono">
                               {caseItem.name}
                             </p>
                             {caseItem.description && (
-                              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                              <p className="text-sm matrix-text-muted mt-1 font-space-mono">
                                 {caseItem.description}
                               </p>
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className="text-slate-600 dark:text-slate-400">
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="h-4 w-4" />
+                        <TableCell className="matrix-text-muted">
+                          <div className="flex items-center space-x-2 font-space-mono">
+                            <Calendar className="h-4 w-4 text-matrix-cyan" />
                             <span>{formatDate(caseItem.dateOpened)}</span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge className={getStatusColor(caseItem.status)}>
+                          <Badge className="bg-matrix-emerald/20 text-matrix-emerald border border-matrix-emerald/50 font-space-mono">
                             {caseItem.status === "completed"
-                              ? "Completed"
-                              : "Ongoing"}
+                              ? "COMPLETED"
+                              : "ONGOING"}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-slate-600 dark:text-slate-400">
+                        <TableCell className="matrix-text-muted font-space-mono">
                           {caseItem.fileSize}
                         </TableCell>
                         <TableCell>
@@ -187,32 +187,32 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 px-3 border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+                                className="h-8 px-3 matrix-button text-xs font-space-mono"
                               >
                                 <Eye className="h-3 w-3 mr-1" />
-                                View
+                                VIEW
                               </Button>
                             </Link>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-8 px-3 border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"
+                              className="h-8 px-3 border-matrix-border text-matrix-text-muted hover:bg-matrix-surface/30 hover:border-matrix-cyan hover:text-matrix-cyan font-space-mono text-xs"
                             >
                               <Download className="h-3 w-3 mr-1" />
-                              Export
+                              EXPORT
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 px-3 text-xs text-slate-400 hover:text-slate-200"
+                              className="h-8 px-3 text-xs matrix-text-muted hover:matrix-text-primary font-space-mono"
                               onClick={() => setShowDecryptFor(caseItem.id)}
                             >
-                              Decrypt
+                              DECRYPT
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-8 px-3 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                              className="h-8 px-3 border-red-500/50 text-red-400 hover:bg-red-500/20 hover:border-red-400 font-space-mono text-xs"
                               onClick={() =>
                                 handleDeleteCase(caseItem.id, caseItem.name)
                               }
@@ -220,8 +220,8 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                             >
                               <Trash2 className="h-3 w-3 mr-1" />
                               {deletingCaseId === caseItem.id
-                                ? "Deleting..."
-                                : "Delete"}
+                                ? "DELETING..."
+                                : "DELETE"}
                             </Button>
                           </div>
                         </TableCell>
@@ -236,35 +236,31 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                 {filteredCases.map((caseItem) => (
                   <Card
                     key={caseItem.id}
-                    className="bg-slate-50 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600"
+                    className="matrix-card matrix-hover bg-matrix-surface/50 border-matrix-border"
                   >
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h4 className="font-medium text-gray-900 dark:text-slate-100 text-sm">
+                            <h4 className="font-medium matrix-text-primary text-sm font-space-mono">
                               {caseItem.name}
                             </h4>
                             {caseItem.description && (
-                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                              <p className="text-xs matrix-text-muted mt-1 font-space-mono">
                                 {caseItem.description}
                               </p>
                             )}
                           </div>
-                          <Badge
-                            className={`${getStatusColor(
-                              caseItem.status
-                            )} text-xs`}
-                          >
+                          <Badge className="bg-matrix-emerald/20 text-matrix-emerald border border-matrix-emerald/50 text-xs font-space-mono">
                             {caseItem.status === "completed"
-                              ? "Completed"
-                              : "Ongoing"}
+                              ? "COMPLETED"
+                              : "ONGOING"}
                           </Badge>
                         </div>
 
-                        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                        <div className="flex items-center justify-between text-xs matrix-text-muted font-space-mono">
                           <div className="flex items-center space-x-1">
-                            <Calendar className="h-3 w-3" />
+                            <Calendar className="h-3 w-3 text-matrix-cyan" />
                             <span>{formatDate(caseItem.dateOpened)}</span>
                           </div>
                           <span>{caseItem.fileSize}</span>
@@ -279,34 +275,34 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="w-full h-8 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+                                className="w-full h-8 text-xs matrix-button font-space-mono"
                               >
                                 <Eye className="h-3 w-3 mr-1" />
-                                View
+                                VIEW
                               </Button>
                             </Link>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="flex-1 h-8 text-xs border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"
+                              className="flex-1 h-8 text-xs border-matrix-border text-matrix-text-muted hover:bg-matrix-surface/30 hover:border-matrix-cyan hover:text-matrix-cyan font-space-mono"
                             >
                               <Download className="h-3 w-3 mr-1" />
-                              Export
+                              EXPORT
                             </Button>
                           </div>
                           <div className="flex space-x-2">
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="flex-1 h-8 text-xs text-slate-400 hover:text-slate-200"
+                              className="flex-1 h-8 text-xs matrix-text-muted hover:matrix-text-primary font-space-mono"
                               onClick={() => setShowDecryptFor(caseItem.id)}
                             >
-                              Decrypt
+                              DECRYPT
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="flex-1 h-8 text-xs border-red-200 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                              className="flex-1 h-8 text-xs border-red-500/50 text-red-400 hover:bg-red-500/20 hover:border-red-400 font-space-mono"
                               onClick={() =>
                                 handleDeleteCase(caseItem.id, caseItem.name)
                               }
@@ -314,8 +310,8 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                             >
                               <Trash2 className="h-3 w-3 mr-1" />
                               {deletingCaseId === caseItem.id
-                                ? "Deleting..."
-                                : "Delete"}
+                                ? "DELETING..."
+                                : "DELETE"}
                             </Button>
                           </div>
                         </div>
@@ -325,17 +321,17 @@ export function CaseList({ cases: propCases }: CaseListProps) {
                 ))}
               </div>
               {showDecryptFor && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                  <div className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded shadow-lg p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-lg font-semibold">
-                        Analyst: Decrypt file for case {showDecryptFor}
+                <div className="matrix-modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+                  <div className="matrix-modal w-full max-w-2xl bg-matrix-surface/95 border-2 border-matrix-cyan/50 rounded shadow-2xl shadow-matrix-cyan/20 p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold matrix-text-primary font-orbitron tracking-wide">
+                        [[ DECRYPT FILE FOR CASE {showDecryptFor} ]]
                       </h3>
                       <button
-                        className="text-slate-500"
+                        className="matrix-text-muted hover:matrix-text-primary font-space-mono"
                         onClick={() => setShowDecryptFor(null)}
                       >
-                        Close
+                        CLOSE
                       </button>
                     </div>
                     <CaseDecrypt />

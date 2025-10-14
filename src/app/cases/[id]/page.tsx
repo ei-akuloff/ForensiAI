@@ -67,10 +67,17 @@ export default function CaseDetailsPage() {
 
   return (
     <ClientWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-white to-teal-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-emerald-900/50 relative overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(16,185,129,0.05),transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_40%,rgba(16,185,129,0.1),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(20,184,166,0.05),transparent_50%)] dark:bg-[radial-gradient(circle_at_70%_60%,rgba(20,184,166,0.1),transparent_50%)]"></div>
+      <div className="min-h-screen bg-matrix-bg relative overflow-hidden">
+        {/* Matrix Background Elements */}
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: 'linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px)',
+          backgroundSize: '50px 50px',
+          animation: 'matrixPulse 30s linear infinite'
+        }}></div>
+        
+        {/* Floating scan lines */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-matrix-cyan to-transparent animate-matrix-scan opacity-40"></div>
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-matrix-emerald to-transparent animate-matrix-scan opacity-40" style={{animationDelay: '2s'}}></div>
 
         <div
           className="relative z-10 flex"
@@ -105,19 +112,19 @@ export default function CaseDetailsPage() {
           {/* Main Content */}
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Mobile Header */}
-            <div className="lg:hidden bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4">
+            <div className="lg:hidden matrix-header border-b border-matrix-border p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                  <h1 className="text-lg font-semibold matrix-text-primary font-orbitron tracking-wide">
                     {displayCaseData.name}
                   </h1>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 capitalize">
+                  <p className="text-sm matrix-text-muted capitalize font-space-mono">
                     {activeSection}
                   </p>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
+                  className="p-2 rounded-lg bg-matrix-surface/50 border border-matrix-border text-matrix-text-muted hover:text-matrix-cyan transition-colors duration-300"
                 >
                   <svg
                     className="w-5 h-5"

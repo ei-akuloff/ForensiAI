@@ -51,7 +51,7 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
       case "low":
         return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
       default:
-        return "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400";
+        return "bg-matrix-surface/30 text-matrix-text-muted border border-matrix-border";
     }
   };
 
@@ -66,15 +66,15 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
       {/* Header Section */}
       <div className="relative">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-            <FileText className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 bg-gradient-to-br from-matrix-cyan to-matrix-emerald rounded-2xl flex items-center justify-center shadow-lg shadow-matrix-cyan/30 matrix-glow-cyan">
+            <FileText className="w-6 h-6 text-matrix-bg" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold gradient-text mb-2">
-              Case Overview
+            <h1 className="text-3xl font-bold gradient-text mb-2 font-orbitron tracking-wide">
+              [[ CASE OVERVIEW ]]
             </h1>
-            <p className="text-slate-600 dark:text-slate-300 text-lg">
-              Comprehensive forensic analysis details and evidence summary
+            <p className="matrix-text-muted text-lg font-space-mono">
+              COMPREHENSIVE FORENSIC ANALYSIS DETAILS AND EVIDENCE SUMMARY
             </p>
           </div>
         </div>
@@ -82,82 +82,75 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Case Information */}
-        <Card className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 animate-slide-up">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+        <Card className="group matrix-panel matrix-hover animate-slide-up">
           
-          <CardHeader className="relative">
-            <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-slate-100">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+          <CardHeader className="relative matrix-header">
+            <CardTitle className="flex items-center space-x-3 matrix-text-primary">
+              <div className="w-10 h-10 bg-gradient-to-br from-matrix-cyan/20 to-matrix-emerald/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 matrix-glow-cyan">
+                <FileText className="h-5 w-5 text-matrix-cyan" />
               </div>
-              <span className="text-xl font-semibold">Case Information</span>
+              <span className="text-xl font-semibold font-orbitron tracking-wide">[[ CASE INFORMATION ]]</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="relative space-y-6">
             <div className="grid grid-cols-1 gap-6">
-              <div className="bg-slate-50/50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200/50 dark:border-slate-700/50">
-                <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Case ID
+              <div className="bg-matrix-surface/50 rounded-xl p-4 border border-matrix-border">
+                <label className="text-sm font-semibold matrix-text-muted uppercase tracking-wider font-space-mono">
+                  [[ Case ID ]]
                 </label>
-                <p className="text-lg font-mono text-gray-900 dark:text-slate-100 mt-1 font-semibold">
+                <p className="text-lg font-mono matrix-text-primary mt-1 font-semibold font-space-mono">
                   {caseData.id}
                 </p>
               </div>
-              <div className="bg-slate-50/50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200/50 dark:border-slate-700/50">
-                <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Status
+              <div className="bg-matrix-surface/50 rounded-xl p-4 border border-matrix-border">
+                <label className="text-sm font-semibold matrix-text-muted uppercase tracking-wider font-space-mono">
+                  [[ Status ]]
                 </label>
                 <div className="flex items-center space-x-3 mt-2">
-                  <StatusIcon className="h-5 w-5 text-slate-500" />
-                  <Badge
-                    className={
-                      caseData.status === "completed"
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                        : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                    }
-                  >
-                    {caseData.status === "completed" ? "Completed" : "Ongoing"}
+                  <StatusIcon className="h-5 w-5 text-matrix-cyan" />
+                  <Badge className="bg-matrix-emerald/20 text-matrix-emerald border border-matrix-emerald/50 font-space-mono">
+                    {caseData.status === "completed" ? "COMPLETED" : "ONGOING"}
                   </Badge>
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                Case Name
+              <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                [[ Case Name ]]
               </label>
-              <p className="text-gray-900 dark:text-slate-100">
+              <p className="matrix-text-primary font-space-mono">
                 {caseData.name}
               </p>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                Description
+              <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                [[ Description ]]
               </label>
-              <p className="text-gray-900 dark:text-slate-100">
+              <p className="matrix-text-primary font-space-mono">
                 {caseData.description || "No description available"}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                <Calendar className="h-4 w-4 text-matrix-cyan" />
                 <div>
-                  <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                    Date Opened
+                  <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                    [[ Date Opened ]]
                   </label>
-                  <p className="text-gray-900 dark:text-slate-100 text-sm">
+                  <p className="matrix-text-primary text-sm font-space-mono">
                     {formatDate(caseData.dateOpened)}
                   </p>
                 </div>
               </div>
               {caseData.priority && (
                 <div className="flex items-center space-x-2">
-                  <AlertTriangle className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                  <AlertTriangle className="h-4 w-4 text-matrix-cyan" />
                   <div>
-                    <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                      Priority
+                    <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                      [[ Priority ]]
                     </label>
                     <div className="mt-1">
                       <Badge className={getPriorityColor(caseData.priority)}>
@@ -172,40 +165,40 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
         </Card>
 
         {/* Evidence Details */}
-        <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-slate-100">
-              <HardDrive className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-              <span>Evidence Details</span>
+        <Card className="matrix-panel matrix-hover animate-slide-up">
+          <CardHeader className="matrix-header">
+            <CardTitle className="flex items-center space-x-2 matrix-text-primary">
+              <HardDrive className="h-5 w-5 text-matrix-cyan" />
+              <span className="font-orbitron tracking-wide">[[ EVIDENCE DETAILS ]]</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                File Name
+              <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                [[ File Name ]]
               </label>
-              <p className="text-gray-900 dark:text-slate-100 font-mono text-sm">
+              <p className="matrix-text-primary font-mono text-sm font-space-mono">
                 {caseData.fileName || "evidence_file.ufdr"}
               </p>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                File Size
+              <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                [[ File Size ]]
               </label>
-              <p className="text-gray-900 dark:text-slate-100">
+              <p className="matrix-text-primary font-space-mono">
                 {caseData.fileSize || "N/A"}
               </p>
             </div>
 
             {(caseData.leadInvestigator || caseData.investigator) && (
               <div className="flex items-center space-x-2">
-                <User className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                <User className="h-4 w-4 text-matrix-cyan" />
                 <div>
-                  <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                    Lead Investigator
+                  <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                    [[ Lead Investigator ]]
                   </label>
-                  <p className="text-gray-900 dark:text-slate-100">
+                  <p className="matrix-text-primary font-space-mono">
                     {caseData.leadInvestigator || caseData.investigator}
                   </p>
                 </div>
@@ -214,10 +207,10 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
 
             {caseData.department && (
               <div>
-                <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                  Department
+                <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                  [[ Department ]]
                 </label>
-                <p className="text-gray-900 dark:text-slate-100">
+                <p className="matrix-text-primary font-space-mono">
                   {caseData.department}
                 </p>
               </div>
@@ -225,10 +218,10 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
 
             {caseData.caseType && (
               <div>
-                <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                  Case Type
+                <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                  [[ Case Type ]]
                 </label>
-                <p className="text-gray-900 dark:text-slate-100">
+                <p className="matrix-text-primary font-space-mono">
                   {caseData.caseType}
                 </p>
               </div>
@@ -236,12 +229,12 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
 
             {caseData.location && (
               <div className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                <MapPin className="h-4 w-4 text-matrix-cyan" />
                 <div>
-                  <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                    Location
+                  <label className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                    [[ Location ]]
                   </label>
-                  <p className="text-gray-900 dark:text-slate-100">
+                  <p className="matrix-text-primary font-space-mono">
                     {caseData.location}
                   </p>
                 </div>
@@ -253,50 +246,50 @@ export function CaseOverview({ caseData }: CaseOverviewProps) {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-200 dark:border-emerald-700">
+        <Card className="matrix-panel matrix-hover">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                  Files Analyzed
+                <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                  [[ Files Analyzed ]]
                 </p>
-                <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                <p className="text-2xl font-bold matrix-text-primary font-orbitron">
                   1,247
                 </p>
               </div>
-              <FileText className="h-8 w-8 text-blue-500 dark:text-blue-400" />
+              <FileText className="h-8 w-8 text-matrix-cyan matrix-glow" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-emerald-200 dark:border-emerald-700">
+        <Card className="matrix-panel matrix-hover">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                  Evidence Found
+                <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                  [[ Evidence Found ]]
                 </p>
-                <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+                <p className="text-2xl font-bold matrix-text-primary font-orbitron">
                   89
                 </p>
               </div>
-              <CheckCircle2 className="h-8 w-8 text-emerald-500 dark:text-emerald-400" />
+              <CheckCircle2 className="h-8 w-8 text-matrix-emerald matrix-glow" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-700">
+        <Card className="matrix-panel matrix-hover">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
-                  Processing Time
+                <p className="text-sm font-medium matrix-text-muted font-space-mono uppercase tracking-wider">
+                  [[ Processing Time ]]
                 </p>
-                <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">
+                <p className="text-2xl font-bold matrix-text-primary font-orbitron">
                   4.2h
                 </p>
               </div>
-              <Clock className="h-8 w-8 text-amber-500 dark:text-amber-400" />
+              <Clock className="h-8 w-8 text-matrix-cyan matrix-glow" />
             </div>
           </CardContent>
         </Card>
